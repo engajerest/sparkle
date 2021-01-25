@@ -1,0 +1,53 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Category {
+  CategoryId: Int!
+  Name: String!
+  Type: Int!
+  SortOrder: Int!
+  Status:String!
+}
+type SubCategory{
+ CategoryId: Int!
+  SubCategoryId: Int!
+   Name: String!
+  Type: Int!
+  SortOrder: Int!
+  Status:String!
+
+}
+type Module{
+  ModuleId:Int!
+   CategoryId: Int!
+    Name: String!
+     Content: String!
+      ImageUrl: String!
+       LogoUrl: String!
+}
+type Sparkle{
+  category:[Category]!
+  subcategory:[SubCategory]!
+  module:[Module]!
+
+}
+type Package{
+   ModuleId:Int! 
+    Name: String!
+    PackageId:Int!
+    Status:String!
+}
+
+type Query {
+  sparkle: Sparkle!
+}
+
+input data{
+  test:String!
+
+}
+
+type Mutation {
+  createTodo(input: data!): SubCategory!
+}
