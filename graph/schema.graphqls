@@ -16,6 +16,7 @@ type SubCategory{
   Type: Int!
   SortOrder: Int!
   Status:String!
+  Icon:String!
 
 }
 type Module{
@@ -29,7 +30,7 @@ type Module{
 type Sparkle{
   category:[Category]!
   subcategory:[SubCategory]!
-  module:[Module]!
+  package:[Package]!
 
 }
 type Package{
@@ -37,17 +38,208 @@ type Package{
     Name: String!
     PackageId:Int!
     Status:String!
+  PackageAmount:String!
+	PaymentMode:String! 
+	PackageContent:String!
+	PackageIcon: String!
+}
+input TenantDetails{
+Name:String!
+Regno:String!
+Email:String!
+Mobile:String!
+ CategoryId: Int!
+  SubCategoryId: Int!
+    Type: Int!
+}
+input TenantAddress{
+  Address:String!
+  Suburb:String!
+  State:String!
+  Zip:String!
+  Countrycode:String!
+  Latitude:String!
+  Longitude:String!
+  TimeZone:String!
+  Opentime:String!
+  Closetime:String!
+}
+type TenantData{
+TenantId:Int!
+  TenantName:String!
+ ModuleId:Int! 
+ ModuleName:String!
+
+}
+type subscribedData{
+   status:Boolean!
+ code:Int!
+ message:String!
+ info:TenantData!
+}
+input subscription{
+TransactionDate:String!
+PackageId:Int!
+ModuleId:Int!
+CurrencyId:Int!
+CurrencyCode:String!
+Price:String!
+TaxId:Int!
+Quantity:Int!
+TaxAmount:String!
+TotalAmount:String!
+PaymentStatus:Int!
+PaymentId:Int
 }
 
+input tenantuser{
+  TenantId:Int!
+   firstname: String!
+  lastname:String!
+    password: String!
+ mobile:String!
+ email:String!
+ locationid:Int!
+ roleid:Int!
+}
+input data{
+  tenantinfo:TenantDetails!
+  tenantlocation:TenantAddress!
+  subscriptiondetails:subscription!
+  }
+input location{
+    TenantId:Int!
+     LocationName:String!
+     Email:String!
+     Contact:String!
+   Address:String!
+  Suburb:String!
+  State:String!
+  Zip:String!
+  Countrycode:String!
+  Latitude:String!
+  Longitude:String!
+  Openingtime:String!
+  Closingtime:String!
+}
+type LocationInfo{
+  Locationid:Int!
+  LocationName:String!
+  status:String!
+  createdby:Int!
+}
+type locationdata{
+   status:Boolean!
+ code:Int!
+ message:String!
+ locationinfo:LocationInfo!
+}
+type locationgetall {
+ locationid:Int!
+  locationName:String!
+  tenantid:Int!
+  email:String
+  contact:String
+address:String!
+suburb:String!
+state:String!
+postcode:String!
+countycode:String!
+latitude:String!
+longitude:String!
+openingtime:String!
+closingtime:String!
+ status:String!
+  createdby:Int!
+
+}
+
+
+type getalllocations{
+   status:Boolean!
+ code:Int!
+ message:String!
+ locations:[locationgetall]
+}
+type user{
+  userid:Int!
+
+}
+type tenantuserdata{
+    status:Boolean!
+ code:Int!
+ message:String!
+ tenantuser:user!
+}
+type usersdata{
+    status:Boolean!
+ code:Int!
+ message:String!
+ users:[userfromtenant]
+}
+type userfromtenant{
+   userId: Int!
+    locationid:Int!
+  locationName:String!
+  tenantid:Int!
+  firstname: String!
+  lastname:String!
+ mobile:String!
+ email:String!
+ created:String!
+ status:String!
+ 
+}
+input updatetenant{
+   userid: Int!
+    tenantid:Int!
+   firstname: String!
+  lastname:String!
+ mobile:String!
+ email:String!
+ locationid:Int!
+}
+type tenantupdatedata{
+   status:Boolean!
+ code:Int!
+ message:String!
+ updated:Int!
+}
+input businessupdatedata{
+    tenantid:Int!
+    brandname:String
+    about:String
+    cod:Int
+    digital:Int
+    tenantaccid:Int
+
+}
+input socialupdatedata{
+socialprofile:String
+sociallink:String
+socialicon:String
+}
+input business{
+businessupdate:businessupdatedata
+socialupdate:socialupdatedata
+}
+type businessdata{
+     status:Boolean!
+ code:Int!
+ message:String!
+ updated:Int!
+}
 type Query {
   sparkle: Sparkle!
-}
-
-input data{
-  test:String!
-
+  location:getalllocations
+tenantusers(tenantid:Int!):usersdata!
 }
 
 type Mutation {
-  createTodo(input: data!): SubCategory!
+  subscribe(input: data!): subscribedData!
+  createtenantuser(create:tenantuser):tenantuserdata
+  updatetenantuser(update:updatetenant):tenantupdatedata
+  updatetenantbusiness(businessinfo:business):businessdata
+  createlocation(input:location):locationdata
+
 }

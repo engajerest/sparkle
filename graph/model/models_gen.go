@@ -10,6 +10,13 @@ type Category struct {
 	Status     string `json:"Status"`
 }
 
+type LocationInfo struct {
+	Locationid   int    `json:"Locationid"`
+	LocationName string `json:"LocationName"`
+	Status       string `json:"status"`
+	Createdby    int    `json:"createdby"`
+}
+
 type Module struct {
 	ModuleID   int    `json:"ModuleId"`
 	CategoryID int    `json:"CategoryId"`
@@ -19,10 +26,21 @@ type Module struct {
 	LogoURL    string `json:"LogoUrl"`
 }
 
+type Package struct {
+	ModuleID       int    `json:"ModuleId"`
+	Name           string `json:"Name"`
+	PackageID      int    `json:"PackageId"`
+	Status         string `json:"Status"`
+	PackageAmount  string `json:"PackageAmount"`
+	PaymentMode    string `json:"PaymentMode"`
+	PackageContent string `json:"PackageContent"`
+	PackageIcon    string `json:"PackageIcon"`
+}
+
 type Sparkle struct {
 	Category    []*Category    `json:"category"`
 	Subcategory []*SubCategory `json:"subcategory"`
-	Module      []*Module      `json:"module"`
+	Package     []*Package     `json:"package"`
 }
 
 type SubCategory struct {
@@ -32,8 +50,198 @@ type SubCategory struct {
 	Type          int    `json:"Type"`
 	SortOrder     int    `json:"SortOrder"`
 	Status        string `json:"Status"`
+	Icon          string `json:"Icon"`
+}
+
+type TenantAddress struct {
+	Address     string `json:"Address"`
+	Suburb      string `json:"Suburb"`
+	State       string `json:"State"`
+	Zip         string `json:"Zip"`
+	Countrycode string `json:"Countrycode"`
+	Latitude    string `json:"Latitude"`
+	Longitude   string `json:"Longitude"`
+	TimeZone    string `json:"TimeZone"`
+	Opentime    string `json:"Opentime"`
+	Closetime   string `json:"Closetime"`
+}
+
+type TenantData struct {
+	TenantID   int    `json:"TenantId"`
+	TenantName string `json:"TenantName"`
+	ModuleID   int    `json:"ModuleId"`
+	ModuleName string `json:"ModuleName"`
+}
+
+type TenantDetails struct {
+	Name          string `json:"Name"`
+	Regno         string `json:"Regno"`
+	Email         string `json:"Email"`
+	Mobile        string `json:"Mobile"`
+	CategoryID    int    `json:"CategoryId"`
+	SubCategoryID int    `json:"SubCategoryId"`
+	Type          int    `json:"Type"`
+}
+
+type Business struct {
+	Businessupdate *Businessupdatedata `json:"businessupdate"`
+	Socialupdate   *Socialupdatedata   `json:"socialupdate"`
+}
+
+type Businessdata struct {
+	Status  bool   `json:"status"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Updated int    `json:"updated"`
+}
+
+type Businessupdatedata struct {
+	Tenantid    int     `json:"tenantid"`
+	Brandname   *string `json:"brandname"`
+	About       *string `json:"about"`
+	Cod         *int    `json:"cod"`
+	Digital     *int    `json:"digital"`
+	Tenantaccid *int    `json:"tenantaccid"`
 }
 
 type Data struct {
-	Test string `json:"test"`
+	Tenantinfo          *TenantDetails `json:"tenantinfo"`
+	Tenantlocation      *TenantAddress `json:"tenantlocation"`
+	Subscriptiondetails *Subscription  `json:"subscriptiondetails"`
+}
+
+type Getalllocations struct {
+	Status    bool              `json:"status"`
+	Code      int               `json:"code"`
+	Message   string            `json:"message"`
+	Locations []*Locationgetall `json:"locations"`
+}
+
+type Location struct {
+	TenantID     int    `json:"TenantId"`
+	LocationName string `json:"LocationName"`
+	Email        string `json:"Email"`
+	Contact      string `json:"Contact"`
+	Address      string `json:"Address"`
+	Suburb       string `json:"Suburb"`
+	State        string `json:"State"`
+	Zip          string `json:"Zip"`
+	Countrycode  string `json:"Countrycode"`
+	Latitude     string `json:"Latitude"`
+	Longitude    string `json:"Longitude"`
+	Openingtime  string `json:"Openingtime"`
+	Closingtime  string `json:"Closingtime"`
+}
+
+type Locationdata struct {
+	Status       bool          `json:"status"`
+	Code         int           `json:"code"`
+	Message      string        `json:"message"`
+	Locationinfo *LocationInfo `json:"locationinfo"`
+}
+
+type Locationgetall struct {
+	Locationid   int     `json:"locationid"`
+	LocationName string  `json:"locationName"`
+	Tenantid     int     `json:"tenantid"`
+	Email        *string `json:"email"`
+	Contact      *string `json:"contact"`
+	Address      string  `json:"address"`
+	Suburb       string  `json:"suburb"`
+	State        string  `json:"state"`
+	Postcode     string  `json:"postcode"`
+	Countycode   string  `json:"countycode"`
+	Latitude     string  `json:"latitude"`
+	Longitude    string  `json:"longitude"`
+	Openingtime  string  `json:"openingtime"`
+	Closingtime  string  `json:"closingtime"`
+	Status       string  `json:"status"`
+	Createdby    int     `json:"createdby"`
+}
+
+type Socialupdatedata struct {
+	Socialprofile *string `json:"socialprofile"`
+	Sociallink    *string `json:"sociallink"`
+	Socialicon    *string `json:"socialicon"`
+}
+
+type SubscribedData struct {
+	Status  bool        `json:"status"`
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Info    *TenantData `json:"info"`
+}
+
+type Subscription struct {
+	TransactionDate string `json:"TransactionDate"`
+	PackageID       int    `json:"PackageId"`
+	ModuleID        int    `json:"ModuleId"`
+	CurrencyID      int    `json:"CurrencyId"`
+	CurrencyCode    string `json:"CurrencyCode"`
+	Price           string `json:"Price"`
+	TaxID           int    `json:"TaxId"`
+	Quantity        int    `json:"Quantity"`
+	TaxAmount       string `json:"TaxAmount"`
+	TotalAmount     string `json:"TotalAmount"`
+	PaymentStatus   int    `json:"PaymentStatus"`
+	PaymentID       *int   `json:"PaymentId"`
+}
+
+type Tenantupdatedata struct {
+	Status  bool   `json:"status"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Updated int    `json:"updated"`
+}
+
+type Tenantuser struct {
+	TenantID   int    `json:"TenantId"`
+	Firstname  string `json:"firstname"`
+	Lastname   string `json:"lastname"`
+	Password   string `json:"password"`
+	Mobile     string `json:"mobile"`
+	Email      string `json:"email"`
+	Locationid int    `json:"locationid"`
+	Roleid     int    `json:"roleid"`
+}
+
+type Tenantuserdata struct {
+	Status     bool   `json:"status"`
+	Code       int    `json:"code"`
+	Message    string `json:"message"`
+	Tenantuser *User  `json:"tenantuser"`
+}
+
+type Updatetenant struct {
+	Userid     int    `json:"userid"`
+	Tenantid   int    `json:"tenantid"`
+	Firstname  string `json:"firstname"`
+	Lastname   string `json:"lastname"`
+	Mobile     string `json:"mobile"`
+	Email      string `json:"email"`
+	Locationid int    `json:"locationid"`
+}
+
+type User struct {
+	Userid int `json:"userid"`
+}
+
+type Userfromtenant struct {
+	UserID       int    `json:"userId"`
+	Locationid   int    `json:"locationid"`
+	LocationName string `json:"locationName"`
+	Tenantid     int    `json:"tenantid"`
+	Firstname    string `json:"firstname"`
+	Lastname     string `json:"lastname"`
+	Mobile       string `json:"mobile"`
+	Email        string `json:"email"`
+	Created      string `json:"created"`
+	Status       string `json:"status"`
+}
+
+type Usersdata struct {
+	Status  bool              `json:"status"`
+	Code    int               `json:"code"`
+	Message string            `json:"message"`
+	Users   []*Userfromtenant `json:"users"`
 }
