@@ -68,7 +68,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	}
 	print(tenantId)
 	if tenantId != 0 {
-		tenantlocationid := data.InsertTenantLocation(tenantId,id.ID)
+		tenantlocationid := data.InsertTenantLocation(tenantId, id.ID)
 		print("loc-id")
 		print(tenantlocationid)
 		auth.TenantID = int(tenantId)
@@ -284,17 +284,18 @@ func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	}, nil
 }
 
-func (r *queryResolver) Location(ctx context.Context) (*model.Getalllocations, error) {
+func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Getalllocations, error) {
 	id, usererr := controller.ForContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
 	print("getalloc")
 	print(id.ID)
+
 	var Result []*model.Locationgetall
 	var locationGetAll []subscription.Location
 
-	locationGetAll = subscription.GetAllTenantUsersLocation(id.ID)
+	locationGetAll = subscription.GetAllTenantUsersLocation(tenantid)
 	for _, loco := range locationGetAll {
 		Result = append(Result, &model.Locationgetall{
 			Locationid:   loco.LocationId,
@@ -360,6 +361,8 @@ func (r *queryResolver) Tenantusers(ctx context.Context, tenantid int) (*model.U
 		Users:   Result,
 	}, nil
 }
+
+
 
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }

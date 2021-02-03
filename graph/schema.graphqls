@@ -229,10 +229,12 @@ type businessdata{
  message:String!
  updated:Int!
 }
+
 type Query {
   sparkle: Sparkle!
-  location:getalllocations
+  location(tenantid:Int!):getalllocations
 tenantusers(tenantid:Int!):usersdata!
+
 }
 
 type Mutation {

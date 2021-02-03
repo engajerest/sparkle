@@ -87,7 +87,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Location    func(childComplexity int) int
+		Location    func(childComplexity int, tenantid int) int
 		Sparkle     func(childComplexity int) int
 		Tenantusers func(childComplexity int, tenantid int) int
 	}
@@ -210,7 +210,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Sparkle(ctx context.Context) (*model.Sparkle, error)
-	Location(ctx context.Context) (*model.Getalllocations, error)
+	Location(ctx context.Context, tenantid int) (*model.Getalllocations, error)
 	Tenantusers(ctx context.Context, tenantid int) (*model.Usersdata, error)
 }
 
@@ -455,7 +455,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Location(childComplexity), true
+		args, err := ec.field_Query_location_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Location(childComplexity, args["tenantid"].(int)), true
 
 	case "Query.sparkle":
 		if e.complexity.Query.Sparkle == nil {
@@ -1254,10 +1259,12 @@ type businessdata{
  message:String!
  updated:Int!
 }
+
 type Query {
   sparkle: Sparkle!
-  location:getalllocations
+  location(tenantid:Int!):getalllocations
 tenantusers(tenantid:Int!):usersdata!
+
 }
 
 type Mutation {
@@ -1362,6 +1369,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_location_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["tenantid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tenantid"] = arg0
 	return args, nil
 }
 
@@ -2472,9 +2494,16 @@ func (ec *executionContext) _Query_location(ctx context.Context, field graphql.C
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_location_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Location(rctx)
+		return ec.resolvers.Query().Location(rctx, args["tenantid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

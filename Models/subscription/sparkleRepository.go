@@ -2,6 +2,7 @@ package subscription
 
 import (
 	"database/sql"
+
 	"fmt"
 	"log"
 
@@ -21,15 +22,15 @@ const (
 	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid, c.name FROM tenantinfo a,tenantsubscription b,app_module c WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid=?"
 	createLocationQuery            = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND locationid=? "
-	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND createdby=? "
+	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND tenantid=? "
 	createTenantUserQuery          = "INSERT INTO app_users (authname,password,hashsalt,contactno,roleid,referenceid) VALUES(?,?,?,?,?,?)"
 	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofile (userid,firstname,lastname,email,contactno,userlocationid) VALUES(?,?,?,?,?,?)"
 	getAllTenantUsers              = "SELECT a.firstname,a.lastname,a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofile a, tenantlocation b, app_users c WHERE  a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=?"
-    updateTenantUser  ="UPDATE app_users a, app_userprofile b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
-getAllTenantUserByLocationId=""
-updateTenantBusiness ="UPDATE tenantinfo SET brandname=?,tenantaccid=?,tenantinfo=?,paymode1=?,paymode2=? WHERE tenantid=?"
-insertSocialInfo="INSERT INTO tenantsocial (tenantid,socialprofile,sociallink,socialicon) VALUES(?,?,?,?)"
-updateauthuser="UPDATE  app_users a,app_userprofile b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
+	updateTenantUser               = "UPDATE app_users a, app_userprofile b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
+	getAllTenantUserByLocationId   = ""
+	updateTenantBusiness           = "UPDATE tenantinfo SET brandname=?,tenantaccid=?,tenantinfo=?,paymode1=?,paymode2=? WHERE tenantid=?"
+	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,sociallink,socialicon) VALUES(?,?,?,?)"
+	updateauthuser                 = "UPDATE  app_users a,app_userprofile b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 )
 
 func GetAllCategory() []Category {
@@ -131,7 +132,7 @@ func (info *SubscriptionData) CreateTenant(userid int) (int64, error) {
 
 	fmt.Println("2")
 	res, err := statement.Exec(userid, &info.Info.Regno, &info.Info.Name, &info.Info.Email, &info.Info.Mobile, &info.Info.CategoryId, &info.Info.SubCategoryID,
-		&info.Address.Address, &info.Address.State, &info.Address.Suburb, &info.Address.Latitude, &info.Address.Longitude, &info.Address.Zip, &info.Address.Countrycode,&info.Address.TimeZone,&info.Address.CurrencyCode)
+		&info.Address.Address, &info.Address.State, &info.Address.Suburb, &info.Address.Latitude, &info.Address.Longitude, &info.Address.Zip, &info.Address.Countrycode, &info.Address.TimeZone, &info.Address.CurrencyCode)
 	if err != nil {
 		log.Fatal(err)
 
@@ -144,7 +145,7 @@ func (info *SubscriptionData) CreateTenant(userid int) (int64, error) {
 	log.Print("Row inserted!")
 	return id, nil
 }
-func (info *SubscriptionData) InsertTenantLocation(tenantid int64,userid int) int64 {
+func (info *SubscriptionData) InsertTenantLocation(tenantid int64, userid int) int64 {
 	statement, err := database.Db.Prepare(insertTenantLocationQuery)
 	print(statement)
 
@@ -152,7 +153,7 @@ func (info *SubscriptionData) InsertTenantLocation(tenantid int64,userid int) in
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(tenantid,&info.Info.Name,&info.Info.Email,&info.Info.Mobile, &info.Address.Address, &info.Address.State, &info.Address.Suburb, &info.Address.Latitude, &info.Address.Longitude, &info.Address.Zip, &info.Address.Countrycode,&info.Address.OpenTime,&info.Address.CloseTime,userid)
+	res, err := statement.Exec(tenantid, &info.Info.Name, &info.Info.Email, &info.Info.Mobile, &info.Address.Address, &info.Address.State, &info.Address.Suburb, &info.Address.Latitude, &info.Address.Longitude, &info.Address.Zip, &info.Address.Countrycode, &info.Address.OpenTime, &info.Address.CloseTime, userid)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -224,7 +225,7 @@ func (loco *Location) CreateLocation(id int64) (int64, error) {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(&loco.TenantID, &loco.LocationName,&loco.Email,&loco.Mobile, &loco.Address, &loco.State, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, id)
+	res, err := statement.Exec(&loco.TenantID, &loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -276,11 +277,11 @@ func GetAllTenantUsersLocation(id int) []Location {
 	var locationlist []Location
 	for rows.Next() {
 		var data Location
-		err = rows.Scan(&data.LocationId, &data.LocationName, &data.TenantID,&data.Email,&data.Mobile, &data.Address, &data.Suburb, &data.State, &data.Zip, &data.Latitude, &data.Longitude, &data.Countrycode, &data.OpeningTime, &data.ClosingTime, &data.Createdby, &data.Status)
+		err = rows.Scan(&data.LocationId, &data.LocationName, &data.TenantID, &data.Email, &data.Mobile, &data.Address, &data.Suburb, &data.State, &data.Zip, &data.Latitude, &data.Longitude, &data.Countrycode, &data.OpeningTime, &data.ClosingTime, &data.Createdby, &data.Status)
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
 		locationlist = append(locationlist, data)
 	}
 	if err = rows.Err(); err != nil {
@@ -352,8 +353,8 @@ func GetAllTenantUsers(id int) []TenantUser {
 		err = rows.Scan(
 			&data.FirstName,
 			&data.LastName,
-			&data.Locationid,&data.Userid,&data.Created,&data.Mobile,&data.Email,
-			&data.Status,&data.Locationname,&data.Referenceid)
+			&data.Locationid, &data.Userid, &data.Created, &data.Mobile, &data.Email,
+			&data.Status, &data.Locationname, &data.Referenceid)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -374,11 +375,11 @@ func (user *TenantUser) UpdateTenantUser() bool {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	_, err = statement.Exec(user.Email,user.Mobile,user.FirstName,user.LastName,user.Email,user.Mobile,user.Locationid,user.Userid)
+	_, err = statement.Exec(user.Email, user.Mobile, user.FirstName, user.LastName, user.Email, user.Mobile, user.Locationid, user.Userid)
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	log.Print("Row updated in tenant user profile!")
 	return true
 }
@@ -390,11 +391,11 @@ func (user *BusinessUpdate) UpdateTenantBusiness() bool {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	_, err = statement.Exec(user.Brandname,user.TenantaccId,user.About,user.Paymode1,user.Paymode2,&user.TenantID)
+	_, err = statement.Exec(user.Brandname, user.TenantaccId, user.About, user.Paymode1, user.Paymode2, &user.TenantID)
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	log.Print("Row updated in business user profile!")
 	return true
 }
@@ -406,7 +407,7 @@ func (info *BusinessUpdate) InsertTenantSocial() int64 {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(info.TenantID,info.SociaProfile,info.SocialLink,info.SocialIcon)
+	res, err := statement.Exec(info.TenantID, info.SociaProfile, info.SocialLink, info.SocialIcon)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -425,14 +426,15 @@ func (info *AuthUser) UpdateAuthUser(userid int) bool {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	_, err1 := statement.Exec(&info.TenantID,&info.LocationId,userid)
+	_, err1 := statement.Exec(&info.TenantID, &info.LocationId, userid)
 
 	if err1 != nil {
 		log.Fatal(err1)
-	
+
 	}
-	
+
 	log.Print("Row updated in auth user profile!")
 	return true
-	
+
 }
+

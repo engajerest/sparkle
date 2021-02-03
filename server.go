@@ -43,11 +43,13 @@ func main() {
 	userName := viper.GetString("APP.DATABASE_USERNAME")
 	_ = viper.GetString("APP.DATABASE_PORT")
 	host := viper.GetString("APP.DATABASE_SERVER_HOST")
-
+      UserContextKey:=viper.GetString("APP.USER_CONTEXT_KEY")
+	  var ContextKey = UserContextKey
+	  print(ContextKey)
 	fmt.Println("PORT :", defaultPort)
 
 	router := gin.Default()
-router.Use(controllers.TokenAuthMiddleware())
+router.Use(controllers.TokenAuthMiddleware(UserContextKey))
 
 	dbconfig.InitDB(dbName, userName, password, host)
 	 logger.Info("sparkle application started")
