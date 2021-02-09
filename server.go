@@ -2,25 +2,12 @@ package main
 
 import (
 	"fmt"
-	// "log"
-	// "net/http"
 	"os"
 
-	// "github.com/99designs/gqlgen/graphql/handler"
-	// "github.com/99designs/gqlgen/graphql/playground"
-	"github.com/gin-gonic/gin"
-
-	// "github.com/engajerest/auth/controller"
 	"github.com/engajerest/auth/logger"
 	"github.com/engajerest/auth/utils/dbconfig"
 	"github.com/engajerest/sparkle/controllers"
-
-	// "github.com/engajerest/sparkle/controllers"
-	// "github.com/engajerest/sparkle/controllers"
-	// "github.com/engajerest/sparkle/graph"
-	// "github.com/engajerest/sparkle/graph/generated"
-
-	// "github.com/go-chi/chi"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
@@ -43,26 +30,24 @@ func main() {
 	userName := viper.GetString("APP.DATABASE_USERNAME")
 	_ = viper.GetString("APP.DATABASE_PORT")
 	host := viper.GetString("APP.DATABASE_SERVER_HOST")
-      UserContextKey:=viper.GetString("APP.USER_CONTEXT_KEY")
-	  var ContextKey = UserContextKey
-	  print(ContextKey)
+	UserContextKey := viper.GetString("APP.USER_CONTEXT_KEY")
+
 	fmt.Println("PORT :", defaultPort)
 
 	router := gin.Default()
-router.Use(controllers.TokenAuthMiddleware(UserContextKey))
+	// router.GET("/locations", controllers.Location)
+	router.Use(controllers.TokenAuthMiddleware(UserContextKey))
 
 	dbconfig.InitDB(dbName, userName, password, host)
-	 logger.Info("sparkle application started")
-	 
+	logger.Info("sparkle application started")
 
-	router.GET("/",controllers.PlaygroundHandlers())
-	router.POST("/sparkle",controllers.GraphHandler())
-router.Run(defaultPort)
+	router.GET("/", controllers.PlaygroundHandlers())
+	router.POST("/sparkle", controllers.GraphHandler())
+	router.Run(defaultPort)
 	// srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
-    //  http.Handle("/", playground.Handler("Engaje", "/query"))
+	//  http.Handle("/", playground.Handler("Engaje", "/query"))
 	// // router.Handle("/middle", middleware(http.HandlerFunc(pong)))
 	// http.Handle("/query", srv)
 	// log.Printf("connect to http://localhost:%s/ for GraphQL playground", defaultPort)
 	// log.Fatal(http.ListenAndServe(":"+defaultPort, nil))
 }
-

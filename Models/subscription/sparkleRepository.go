@@ -1,21 +1,25 @@
 package subscription
 
 import (
+	"context"
 	"database/sql"
-
+	"strings"
+	"time"
 	"fmt"
 	"log"
-
-	// "github.com/engajerest/auth/Models/users"
+	"github.com/engajerest/auth/Models/users"
 	"github.com/engajerest/auth/utils/Errors"
-	database "github.com/engajerest/auth/utils/dbconfig"
+	"github.com/engajerest/auth/utils/dbconfig"
+     database "github.com/engajerest/auth/utils/dbconfig"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 const (
 	getAllCategoryQuery            = "SELECT categoryid,categoryname,categorytype,sortorder,status FROM app_category WHERE STATUS='Active'"
 	getAllSubCategoryQuery         = "SELECT  subcategoryid,categorytypeid,categoryid,subcategoryname,status,icon FROM app_subcategory WHERE statuscode=1"
-	getAllPackageQuery             = "SELECT packageid,moduleid,packagename,packageamount,paymentmode,packagecontent,packageicon FROM app_package  WHERE STATUS='Active'"
+	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename FROM app_package a,app_module b  WHERE a.STATUS='Active' AND a.moduleid=b.moduleid"
 	insertTenantInfoQuery          = "INSERT INTO tenantinfo (createdby,registrationno,tenantname,primaryemail,primarycontact,bizcategoryid,bizsubcategoryid,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,moduleid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamout,paymentstatus,paymentid) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
@@ -24,13 +28,16 @@ const (
 	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND locationid=? "
 	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND tenantid=? "
 	createTenantUserQuery          = "INSERT INTO app_users (authname,password,hashsalt,contactno,roleid,referenceid) VALUES(?,?,?,?,?,?)"
-	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofile (userid,firstname,lastname,email,contactno,userlocationid) VALUES(?,?,?,?,?,?)"
-	getAllTenantUsers              = "SELECT a.firstname,a.lastname,a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofile a, tenantlocation b, app_users c WHERE  a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=?"
-	updateTenantUser               = "UPDATE app_users a, app_userprofile b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
+	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofiles (userid,firstname,lastname,email,contactno,userlocationid) VALUES(?,?,?,?,?,?)"
+	getAllTenantUsers              = "SELECT a.firstname,a.lastname,a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocation b, app_users c WHERE  a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=?"
+	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 	getAllTenantUserByLocationId   = ""
 	updateTenantBusiness           = "UPDATE tenantinfo SET brandname=?,tenantaccid=?,tenantinfo=?,paymode1=?,paymode2=? WHERE tenantid=?"
-	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,sociallink,socialicon) VALUES(?,?,?,?)"
-	updateauthuser                 = "UPDATE  app_users a,app_userprofile b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
+	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,sociallink,socialicon) VALUES"
+	updateauthuser                 = "UPDATE  app_users a,app_userprofiles b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
+	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid FROM tenantinfo WHERE tenantid=?"
+	getAllSocial                   = "SELECT  IFNULL(socialprofile,'') AS socialprofile , IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
+	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
 )
 
 func GetAllCategory() []Category {
@@ -104,7 +111,7 @@ func GetAllPackages() []Packages {
 
 	for rows.Next() {
 		var pack Packages
-		err := rows.Scan(&pack.PackageID, &pack.ModuleID, &pack.Name, &pack.PackageAmount, &pack.PaymentMode, &pack.PackageContent, &pack.PackageIcon)
+		err := rows.Scan(&pack.PackageID, &pack.ModuleID, &pack.Name, &pack.PackageAmount, &pack.PaymentMode, &pack.PackageContent, &pack.PackageIcon, &pack.ModuleName)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -289,6 +296,133 @@ func GetAllTenantUsersLocation(id int) []Location {
 	}
 	return locationlist
 }
+func LocationTest(id int) []Tenantlocation {
+
+	// var data Location
+
+	// dsn := "cegxbczruu:Package@123#@tcp(139.59.69.8:3306)/cegxbczruu?charset=utf8mb4&parseTime=True&loc=Local"
+	// // // DB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// // DB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// sqlDB, err := sql.Open("mysql", dsn)
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+	// var user []Tenantlocation
+	// err = DB.Debug().Where(&Tenantlocation{Tenantid:37}).Find(&user).Error
+	// if err != nil {
+	//     fmt.Println("Query failed")
+	// }
+	// fmt.Println(user)
+
+	// var emails []App_userprofile
+	// err = DB.Debug().Model(&user[1]).Related(&emails, "Appuserprofiles").Error
+	// if err != nil {
+	//     fmt.Println("Query failed")
+	// }
+	// fmt.Println(emails)
+
+	// // user.Appuserprofiles = emails
+	// fmt.Println(user)
+	var orders []Tenantlocation
+
+	DB.Table("tenantlocation").Preload("Appuserprofiles").Where("tenantid=?", id).Find(&orders)
+
+	fmt.Println(orders)
+	for index, value := range orders {
+		fmt.Println(index, " = ", value)
+
+	}
+
+	// Tlocations := &Tenantlocations{}
+
+	// rows, err := DB.Table("tenantlocation").Where("tenantlocation.tenantid= ? and tenantlocation.status = ?", id, "Active").
+	// 	Joins("Join app_userprofile on app_userprofile.userlocationid = tenantlocation.locationid").
+	// 	// Joins("Join items on items.id = order_items.id").
+	// 	Select("tenantlocation.locationid,tenantlocation.locationname,tenantlocation.tenantid,tenantlocation.email,tenantlocation.contactno,tenantlocation.address,tenantlocation.city,tenantlocation.state,tenantlocation.postcode,tenantlocation.latitude,tenantlocation.longitude,tenantlocation.countrycode,tenantlocation.opentime,tenantlocation.closetime,tenantlocation.createdby,tenantlocation.status,app_userprofile.userid,app_userprofile.firstname,app_userprofile.lastname,app_userprofile.email,app_userprofile.contactno,app_userprofile.userlocationid").Rows()
+	// if err != nil {
+	// 	log.Panic(err)
+	// }
+
+	// defer rows.Close()
+	// // Values to load into
+	// print("1.1")
+	// tentlocation := &Tenantlocation{}
+	// tentlocation.Tenantusers = make([]Appprofile, 0)
+	// print("1.2")
+	// for rows.Next() {
+	// 	print("1.3")
+	// 	profile := Appprofile{}
+	// 	// item := Item{}
+	// 	err = rows.Scan(&tentlocation.LocationId, &tentlocation.LocationName, &tentlocation.TenantID, &tentlocation.Email, &tentlocation.Mobile, &tentlocation.Address, &tentlocation.Suburb, &tentlocation.State, &tentlocation.Zip, &tentlocation.Latitude, &tentlocation.Longitude, &tentlocation.Countrycode, &tentlocation.OpeningTime, &tentlocation.ClosingTime, &tentlocation.Createdby, &tentlocation.Status,&profile.Userid,&profile.FirstName,&profile.LastName,&profile.Email,&profile.Mobile,&profile.Userlocationid)
+	// 	if err != nil {
+	// 		print("1.4")
+	// 		log.Panic(err)
+	// 	}
+	// 	print("1.5")
+	// 	// orderItem.Item = item
+	// 	tentlocation.Tenantusers = append(tentlocation.Tenantusers, profile)
+	// 	print("1.6")
+	// }
+	// log.Print(pretty.Sprint(tentlocation))
+
+	// print("st1")
+	// rows, err := DB.Table("tenantlocation").Select("locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status").Where("tenantid", id).Rows()
+	// print("st222")
+	// for rows.Next() {
+	// 	var data Tenantlocation
+	// 	// DB.ScanRows(rows, &data)
+	// 	err = rows.Scan(&data.LocationId, &data.LocationName, &data.TenantID, &data.Email, &data.Mobile, &data.Address, &data.Suburb, &data.State, &data.Zip, &data.Latitude, &data.Longitude, &data.Countrycode, &data.OpeningTime, &data.ClosingTime, &data.Createdby, &data.Status)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+
+	// 	loc = append(loc, data)
+	// }
+
+	return orders
+
+}
+
+func userget(ids []int) ([]*users.User, []error) {
+	placeholders := make([]string, len(ids))
+	args := make([]interface{}, len(ids))
+	for i := 0; i < len(ids); i++ {
+		placeholders[i] = "?"
+		args[i] = i
+	}
+
+	res, err := database.Db.Prepare(getAllLocations)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Close()
+
+	rows, err := res.Query(ids)
+	if err != nil {
+		log.Fatal(err)
+	}
+	userById := map[int]*users.User{}
+	for rows.Next() {
+		user := users.User{}
+		err := rows.Scan(&user.ID, &user.FirstName)
+		if err != nil {
+			panic(err)
+		}
+		userById[user.ID] = &user
+	}
+
+	users := make([]*users.User, len(ids))
+	for i, id := range ids {
+		users[i] = userById[id]
+	}
+
+	return users, nil
+}
+
 func (user *TenantUser) CreateTenantUser() int64 {
 	fmt.Println("0")
 	statement, err := database.Db.Prepare(createTenantUserQuery)
@@ -399,25 +533,41 @@ func (user *BusinessUpdate) UpdateTenantBusiness() bool {
 	log.Print("Row updated in business user profile!")
 	return true
 }
-func (info *BusinessUpdate) InsertTenantSocial() int64 {
-	statement, err := database.Db.Prepare(insertSocialInfo)
-	print(statement)
+func (info *BusinessUpdate) InsertTenantSocial(soc []Social, id int) error {
 
-	if err != nil {
-		log.Fatal(err)
+	var inserts []string
+	var params []interface{}
+	for _, v := range soc {
+		inserts = append(inserts, "(?, ?, ?, ?)")
+		params = append(params, id, v.SociaProfile, v.SocialLink, v.SocialIcon)
 	}
-	defer statement.Close()
-	res, err := statement.Exec(info.TenantID, info.SociaProfile, info.SocialLink, info.SocialIcon)
+	queryVals := strings.Join(inserts, ",")
+	query := insertSocialInfo + queryVals
+	log.Println("query is", query)
+
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelfunc()
+	stmt, err := database.Db.PrepareContext(ctx, query)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error %s when preparing SQL statement", err)
+		return err
 	}
-	id, err := res.LastInsertId()
+	defer stmt.Close()
+	res, err := stmt.ExecContext(ctx, params...)
 	if err != nil {
-		log.Fatal("Error:", err.Error())
+		log.Printf("Error %s when inserting row into products table", err)
+		return err
 	}
-	log.Print("Row inserted in tenant social!")
-	return id
+	rows, err := res.RowsAffected()
+	if err != nil {
+		log.Printf("Error %s when finding rows affected", err)
+		return err
+	}
+	log.Printf("%d products created simulatneously", rows)
+	return nil
+
 }
+
 func (info *AuthUser) UpdateAuthUser(userid int) bool {
 	statement, err := database.Db.Prepare(updateauthuser)
 	print(statement)
@@ -437,4 +587,91 @@ func (info *AuthUser) UpdateAuthUser(userid int) bool {
 	return true
 
 }
+func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) {
+	var data BusinessUpdate
+	stmt, err := database.Db.Prepare(getBusinessbyid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	row := stmt.QueryRow(id)
+	// print(row)
+	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId)
+	print(err)
+	fmt.Println("2")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("no rows found")
+			return nil, false
+		} else {
+			log.Fatal(err)
+			return nil, false
+		}
+	}
+	// fmt.Println(user)
 
+	fmt.Println("completed")
+	return &data, true
+}
+func GetAllSocial(id int) []Social {
+	stmt, err := database.Db.Prepare(getAllSocial)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	var sociallist []Social
+	for rows.Next() {
+		var data Social
+		err = rows.Scan(
+			&data.SociaProfile,
+			&data.SocialLink,
+			&data.SocialIcon,
+		)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		sociallist = append(sociallist, data)
+	}
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return sociallist
+}
+
+func UserAuthentication(id int64) (*users.User, bool, error) {
+	fmt.Println("enrty in sparkleauth")
+	print(id)
+	var data users.User
+	stmt, err := database.Db.Prepare(userAuthentication)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	row := stmt.QueryRow(id)
+	err = row.Scan(&data.ID, &data.FirstName, &data.LastName, &data.Mobile, &data.Email, &data.Status, &data.CreatedDate)
+	print(err)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("no rows found")
+			data1 := Errors.RestError{}
+			data1.Error = err
+			return &data, false, err
+		} else {
+			log.Fatal(err)
+			fmt.Println("nodata")
+			var data1 *Errors.RestError
+			data1.Error = err
+			return &data, false, err
+		}
+
+	}
+	// user.Check=true
+	return &data, true, err
+}

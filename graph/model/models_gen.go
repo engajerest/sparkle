@@ -28,6 +28,7 @@ type Module struct {
 
 type Package struct {
 	ModuleID       int    `json:"ModuleId"`
+	Modulename     string `json:"Modulename"`
 	Name           string `json:"Name"`
 	PackageID      int    `json:"PackageId"`
 	Status         string `json:"Status"`
@@ -85,7 +86,7 @@ type TenantDetails struct {
 
 type Business struct {
 	Businessupdate *Businessupdatedata `json:"businessupdate"`
-	Socialupdate   *Socialupdatedata   `json:"socialupdate"`
+	Socialupdate   []*Socialupdatedata `json:"socialupdate"`
 }
 
 type Businessdata struct {
@@ -110,11 +111,28 @@ type Data struct {
 	Subscriptiondetails *Subscription  `json:"subscriptiondetails"`
 }
 
+type GetBusinessdata struct {
+	Status       bool   `json:"status"`
+	Code         int    `json:"code"`
+	Message      string `json:"message"`
+	Businessinfo *Info  `json:"businessinfo"`
+}
+
 type Getalllocations struct {
 	Status    bool              `json:"status"`
 	Code      int               `json:"code"`
 	Message   string            `json:"message"`
 	Locations []*Locationgetall `json:"locations"`
+}
+
+type Info struct {
+	Tenantid    int           `json:"tenantid"`
+	Brandname   *string       `json:"brandname"`
+	About       *string       `json:"about"`
+	Cod         *int          `json:"cod"`
+	Digital     *int          `json:"digital"`
+	Tenantaccid *int          `json:"tenantaccid"`
+	Social      []*Socialinfo `json:"social"`
 }
 
 type Location struct {
@@ -141,22 +159,29 @@ type Locationdata struct {
 }
 
 type Locationgetall struct {
-	Locationid   int     `json:"locationid"`
-	LocationName string  `json:"locationName"`
-	Tenantid     int     `json:"tenantid"`
-	Email        *string `json:"email"`
-	Contact      *string `json:"contact"`
-	Address      string  `json:"address"`
-	Suburb       string  `json:"suburb"`
-	State        string  `json:"state"`
-	Postcode     string  `json:"postcode"`
-	Countycode   string  `json:"countycode"`
-	Latitude     string  `json:"latitude"`
-	Longitude    string  `json:"longitude"`
-	Openingtime  string  `json:"openingtime"`
-	Closingtime  string  `json:"closingtime"`
-	Status       string  `json:"status"`
-	Createdby    int     `json:"createdby"`
+	Locationid   int           `json:"locationid"`
+	LocationName string        `json:"locationName"`
+	Tenantid     int           `json:"tenantid"`
+	Email        *string       `json:"email"`
+	Contact      *string       `json:"contact"`
+	Address      string        `json:"address"`
+	Suburb       string        `json:"suburb"`
+	State        string        `json:"state"`
+	Postcode     string        `json:"postcode"`
+	Countycode   string        `json:"countycode"`
+	Latitude     string        `json:"latitude"`
+	Longitude    string        `json:"longitude"`
+	Openingtime  string        `json:"openingtime"`
+	Closingtime  string        `json:"closingtime"`
+	Status       string        `json:"status"`
+	Createdby    int           `json:"createdby"`
+	Tenantusers  []*Usertenant `json:"tenantusers"`
+}
+
+type Socialinfo struct {
+	Socialprofile *string `json:"socialprofile"`
+	Sociallink    *string `json:"sociallink"`
+	Socialicon    *string `json:"socialicon"`
 }
 
 type Socialupdatedata struct {
@@ -244,4 +269,13 @@ type Usersdata struct {
 	Code    int               `json:"code"`
 	Message string            `json:"message"`
 	Users   []*Userfromtenant `json:"users"`
+}
+
+type Usertenant struct {
+	Userid         int    `json:"userid"`
+	Firstname      string `json:"firstname"`
+	Lastname       string `json:"lastname"`
+	Mobile         string `json:"mobile"`
+	Email          string `json:"email"`
+	Userlocationid int    `json:"Userlocationid"`
 }

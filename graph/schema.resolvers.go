@@ -175,6 +175,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	}
 	print("userid=")
 	print(id.ID)
+
 	var data subscription.BusinessUpdate
 	data.TenantID = businessinfo.Businessupdate.Tenantid
 	data.TenantaccId = *businessinfo.Businessupdate.Tenantaccid
@@ -182,11 +183,13 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	data.About = *businessinfo.Businessupdate.About
 	data.Paymode1 = *businessinfo.Businessupdate.Cod
 	data.Paymode2 = *businessinfo.Businessupdate.Digital
-	data.SociaProfile = *businessinfo.Socialupdate.Socialprofile
-	data.SocialLink = *businessinfo.Socialupdate.Sociallink
-	data.SocialIcon = *businessinfo.Socialupdate.Socialicon
+	var check []subscription.Social
+	schemasocial := *&businessinfo.Socialupdate
+	for _, v := range schemasocial {
+		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon})
+	}
 	data1 := data.UpdateTenantBusiness()
-	social := data.InsertTenantSocial()
+	social := data.InsertTenantSocial(check, data.TenantID)
 	print(social)
 	if data1 != false {
 		return &model.Businessdata{
@@ -255,6 +258,7 @@ func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	}
 	print("raju")
 	print(id.ID)
+
 	var cat []*model.Category
 	var sub []*model.SubCategory
 	var pack []*model.Package
@@ -273,7 +277,7 @@ func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	}
 	packageGetAll = subscription.GetAllPackages()
 	for _, packdata := range packageGetAll {
-		pack = append(pack, &model.Package{ModuleID: packdata.ModuleID, Name: packdata.Name, PackageID: packdata.PackageID, Status: packdata.Status, PackageAmount: packdata.PackageAmount, PaymentMode: packdata.PaymentMode, PackageContent: packdata.PackageContent, PackageIcon: packdata.PackageIcon})
+		pack = append(pack, &model.Package{ModuleID: packdata.ModuleID, Modulename: packdata.ModuleName, Name: packdata.Name, PackageID: packdata.PackageID, Status: packdata.Status, PackageAmount: packdata.PackageAmount, PaymentMode: packdata.PaymentMode, PackageContent: packdata.PackageContent, PackageIcon: packdata.PackageIcon})
 
 	}
 
@@ -293,27 +297,41 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 	print(id.ID)
 
 	var Result []*model.Locationgetall
-	var locationGetAll []subscription.Location
+	var userresult []*model.Usertenant
+	var locationGetAll []subscription.Tenantlocation
 
-	locationGetAll = subscription.GetAllTenantUsersLocation(tenantid)
+	locationGetAll = subscription.LocationTest(tenantid)
+
 	for _, loco := range locationGetAll {
+		userresult = make([]*model.Usertenant, len(loco.Appuserprofiles))
+		for i, key := range loco.Appuserprofiles {
+			userresult[i] = &model.Usertenant{
+				Userid: key.Userid,
+				 Userlocationid: key.Userlocationid,
+				 Firstname: key.Firstname,
+				 Lastname: key.Lastname,
+				 Mobile: key.Contactno,
+				 Email: key.Email,
+				}
+		}
 		Result = append(Result, &model.Locationgetall{
-			Locationid:   loco.LocationId,
-			LocationName: loco.LocationName,
-			Tenantid:     loco.TenantID,
+			Locationid:   loco.Locationid,
+			LocationName: loco.Locationname,
+			Tenantid:     loco.Tenantid,
 			Email:        &loco.Email,
-			Contact:      &loco.Mobile,
+			Contact:      &loco.Contactno,
 			Address:      loco.Address,
-			Suburb:       loco.Suburb,
+			Suburb:       loco.City,
 			State:        loco.State,
 			Countycode:   loco.Countrycode,
-			Postcode:     loco.Zip,
+			Postcode:     loco.Postcode,
 			Latitude:     loco.Latitude,
 			Longitude:    loco.Longitude,
-			Openingtime:  loco.OpeningTime,
-			Closingtime:  loco.ClosingTime,
+			Openingtime:  loco.Opentime,
+			Closingtime:  loco.Closetime,
 			Status:       loco.Status,
 			Createdby:    loco.Createdby,
+			Tenantusers:  userresult,
 		})
 
 	}
@@ -362,7 +380,51 @@ func (r *queryResolver) Tenantusers(ctx context.Context, tenantid int) (*model.U
 	}, nil
 }
 
+func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int) (*model.GetBusinessdata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("getbusin")
+	print(id.ID)
+	var Result []*model.Socialinfo
+	var business subscription.BusinessUpdate
+	businessinfo, value := business.GetBusinessInfo(tenantid)
+	if value != true {
+		print(value)
+		return &model.GetBusinessdata{
+			Status:       true,
+			Code:         http.StatusOK,
+			Message:      "Success",
+			Businessinfo: nil,
+		}, nil
+	}
 
+	var socialgetall []subscription.Social
+	socialgetall = subscription.GetAllSocial(tenantid)
+	for _, user := range socialgetall {
+		Result = append(Result, &model.Socialinfo{
+			Socialprofile: &user.SociaProfile,
+			Sociallink:    &user.SocialLink,
+			Socialicon:    &user.SocialIcon,
+		})
+	}
+
+	return &model.GetBusinessdata{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+		Businessinfo: &model.Info{
+			Tenantid:    businessinfo.TenantID,
+			Brandname:   &businessinfo.Brandname,
+			About:       &businessinfo.About,
+			Cod:         &businessinfo.Paymode1,
+			Digital:     &businessinfo.Paymode2,
+			Tenantaccid: &businessinfo.TenantaccId,
+			Social:      Result,
+		},
+	}, nil
+}
 
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }

@@ -77,6 +77,7 @@ type ComplexityRoot struct {
 
 	Package struct {
 		ModuleID       func(childComplexity int) int
+		Modulename     func(childComplexity int) int
 		Name           func(childComplexity int) int
 		PackageAmount  func(childComplexity int) int
 		PackageContent func(childComplexity int) int
@@ -87,6 +88,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		GetBusiness func(childComplexity int, tenantid int) int
 		Location    func(childComplexity int, tenantid int) int
 		Sparkle     func(childComplexity int) int
 		Tenantusers func(childComplexity int, tenantid int) int
@@ -122,11 +124,28 @@ type ComplexityRoot struct {
 		Updated func(childComplexity int) int
 	}
 
+	GetBusinessdata struct {
+		Businessinfo func(childComplexity int) int
+		Code         func(childComplexity int) int
+		Message      func(childComplexity int) int
+		Status       func(childComplexity int) int
+	}
+
 	Getalllocations struct {
 		Code      func(childComplexity int) int
 		Locations func(childComplexity int) int
 		Message   func(childComplexity int) int
 		Status    func(childComplexity int) int
+	}
+
+	Info struct {
+		About       func(childComplexity int) int
+		Brandname   func(childComplexity int) int
+		Cod         func(childComplexity int) int
+		Digital     func(childComplexity int) int
+		Social      func(childComplexity int) int
+		Tenantaccid func(childComplexity int) int
+		Tenantid    func(childComplexity int) int
 	}
 
 	Locationdata struct {
@@ -153,6 +172,13 @@ type ComplexityRoot struct {
 		Status       func(childComplexity int) int
 		Suburb       func(childComplexity int) int
 		Tenantid     func(childComplexity int) int
+		Tenantusers  func(childComplexity int) int
+	}
+
+	Socialinfo struct {
+		Socialicon    func(childComplexity int) int
+		Sociallink    func(childComplexity int) int
+		Socialprofile func(childComplexity int) int
 	}
 
 	SubscribedData struct {
@@ -199,6 +225,15 @@ type ComplexityRoot struct {
 		Status  func(childComplexity int) int
 		Users   func(childComplexity int) int
 	}
+
+	Usertenant struct {
+		Email          func(childComplexity int) int
+		Firstname      func(childComplexity int) int
+		Lastname       func(childComplexity int) int
+		Mobile         func(childComplexity int) int
+		Userid         func(childComplexity int) int
+		Userlocationid func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
@@ -212,6 +247,7 @@ type QueryResolver interface {
 	Sparkle(ctx context.Context) (*model.Sparkle, error)
 	Location(ctx context.Context, tenantid int) (*model.Getalllocations, error)
 	Tenantusers(ctx context.Context, tenantid int) (*model.Usersdata, error)
+	GetBusiness(ctx context.Context, tenantid int) (*model.GetBusinessdata, error)
 }
 
 type executableSchema struct {
@@ -401,6 +437,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Package.ModuleID(childComplexity), true
 
+	case "Package.Modulename":
+		if e.complexity.Package.Modulename == nil {
+			break
+		}
+
+		return e.complexity.Package.Modulename(childComplexity), true
+
 	case "Package.Name":
 		if e.complexity.Package.Name == nil {
 			break
@@ -449,6 +492,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Package.Status(childComplexity), true
+
+	case "Query.getBusiness":
+		if e.complexity.Query.GetBusiness == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getBusiness_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetBusiness(childComplexity, args["tenantid"].(int)), true
 
 	case "Query.location":
 		if e.complexity.Query.Location == nil {
@@ -607,6 +662,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Businessdata.Updated(childComplexity), true
 
+	case "getBusinessdata.businessinfo":
+		if e.complexity.GetBusinessdata.Businessinfo == nil {
+			break
+		}
+
+		return e.complexity.GetBusinessdata.Businessinfo(childComplexity), true
+
+	case "getBusinessdata.code":
+		if e.complexity.GetBusinessdata.Code == nil {
+			break
+		}
+
+		return e.complexity.GetBusinessdata.Code(childComplexity), true
+
+	case "getBusinessdata.message":
+		if e.complexity.GetBusinessdata.Message == nil {
+			break
+		}
+
+		return e.complexity.GetBusinessdata.Message(childComplexity), true
+
+	case "getBusinessdata.status":
+		if e.complexity.GetBusinessdata.Status == nil {
+			break
+		}
+
+		return e.complexity.GetBusinessdata.Status(childComplexity), true
+
 	case "getalllocations.code":
 		if e.complexity.Getalllocations.Code == nil {
 			break
@@ -634,6 +717,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Getalllocations.Status(childComplexity), true
+
+	case "info.about":
+		if e.complexity.Info.About == nil {
+			break
+		}
+
+		return e.complexity.Info.About(childComplexity), true
+
+	case "info.brandname":
+		if e.complexity.Info.Brandname == nil {
+			break
+		}
+
+		return e.complexity.Info.Brandname(childComplexity), true
+
+	case "info.cod":
+		if e.complexity.Info.Cod == nil {
+			break
+		}
+
+		return e.complexity.Info.Cod(childComplexity), true
+
+	case "info.digital":
+		if e.complexity.Info.Digital == nil {
+			break
+		}
+
+		return e.complexity.Info.Digital(childComplexity), true
+
+	case "info.social":
+		if e.complexity.Info.Social == nil {
+			break
+		}
+
+		return e.complexity.Info.Social(childComplexity), true
+
+	case "info.tenantaccid":
+		if e.complexity.Info.Tenantaccid == nil {
+			break
+		}
+
+		return e.complexity.Info.Tenantaccid(childComplexity), true
+
+	case "info.tenantid":
+		if e.complexity.Info.Tenantid == nil {
+			break
+		}
+
+		return e.complexity.Info.Tenantid(childComplexity), true
 
 	case "locationdata.code":
 		if e.complexity.Locationdata.Code == nil {
@@ -774,6 +906,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Locationgetall.Tenantid(childComplexity), true
+
+	case "locationgetall.tenantusers":
+		if e.complexity.Locationgetall.Tenantusers == nil {
+			break
+		}
+
+		return e.complexity.Locationgetall.Tenantusers(childComplexity), true
+
+	case "socialinfo.socialicon":
+		if e.complexity.Socialinfo.Socialicon == nil {
+			break
+		}
+
+		return e.complexity.Socialinfo.Socialicon(childComplexity), true
+
+	case "socialinfo.sociallink":
+		if e.complexity.Socialinfo.Sociallink == nil {
+			break
+		}
+
+		return e.complexity.Socialinfo.Sociallink(childComplexity), true
+
+	case "socialinfo.socialprofile":
+		if e.complexity.Socialinfo.Socialprofile == nil {
+			break
+		}
+
+		return e.complexity.Socialinfo.Socialprofile(childComplexity), true
 
 	case "subscribedData.code":
 		if e.complexity.SubscribedData.Code == nil {
@@ -964,6 +1124,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Usersdata.Users(childComplexity), true
 
+	case "usertenant.email":
+		if e.complexity.Usertenant.Email == nil {
+			break
+		}
+
+		return e.complexity.Usertenant.Email(childComplexity), true
+
+	case "usertenant.firstname":
+		if e.complexity.Usertenant.Firstname == nil {
+			break
+		}
+
+		return e.complexity.Usertenant.Firstname(childComplexity), true
+
+	case "usertenant.lastname":
+		if e.complexity.Usertenant.Lastname == nil {
+			break
+		}
+
+		return e.complexity.Usertenant.Lastname(childComplexity), true
+
+	case "usertenant.mobile":
+		if e.complexity.Usertenant.Mobile == nil {
+			break
+		}
+
+		return e.complexity.Usertenant.Mobile(childComplexity), true
+
+	case "usertenant.userid":
+		if e.complexity.Usertenant.Userid == nil {
+			break
+		}
+
+		return e.complexity.Usertenant.Userid(childComplexity), true
+
+	case "usertenant.Userlocationid":
+		if e.complexity.Usertenant.Userlocationid == nil {
+			break
+		}
+
+		return e.complexity.Usertenant.Userlocationid(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -1033,247 +1235,269 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 
 type Category {
-  CategoryId: Int!
-  Name: String!
-  Type: Int!
-  SortOrder: Int!
-  Status:String!
+ CategoryId: Int!
+ Name: String!
+ Type: Int!
+ SortOrder: Int!
+ Status:String!
 }
 type SubCategory{
  CategoryId: Int!
-  SubCategoryId: Int!
-   Name: String!
-  Type: Int!
-  SortOrder: Int!
-  Status:String!
-  Icon:String!
+ SubCategoryId: Int!
+ Name: String!
+ Type: Int!
+ SortOrder: Int!
+ Status:String!
+ Icon:String!
 
 }
 type Module{
-  ModuleId:Int!
-   CategoryId: Int!
-    Name: String!
-     Content: String!
-      ImageUrl: String!
-       LogoUrl: String!
+ ModuleId:Int!
+ CategoryId: Int!
+ Name: String!
+ Content: String!
+ ImageUrl: String!
+ LogoUrl: String!
 }
 type Sparkle{
-  category:[Category]!
-  subcategory:[SubCategory]!
-  package:[Package]!
+ category:[Category]!
+ subcategory:[SubCategory]!
+ package:[Package]!
 
 }
 type Package{
-   ModuleId:Int! 
-    Name: String!
-    PackageId:Int!
-    Status:String!
-  PackageAmount:String!
-	PaymentMode:String! 
-	PackageContent:String!
-	PackageIcon: String!
+ ModuleId:Int! 
+ Modulename:String!
+ Name: String!
+ PackageId:Int!
+ Status:String!
+ PackageAmount:String!
+ PaymentMode:String! 
+ PackageContent:String!
+ PackageIcon: String!
 }
 input TenantDetails{
-Name:String!
-Regno:String!
-Email:String!
-Mobile:String!
+ Name:String!
+ Regno:String!
+ Email:String!
+ Mobile:String!
  CategoryId: Int!
-  SubCategoryId: Int!
-    Type: Int!
+ SubCategoryId: Int!
+ Type: Int!
 }
 input TenantAddress{
-  Address:String!
-  Suburb:String!
-  State:String!
-  Zip:String!
-  Countrycode:String!
-  Latitude:String!
-  Longitude:String!
-  TimeZone:String!
-  Opentime:String!
-  Closetime:String!
+ Address:String!
+ Suburb:String!
+ State:String!
+ Zip:String!
+ Countrycode:String!
+ Latitude:String!
+ Longitude:String!
+ TimeZone:String!
+ Opentime:String!
+ Closetime:String!
 }
 type TenantData{
-TenantId:Int!
-  TenantName:String!
+ TenantId:Int!
+ TenantName:String!
  ModuleId:Int! 
  ModuleName:String!
-
 }
 type subscribedData{
-   status:Boolean!
+ status:Boolean!
  code:Int!
  message:String!
  info:TenantData!
 }
 input subscription{
-TransactionDate:String!
-PackageId:Int!
-ModuleId:Int!
-CurrencyId:Int!
-CurrencyCode:String!
-Price:String!
-TaxId:Int!
-Quantity:Int!
-TaxAmount:String!
-TotalAmount:String!
-PaymentStatus:Int!
-PaymentId:Int
+ TransactionDate:String!
+ PackageId:Int!
+ ModuleId:Int!
+ CurrencyId:Int!
+ CurrencyCode:String!
+ Price:String!
+ TaxId:Int!
+ Quantity:Int!
+ TaxAmount:String!
+ TotalAmount:String!
+ PaymentStatus:Int!
+ PaymentId:Int
 }
 
 input tenantuser{
-  TenantId:Int!
-   firstname: String!
-  lastname:String!
-    password: String!
+ TenantId:Int!
+ firstname: String!
+ lastname:String!
+ password: String!
  mobile:String!
  email:String!
  locationid:Int!
  roleid:Int!
 }
 input data{
-  tenantinfo:TenantDetails!
-  tenantlocation:TenantAddress!
-  subscriptiondetails:subscription!
-  }
+ tenantinfo:TenantDetails!
+ tenantlocation:TenantAddress!
+ subscriptiondetails:subscription!
+}
 input location{
-    TenantId:Int!
-     LocationName:String!
-     Email:String!
-     Contact:String!
-   Address:String!
-  Suburb:String!
-  State:String!
-  Zip:String!
-  Countrycode:String!
-  Latitude:String!
-  Longitude:String!
-  Openingtime:String!
-  Closingtime:String!
+ TenantId:Int!
+ LocationName:String!
+ Email:String!
+ Contact:String!
+ Address:String!
+ Suburb:String!
+ State:String!
+ Zip:String!
+ Countrycode:String!
+ Latitude:String!
+ Longitude:String!
+ Openingtime:String!
+ Closingtime:String!
 }
 type LocationInfo{
-  Locationid:Int!
-  LocationName:String!
-  status:String!
-  createdby:Int!
+ Locationid:Int!
+ LocationName:String!
+ status:String!
+ createdby:Int!
 }
 type locationdata{
-   status:Boolean!
+ status:Boolean!
  code:Int!
  message:String!
  locationinfo:LocationInfo!
 }
 type locationgetall {
  locationid:Int!
-  locationName:String!
-  tenantid:Int!
-  email:String
-  contact:String
-address:String!
-suburb:String!
-state:String!
-postcode:String!
-countycode:String!
-latitude:String!
-longitude:String!
-openingtime:String!
-closingtime:String!
+ locationName:String!
+ tenantid:Int!
+ email:String
+ contact:String
+ address:String!
+ suburb:String!
+ state:String!
+ postcode:String!
+ countycode:String!
+ latitude:String!
+ longitude:String!
+ openingtime:String!
+ closingtime:String!
  status:String!
-  createdby:Int!
-
+ createdby:Int!
+ tenantusers:[usertenant] 
 }
 
-
+type usertenant{
+ userid:Int!
+ firstname: String!
+ lastname:String!
+ mobile:String!
+ email:String!
+ Userlocationid:Int!
+}
 type getalllocations{
-   status:Boolean!
+ status:Boolean!
  code:Int!
  message:String!
  locations:[locationgetall]
 }
 type user{
-  userid:Int!
-
+ userid:Int!
 }
 type tenantuserdata{
-    status:Boolean!
+ status:Boolean!
  code:Int!
  message:String!
  tenantuser:user!
 }
 type usersdata{
-    status:Boolean!
+ status:Boolean!
  code:Int!
  message:String!
  users:[userfromtenant]
 }
 type userfromtenant{
-   userId: Int!
-    locationid:Int!
-  locationName:String!
-  tenantid:Int!
-  firstname: String!
-  lastname:String!
+ userId: Int! 
+ locationid:Int!
+ locationName:String!
+ tenantid:Int!
+ firstname: String!
+ lastname:String!
  mobile:String!
  email:String!
  created:String!
  status:String!
- 
 }
 input updatetenant{
-   userid: Int!
-    tenantid:Int!
-   firstname: String!
-  lastname:String!
+ userid: Int! 
+ tenantid:Int!
+ firstname: String!
+ lastname:String!
  mobile:String!
  email:String!
  locationid:Int!
 }
 type tenantupdatedata{
-   status:Boolean!
+ status:Boolean!
  code:Int!
  message:String!
  updated:Int!
 }
 input businessupdatedata{
-    tenantid:Int!
-    brandname:String
-    about:String
-    cod:Int
-    digital:Int
-    tenantaccid:Int
-
+ tenantid:Int!
+ brandname:String
+ about:String
+ cod:Int
+ digital:Int
+ tenantaccid:Int
 }
 input socialupdatedata{
-socialprofile:String
-sociallink:String
-socialicon:String
+ socialprofile:String
+ sociallink:String
+ socialicon:String
 }
 input business{
-businessupdate:businessupdatedata
-socialupdate:socialupdatedata
+ businessupdate:businessupdatedata
+ socialupdate:[socialupdatedata]
 }
 type businessdata{
-     status:Boolean!
+ status:Boolean!
  code:Int!
  message:String!
  updated:Int!
 }
-
+type getBusinessdata{
+ status:Boolean!
+ code:Int!
+ message:String!
+ businessinfo:info
+}
+type info{
+ tenantid:Int!
+ brandname:String
+ about:String
+ cod:Int
+ digital:Int
+ tenantaccid:Int
+ social:[socialinfo]
+}
+type socialinfo{
+ socialprofile:String
+ sociallink:String
+ socialicon:String
+}
 type Query {
-  sparkle: Sparkle!
-  location(tenantid:Int!):getalllocations
-tenantusers(tenantid:Int!):usersdata!
-
+ sparkle: Sparkle!
+ location(tenantid:Int!):getalllocations
+ tenantusers(tenantid:Int!):usersdata!
+ getBusiness(tenantid:Int!):getBusinessdata
 }
 
 type Mutation {
-  subscribe(input: data!): subscribedData!
-  createtenantuser(create:tenantuser):tenantuserdata
-  updatetenantuser(update:updatetenant):tenantupdatedata
-  updatetenantbusiness(businessinfo:business):businessdata
-  createlocation(input:location):locationdata
-
+ subscribe(input: data!): subscribedData!
+ createtenantuser(create:tenantuser):tenantuserdata
+ updatetenantuser(update:updatetenant):tenantupdatedata
+ updatetenantbusiness(businessinfo:business):businessdata
+ createlocation(input:location):locationdata
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1369,6 +1593,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getBusiness_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["tenantid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tenantid"] = arg0
 	return args, nil
 }
 
@@ -2198,6 +2437,41 @@ func (ec *executionContext) _Package_ModuleId(ctx context.Context, field graphql
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Package_Modulename(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Package",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Modulename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Package_Name(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2557,6 +2831,45 @@ func (ec *executionContext) _Query_tenantusers(ctx context.Context, field graphq
 	res := resTmp.(*model.Usersdata)
 	fc.Result = res
 	return ec.marshalNusersdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUsersdata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getBusiness(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getBusiness_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetBusiness(rctx, args["tenantid"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.GetBusinessdata)
+	fc.Result = res
+	return ec.marshalOgetBusinessdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetBusinessdata(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4343,6 +4656,143 @@ func (ec *executionContext) _businessdata_updated(ctx context.Context, field gra
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _getBusinessdata_status(ctx context.Context, field graphql.CollectedField, obj *model.GetBusinessdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getBusinessdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getBusinessdata_code(ctx context.Context, field graphql.CollectedField, obj *model.GetBusinessdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getBusinessdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getBusinessdata_message(ctx context.Context, field graphql.CollectedField, obj *model.GetBusinessdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getBusinessdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getBusinessdata_businessinfo(ctx context.Context, field graphql.CollectedField, obj *model.GetBusinessdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getBusinessdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Businessinfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Info)
+	fc.Result = res
+	return ec.marshalOinfo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐInfo(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _getalllocations_status(ctx context.Context, field graphql.CollectedField, obj *model.Getalllocations) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4478,6 +4928,233 @@ func (ec *executionContext) _getalllocations_locations(ctx context.Context, fiel
 	res := resTmp.([]*model.Locationgetall)
 	fc.Result = res
 	return ec.marshalOlocationgetall2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocationgetall(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_tenantid(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_brandname(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Brandname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_about(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.About, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_cod(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cod, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_digital(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Digital, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_tenantaccid(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantaccid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_social(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Social, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Socialinfo)
+	fc.Result = res
+	return ec.marshalOsocialinfo2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialinfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _locationdata_status(ctx context.Context, field graphql.CollectedField, obj *model.Locationdata) (ret graphql.Marshaler) {
@@ -5172,6 +5849,134 @@ func (ec *executionContext) _locationgetall_createdby(ctx context.Context, field
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _locationgetall_tenantusers(ctx context.Context, field graphql.CollectedField, obj *model.Locationgetall) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "locationgetall",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantusers, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Usertenant)
+	fc.Result = res
+	return ec.marshalOusertenant2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUsertenant(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _socialinfo_socialprofile(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "socialinfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Socialprofile, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _socialinfo_sociallink(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "socialinfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Sociallink, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _socialinfo_socialicon(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "socialinfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Socialicon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _subscribedData_status(ctx context.Context, field graphql.CollectedField, obj *model.SubscribedData) (ret graphql.Marshaler) {
@@ -6116,6 +6921,216 @@ func (ec *executionContext) _usersdata_users(ctx context.Context, field graphql.
 	return ec.marshalOuserfromtenant2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUserfromtenant(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _usertenant_userid(ctx context.Context, field graphql.CollectedField, obj *model.Usertenant) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "usertenant",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Userid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _usertenant_firstname(ctx context.Context, field graphql.CollectedField, obj *model.Usertenant) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "usertenant",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Firstname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _usertenant_lastname(ctx context.Context, field graphql.CollectedField, obj *model.Usertenant) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "usertenant",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Lastname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _usertenant_mobile(ctx context.Context, field graphql.CollectedField, obj *model.Usertenant) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "usertenant",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mobile, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _usertenant_email(ctx context.Context, field graphql.CollectedField, obj *model.Usertenant) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "usertenant",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _usertenant_Userlocationid(ctx context.Context, field graphql.CollectedField, obj *model.Usertenant) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "usertenant",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Userlocationid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
@@ -6298,7 +7313,7 @@ func (ec *executionContext) unmarshalInputbusiness(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialupdate"))
-			it.Socialupdate, err = ec.unmarshalOsocialupdatedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialupdatedata(ctx, v)
+			it.Socialupdate, err = ec.unmarshalOsocialupdatedata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialupdatedata(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7012,6 +8027,11 @@ func (ec *executionContext) _Package(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "Modulename":
+			out.Values[i] = ec._Package_Modulename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Name":
 			out.Values[i] = ec._Package_Name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7110,6 +8130,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			})
+		case "getBusiness":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getBusiness(ctx, field)
 				return res
 			})
 		case "__type":
@@ -7546,6 +8577,45 @@ func (ec *executionContext) _businessdata(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var getBusinessdataImplementors = []string{"getBusinessdata"}
+
+func (ec *executionContext) _getBusinessdata(ctx context.Context, sel ast.SelectionSet, obj *model.GetBusinessdata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getBusinessdataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("getBusinessdata")
+		case "status":
+			out.Values[i] = ec._getBusinessdata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._getBusinessdata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._getBusinessdata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "businessinfo":
+			out.Values[i] = ec._getBusinessdata_businessinfo(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var getalllocationsImplementors = []string{"getalllocations"}
 
 func (ec *executionContext) _getalllocations(ctx context.Context, sel ast.SelectionSet, obj *model.Getalllocations) graphql.Marshaler {
@@ -7574,6 +8644,45 @@ func (ec *executionContext) _getalllocations(ctx context.Context, sel ast.Select
 			}
 		case "locations":
 			out.Values[i] = ec._getalllocations_locations(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var infoImplementors = []string{"info"}
+
+func (ec *executionContext) _info(ctx context.Context, sel ast.SelectionSet, obj *model.Info) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, infoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("info")
+		case "tenantid":
+			out.Values[i] = ec._info_tenantid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "brandname":
+			out.Values[i] = ec._info_brandname(ctx, field, obj)
+		case "about":
+			out.Values[i] = ec._info_about(ctx, field, obj)
+		case "cod":
+			out.Values[i] = ec._info_cod(ctx, field, obj)
+		case "digital":
+			out.Values[i] = ec._info_digital(ctx, field, obj)
+		case "tenantaccid":
+			out.Values[i] = ec._info_tenantaccid(ctx, field, obj)
+		case "social":
+			out.Values[i] = ec._info_social(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7712,6 +8821,36 @@ func (ec *executionContext) _locationgetall(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "tenantusers":
+			out.Values[i] = ec._locationgetall_tenantusers(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var socialinfoImplementors = []string{"socialinfo"}
+
+func (ec *executionContext) _socialinfo(ctx context.Context, sel ast.SelectionSet, obj *model.Socialinfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, socialinfoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("socialinfo")
+		case "socialprofile":
+			out.Values[i] = ec._socialinfo_socialprofile(ctx, field, obj)
+		case "sociallink":
+			out.Values[i] = ec._socialinfo_sociallink(ctx, field, obj)
+		case "socialicon":
+			out.Values[i] = ec._socialinfo_socialicon(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7976,6 +9115,58 @@ func (ec *executionContext) _usersdata(ctx context.Context, sel ast.SelectionSet
 			}
 		case "users":
 			out.Values[i] = ec._usersdata_users(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var usertenantImplementors = []string{"usertenant"}
+
+func (ec *executionContext) _usertenant(ctx context.Context, sel ast.SelectionSet, obj *model.Usertenant) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, usertenantImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("usertenant")
+		case "userid":
+			out.Values[i] = ec._usertenant_userid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "firstname":
+			out.Values[i] = ec._usertenant_firstname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "lastname":
+			out.Values[i] = ec._usertenant_lastname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "mobile":
+			out.Values[i] = ec._usertenant_mobile(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "email":
+			out.Values[i] = ec._usertenant_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Userlocationid":
+			out.Values[i] = ec._usertenant_Userlocationid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8749,11 +9940,25 @@ func (ec *executionContext) unmarshalObusinessupdatedata2ᚖgithubᚗcomᚋengaj
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOgetBusinessdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetBusinessdata(ctx context.Context, sel ast.SelectionSet, v *model.GetBusinessdata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._getBusinessdata(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOgetalllocations2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetalllocations(ctx context.Context, sel ast.SelectionSet, v *model.Getalllocations) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._getalllocations(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOinfo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐInfo(ctx context.Context, sel ast.SelectionSet, v *model.Info) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._info(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOlocation2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocation(ctx context.Context, v interface{}) (*model.Location, error) {
@@ -8816,6 +10021,77 @@ func (ec *executionContext) marshalOlocationgetall2ᚖgithubᚗcomᚋengajerest�
 		return graphql.Null
 	}
 	return ec._locationgetall(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOsocialinfo2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialinfo(ctx context.Context, sel ast.SelectionSet, v []*model.Socialinfo) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOsocialinfo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialinfo(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOsocialinfo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialinfo(ctx context.Context, sel ast.SelectionSet, v *model.Socialinfo) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._socialinfo(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOsocialupdatedata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialupdatedata(ctx context.Context, v interface{}) ([]*model.Socialupdatedata, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Socialupdatedata, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOsocialupdatedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialupdatedata(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalOsocialupdatedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialupdatedata(ctx context.Context, v interface{}) (*model.Socialupdatedata, error) {
@@ -8901,6 +10177,53 @@ func (ec *executionContext) marshalOuserfromtenant2ᚖgithubᚗcomᚋengajerest�
 		return graphql.Null
 	}
 	return ec._userfromtenant(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOusertenant2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUsertenant(ctx context.Context, sel ast.SelectionSet, v []*model.Usertenant) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOusertenant2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUsertenant(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOusertenant2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUsertenant(ctx context.Context, sel ast.SelectionSet, v *model.Usertenant) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._usertenant(ctx, sel, v)
 }
 
 // endregion ***************************** type.gotpl *****************************

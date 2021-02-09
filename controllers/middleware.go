@@ -18,13 +18,12 @@ import (
 	"github.com/engajerest/auth/utils/Errors"
 	"github.com/engajerest/auth/utils/accesstoken"
 
+	"github.com/engajerest/sparkle/Models/subscription"
 	"github.com/engajerest/sparkle/graph"
 	"github.com/engajerest/sparkle/graph/generated"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 )
-
-
 
 func PlaygroundHandlers() gin.HandlerFunc {
 	h := playground.Handler("GraphQL playground", "/query")
@@ -33,6 +32,7 @@ func PlaygroundHandlers() gin.HandlerFunc {
 	}
 
 }
+
 func GraphHandler() gin.HandlerFunc {
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 	return func(c *gin.Context) {
@@ -48,9 +48,9 @@ func TokenAuthMiddleware(contextkey string) gin.HandlerFunc {
 		fmt.Println("tkn2")
 		print(token)
 		if token == "" {
-			c.JSON(http.StatusUnauthorized, "token null")
-			c.Abort()
-			// c.Next()
+			// c.JSON(http.StatusUnauthorized, "token null")
+			// c.Abort()
+			c.Next()
 			return
 		}
 		fmt.Println("tkn3")
@@ -64,10 +64,10 @@ func TokenAuthMiddleware(contextkey string) gin.HandlerFunc {
 		fmt.Println("tkn4")
 		id := int(userId)
 		// create user and check if user exists in db
-		data1 := users.User{}
-		user, status, errrr := data1.UserAuthentication(int64(id))
+		// data1 := users.User{}
+		user, status, errrr := subscription.UserAuthentication(int64(id))
 		print(status)
-		print("testing")
+		// print("testing")
 		// user, err := data1.GetByUserId(int64(id))
 		if errrr != nil {
 			c.JSON(http.StatusBadRequest, "user not found")
@@ -121,3 +121,9 @@ func ForSparkleContext(ctx context.Context) (*users.User, *Errors.RestError) {
 	}
 	return user, nil
 }
+// func Location(c *gin.Context) {
+
+// 	var locationGetAll []subscription.Tenantlocation
+//     locationGetAll = subscription.LocationTest(37)
+// 	c.JSON(http.StatusOK, locationGetAll)
+// }
