@@ -51,7 +51,6 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	data1.Date = input.Subscriptiondetails.TransactionDate
 	data1.CurrencyId = input.Subscriptiondetails.CurrencyID
 	data1.ModuleId = input.Subscriptiondetails.ModuleID
-	data1.PackageId = input.Subscriptiondetails.PackageID
 	data1.PaymentId = *input.Subscriptiondetails.PaymentID
 	data1.PaymentStatus = input.Subscriptiondetails.PaymentStatus
 	data1.Price = input.Subscriptiondetails.Price
@@ -61,6 +60,8 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	data1.TotalAmount = input.Subscriptiondetails.TotalAmount
 	var data2 subscription.SubscribedData
 	var auth subscription.AuthUser
+	intlist := input.Subscriptiondetails.PackageID
+
 	print("check456")
 	tenantId, err := data.CreateTenant(user.ID)
 	if err != nil {
@@ -73,10 +74,29 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		print(tenantlocationid)
 		auth.TenantID = int(tenantId)
 		auth.LocationId = int(tenantlocationid)
-		subscribedid := data1.InsertSubscription(tenantId)
-		print("subs-id")
-		print(subscribedid)
-		print(tenantId)
+
+		if len(intlist) != 0 {
+
+			for i := 0; i < len(intlist); i++ {
+				data1.PackageId = intlist[i]
+				subscribedid := data1.InsertSubscription(tenantId)
+				print("subs-id===")
+				print(subscribedid)
+				print(tenantId)
+			}
+		}
+		var seq subscription.Ordersequence
+		seq.Tenantid=int(tenantId)
+		seq.Tablename="order"
+		seq.Seqno=0
+		seq.Prefix="ORD"
+		seq.Subprefix=2021
+		seqid,err:=seq.Insertsequence()
+		if err!=nil{
+			print(err)
+			print("seqid==",seqid)
+		}
+
 
 	}
 	subscribed, Error := data2.GetSubscribedData(tenantId)
@@ -184,13 +204,34 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	data.Paymode1 = *businessinfo.Businessupdate.Cod
 	data.Paymode2 = *businessinfo.Businessupdate.Digital
 	var check []subscription.Social
-	schemasocial := *&businessinfo.Socialupdate
-	for _, v := range schemasocial {
+	var updatedata []subscription.Social
+	schemasocialadd := *&businessinfo.Socialadd
+	schemasocialupdate := *&businessinfo.Socialupdate
+	for _, v := range schemasocialadd {
 		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon})
 	}
 	data1 := data.UpdateTenantBusiness()
-	social := data.InsertTenantSocial(check, data.TenantID)
-	print(social)
+	if len(check) != 0 {
+		social := data.InsertTenantSocial(check, data.TenantID)
+		print(social)
+	}
+	for _, k := range schemasocialupdate {
+		updatedata = append(updatedata, subscription.Social{Socialid: *k.Socialid, SociaProfile: *k.Socialprofile, SocialLink: *k.Sociallink, SocialIcon: *k.Socialicon})
+	}
+	if len(updatedata) != 0 {
+		var s subscription.Social
+		for i := 0; i < len(updatedata); i++ {
+			s.Socialid = updatedata[i].Socialid
+			s.SociaProfile = updatedata[i].SociaProfile
+			s.SocialIcon = updatedata[i].SocialIcon
+			s.SocialLink = updatedata[i].SocialLink
+			status := s.UpdateTenantSocial(data.TenantID)
+			if status == false {
+				return nil, errors.New("error in updating socialinfo")
+			}
+		}
+
+	}
 	if data1 != false {
 		return &model.Businessdata{
 			Status:  true,
@@ -251,6 +292,30 @@ func (r *mutationResolver) Createlocation(ctx context.Context, input *model.Loca
 	}, nil
 }
 
+func (r *mutationResolver) Createpromotion(ctx context.Context, input *model.Promoinput) (*model.Promotioncreateddata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid=")
+	print(id.ID)
+	var p subscription.Promotion
+	p.Promotiontypeid = input.Promotiontypeid
+	p.Tenantid = input.Tenantid
+	p.Promoname = *input.Promotionname
+	p.Promoterms = *input.Promoterms
+	p.Promocode = *input.Promocode
+	p.Promovalue = *input.Promovalue
+	p.Startdate = *input.Startdate
+	p.Enddate = *input.Enddate
+
+	promoid := p.Createpromotion(id.ID)
+	if promoid == 0 {
+		return nil, errors.New("error occurs in promotion")
+	}
+	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Promotion created Successfully"}, nil
+}
+
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	id, usererr := controller.ForContext(ctx)
 	if usererr != nil {
@@ -268,7 +333,7 @@ func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 
 	categoryGetAll = subscription.GetAllCategory()
 	for _, category := range categoryGetAll {
-		cat = append(cat, &model.Category{CategoryID: category.CategoryID, Name: category.Name, Type: category.Typeid, SortOrder: category.SortOrder, Status: category.Status})
+		cat = append(cat, &model.Category{Categoryid: category.CategoryID, Name: category.Name, Type: category.Typeid, SortOrder: category.SortOrder, Status: category.Status})
 
 	}
 	subcategoryGetAll = subscription.GetAllSubCategory()
@@ -306,13 +371,13 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 		userresult = make([]*model.Usertenant, len(loco.Appuserprofiles))
 		for i, key := range loco.Appuserprofiles {
 			userresult[i] = &model.Usertenant{
-				Userid: key.Userid,
-				 Userlocationid: key.Userlocationid,
-				 Firstname: key.Firstname,
-				 Lastname: key.Lastname,
-				 Mobile: key.Contactno,
-				 Email: key.Email,
-				}
+				Userid:         key.Userid,
+				Userlocationid: key.Userlocationid,
+				Firstname:      key.Firstname,
+				Lastname:       key.Lastname,
+				Mobile:         key.Contactno,
+				Email:          key.Email,
+			}
 		}
 		Result = append(Result, &model.Locationgetall{
 			Locationid:   loco.Locationid,
@@ -404,6 +469,7 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int) (*model.G
 	socialgetall = subscription.GetAllSocial(tenantid)
 	for _, user := range socialgetall {
 		Result = append(Result, &model.Socialinfo{
+			Socialid:      &user.Socialid,
 			Socialprofile: &user.SociaProfile,
 			Sociallink:    &user.SocialLink,
 			Socialicon:    &user.SocialIcon,
@@ -424,6 +490,54 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int) (*model.G
 			Social:      Result,
 		},
 	}, nil
+}
+
+func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int) (*model.Getpromotiondata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("promo")
+	print(id.ID)
+	var promo []*model.Promotion
+	var promotionGetAll []subscription.Promotion
+	promotionGetAll = subscription.GetAllPromotions(tenantid)
+	for _, p := range promotionGetAll {
+		promo = append(promo, &model.Promotion{
+			Promotionid: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: &p.Promoname, Tenantid: p.Tenantid, Tenantame: &p.Tenantname, Promocode: &p.Promocode,
+			Promoterms: &p.Promoterms, Promovalue: &p.Promovalue, Promotag: &p.Promotag, Promotype: &p.Promotype, Startdate: &p.Startdate, Enddate: &p.Enddate, Status: &p.Status,
+		})
+	}
+	return &model.Getpromotiondata{
+		Status: true, Code: http.StatusOK, Message: "Success", Promotions: promo,
+	}, nil
+}
+
+func (r *queryResolver) Getpromotypes(ctx context.Context) (*model.Promotypesdata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("promotypes")
+	print(id.ID)
+	var data []*model.Typedata
+	data = subscription.Getpromotypes()
+	return &model.Promotypesdata{
+		Status: true, Code: http.StatusOK, Message: "Success", Types: data,
+	}, nil
+}
+
+func (r *queryResolver) Getchargetypes(ctx context.Context) (*model.Chargetypedata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)
+	var data []*model.Chargetype
+	data=subscription.Getchargetypes()
+
+	return &model.Chargetypedata{Status: true,Code: http.StatusOK,Message: "Success",Types: data},nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

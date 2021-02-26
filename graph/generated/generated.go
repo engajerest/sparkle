@@ -44,7 +44,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Category struct {
-		CategoryID func(childComplexity int) int
+		Categoryid func(childComplexity int) int
 		Name       func(childComplexity int) int
 		SortOrder  func(childComplexity int) int
 		Status     func(childComplexity int) int
@@ -69,6 +69,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		Createlocation       func(childComplexity int, input *model.Location) int
+		Createpromotion      func(childComplexity int, input *model.Promoinput) int
 		Createtenantuser     func(childComplexity int, create *model.Tenantuser) int
 		Subscribe            func(childComplexity int, input model.Data) int
 		Updatetenantbusiness func(childComplexity int, businessinfo *model.Business) int
@@ -87,11 +88,30 @@ type ComplexityRoot struct {
 		Status         func(childComplexity int) int
 	}
 
+	Promotion struct {
+		Enddate         func(childComplexity int) int
+		Promocode       func(childComplexity int) int
+		Promotag        func(childComplexity int) int
+		Promoterms      func(childComplexity int) int
+		Promotionid     func(childComplexity int) int
+		Promotionname   func(childComplexity int) int
+		Promotiontypeid func(childComplexity int) int
+		Promotype       func(childComplexity int) int
+		Promovalue      func(childComplexity int) int
+		Startdate       func(childComplexity int) int
+		Status          func(childComplexity int) int
+		Tenantame       func(childComplexity int) int
+		Tenantid        func(childComplexity int) int
+	}
+
 	Query struct {
-		GetBusiness func(childComplexity int, tenantid int) int
-		Location    func(childComplexity int, tenantid int) int
-		Sparkle     func(childComplexity int) int
-		Tenantusers func(childComplexity int, tenantid int) int
+		GetBusiness    func(childComplexity int, tenantid int) int
+		Getchargetypes func(childComplexity int) int
+		Getpromotions  func(childComplexity int, tenantid int) int
+		Getpromotypes  func(childComplexity int) int
+		Location       func(childComplexity int, tenantid int) int
+		Sparkle        func(childComplexity int) int
+		Tenantusers    func(childComplexity int, tenantid int) int
 	}
 
 	Sparkle struct {
@@ -124,6 +144,19 @@ type ComplexityRoot struct {
 		Updated func(childComplexity int) int
 	}
 
+	Chargetype struct {
+		Chargeid   func(childComplexity int) int
+		Chargename func(childComplexity int) int
+		Status     func(childComplexity int) int
+	}
+
+	Chargetypedata struct {
+		Code    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Status  func(childComplexity int) int
+		Types   func(childComplexity int) int
+	}
+
 	GetBusinessdata struct {
 		Businessinfo func(childComplexity int) int
 		Code         func(childComplexity int) int
@@ -136,6 +169,13 @@ type ComplexityRoot struct {
 		Locations func(childComplexity int) int
 		Message   func(childComplexity int) int
 		Status    func(childComplexity int) int
+	}
+
+	Getpromotiondata struct {
+		Code       func(childComplexity int) int
+		Message    func(childComplexity int) int
+		Promotions func(childComplexity int) int
+		Status     func(childComplexity int) int
 	}
 
 	Info struct {
@@ -175,8 +215,22 @@ type ComplexityRoot struct {
 		Tenantusers  func(childComplexity int) int
 	}
 
+	Promotioncreateddata struct {
+		Code    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Status  func(childComplexity int) int
+	}
+
+	Promotypesdata struct {
+		Code    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Status  func(childComplexity int) int
+		Types   func(childComplexity int) int
+	}
+
 	Socialinfo struct {
 		Socialicon    func(childComplexity int) int
+		Socialid      func(childComplexity int) int
 		Sociallink    func(childComplexity int) int
 		Socialprofile func(childComplexity int) int
 	}
@@ -200,6 +254,12 @@ type ComplexityRoot struct {
 		Message    func(childComplexity int) int
 		Status     func(childComplexity int) int
 		Tenantuser func(childComplexity int) int
+	}
+
+	Typedata struct {
+		Promotiontypeid func(childComplexity int) int
+		Tag             func(childComplexity int) int
+		Typename        func(childComplexity int) int
 	}
 
 	User struct {
@@ -242,12 +302,16 @@ type MutationResolver interface {
 	Updatetenantuser(ctx context.Context, update *model.Updatetenant) (*model.Tenantupdatedata, error)
 	Updatetenantbusiness(ctx context.Context, businessinfo *model.Business) (*model.Businessdata, error)
 	Createlocation(ctx context.Context, input *model.Location) (*model.Locationdata, error)
+	Createpromotion(ctx context.Context, input *model.Promoinput) (*model.Promotioncreateddata, error)
 }
 type QueryResolver interface {
 	Sparkle(ctx context.Context) (*model.Sparkle, error)
 	Location(ctx context.Context, tenantid int) (*model.Getalllocations, error)
 	Tenantusers(ctx context.Context, tenantid int) (*model.Usersdata, error)
 	GetBusiness(ctx context.Context, tenantid int) (*model.GetBusinessdata, error)
+	Getpromotions(ctx context.Context, tenantid int) (*model.Getpromotiondata, error)
+	Getpromotypes(ctx context.Context) (*model.Promotypesdata, error)
+	Getchargetypes(ctx context.Context) (*model.Chargetypedata, error)
 }
 
 type executableSchema struct {
@@ -265,12 +329,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Category.CategoryId":
-		if e.complexity.Category.CategoryID == nil {
+	case "Category.Categoryid":
+		if e.complexity.Category.Categoryid == nil {
 			break
 		}
 
-		return e.complexity.Category.CategoryID(childComplexity), true
+		return e.complexity.Category.Categoryid(childComplexity), true
 
 	case "Category.Name":
 		if e.complexity.Category.Name == nil {
@@ -381,6 +445,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Createlocation(childComplexity, args["input"].(*model.Location)), true
+
+	case "Mutation.createpromotion":
+		if e.complexity.Mutation.Createpromotion == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createpromotion_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Createpromotion(childComplexity, args["input"].(*model.Promoinput)), true
 
 	case "Mutation.createtenantuser":
 		if e.complexity.Mutation.Createtenantuser == nil {
@@ -493,6 +569,97 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Package.Status(childComplexity), true
 
+	case "Promotion.Enddate":
+		if e.complexity.Promotion.Enddate == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Enddate(childComplexity), true
+
+	case "Promotion.Promocode":
+		if e.complexity.Promotion.Promocode == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Promocode(childComplexity), true
+
+	case "Promotion.Promotag":
+		if e.complexity.Promotion.Promotag == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Promotag(childComplexity), true
+
+	case "Promotion.Promoterms":
+		if e.complexity.Promotion.Promoterms == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Promoterms(childComplexity), true
+
+	case "Promotion.Promotionid":
+		if e.complexity.Promotion.Promotionid == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Promotionid(childComplexity), true
+
+	case "Promotion.Promotionname":
+		if e.complexity.Promotion.Promotionname == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Promotionname(childComplexity), true
+
+	case "Promotion.Promotiontypeid":
+		if e.complexity.Promotion.Promotiontypeid == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Promotiontypeid(childComplexity), true
+
+	case "Promotion.Promotype":
+		if e.complexity.Promotion.Promotype == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Promotype(childComplexity), true
+
+	case "Promotion.Promovalue":
+		if e.complexity.Promotion.Promovalue == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Promovalue(childComplexity), true
+
+	case "Promotion.Startdate":
+		if e.complexity.Promotion.Startdate == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Startdate(childComplexity), true
+
+	case "Promotion.Status":
+		if e.complexity.Promotion.Status == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Status(childComplexity), true
+
+	case "Promotion.Tenantame":
+		if e.complexity.Promotion.Tenantame == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Tenantame(childComplexity), true
+
+	case "Promotion.Tenantid":
+		if e.complexity.Promotion.Tenantid == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Tenantid(childComplexity), true
+
 	case "Query.getBusiness":
 		if e.complexity.Query.GetBusiness == nil {
 			break
@@ -504,6 +671,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetBusiness(childComplexity, args["tenantid"].(int)), true
+
+	case "Query.getchargetypes":
+		if e.complexity.Query.Getchargetypes == nil {
+			break
+		}
+
+		return e.complexity.Query.Getchargetypes(childComplexity), true
+
+	case "Query.getpromotions":
+		if e.complexity.Query.Getpromotions == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getpromotions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Getpromotions(childComplexity, args["tenantid"].(int)), true
+
+	case "Query.getpromotypes":
+		if e.complexity.Query.Getpromotypes == nil {
+			break
+		}
+
+		return e.complexity.Query.Getpromotypes(childComplexity), true
 
 	case "Query.location":
 		if e.complexity.Query.Location == nil {
@@ -662,6 +855,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Businessdata.Updated(childComplexity), true
 
+	case "chargetype.Chargeid":
+		if e.complexity.Chargetype.Chargeid == nil {
+			break
+		}
+
+		return e.complexity.Chargetype.Chargeid(childComplexity), true
+
+	case "chargetype.Chargename":
+		if e.complexity.Chargetype.Chargename == nil {
+			break
+		}
+
+		return e.complexity.Chargetype.Chargename(childComplexity), true
+
+	case "chargetype.Status":
+		if e.complexity.Chargetype.Status == nil {
+			break
+		}
+
+		return e.complexity.Chargetype.Status(childComplexity), true
+
+	case "chargetypedata.code":
+		if e.complexity.Chargetypedata.Code == nil {
+			break
+		}
+
+		return e.complexity.Chargetypedata.Code(childComplexity), true
+
+	case "chargetypedata.message":
+		if e.complexity.Chargetypedata.Message == nil {
+			break
+		}
+
+		return e.complexity.Chargetypedata.Message(childComplexity), true
+
+	case "chargetypedata.status":
+		if e.complexity.Chargetypedata.Status == nil {
+			break
+		}
+
+		return e.complexity.Chargetypedata.Status(childComplexity), true
+
+	case "chargetypedata.types":
+		if e.complexity.Chargetypedata.Types == nil {
+			break
+		}
+
+		return e.complexity.Chargetypedata.Types(childComplexity), true
+
 	case "getBusinessdata.businessinfo":
 		if e.complexity.GetBusinessdata.Businessinfo == nil {
 			break
@@ -717,6 +959,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Getalllocations.Status(childComplexity), true
+
+	case "getpromotiondata.code":
+		if e.complexity.Getpromotiondata.Code == nil {
+			break
+		}
+
+		return e.complexity.Getpromotiondata.Code(childComplexity), true
+
+	case "getpromotiondata.message":
+		if e.complexity.Getpromotiondata.Message == nil {
+			break
+		}
+
+		return e.complexity.Getpromotiondata.Message(childComplexity), true
+
+	case "getpromotiondata.promotions":
+		if e.complexity.Getpromotiondata.Promotions == nil {
+			break
+		}
+
+		return e.complexity.Getpromotiondata.Promotions(childComplexity), true
+
+	case "getpromotiondata.status":
+		if e.complexity.Getpromotiondata.Status == nil {
+			break
+		}
+
+		return e.complexity.Getpromotiondata.Status(childComplexity), true
 
 	case "info.about":
 		if e.complexity.Info.About == nil {
@@ -914,12 +1184,68 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Locationgetall.Tenantusers(childComplexity), true
 
+	case "promotioncreateddata.code":
+		if e.complexity.Promotioncreateddata.Code == nil {
+			break
+		}
+
+		return e.complexity.Promotioncreateddata.Code(childComplexity), true
+
+	case "promotioncreateddata.message":
+		if e.complexity.Promotioncreateddata.Message == nil {
+			break
+		}
+
+		return e.complexity.Promotioncreateddata.Message(childComplexity), true
+
+	case "promotioncreateddata.status":
+		if e.complexity.Promotioncreateddata.Status == nil {
+			break
+		}
+
+		return e.complexity.Promotioncreateddata.Status(childComplexity), true
+
+	case "promotypesdata.code":
+		if e.complexity.Promotypesdata.Code == nil {
+			break
+		}
+
+		return e.complexity.Promotypesdata.Code(childComplexity), true
+
+	case "promotypesdata.message":
+		if e.complexity.Promotypesdata.Message == nil {
+			break
+		}
+
+		return e.complexity.Promotypesdata.Message(childComplexity), true
+
+	case "promotypesdata.status":
+		if e.complexity.Promotypesdata.Status == nil {
+			break
+		}
+
+		return e.complexity.Promotypesdata.Status(childComplexity), true
+
+	case "promotypesdata.types":
+		if e.complexity.Promotypesdata.Types == nil {
+			break
+		}
+
+		return e.complexity.Promotypesdata.Types(childComplexity), true
+
 	case "socialinfo.socialicon":
 		if e.complexity.Socialinfo.Socialicon == nil {
 			break
 		}
 
 		return e.complexity.Socialinfo.Socialicon(childComplexity), true
+
+	case "socialinfo.socialid":
+		if e.complexity.Socialinfo.Socialid == nil {
+			break
+		}
+
+		return e.complexity.Socialinfo.Socialid(childComplexity), true
 
 	case "socialinfo.sociallink":
 		if e.complexity.Socialinfo.Sociallink == nil {
@@ -1018,6 +1344,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tenantuserdata.Tenantuser(childComplexity), true
+
+	case "typedata.Promotiontypeid":
+		if e.complexity.Typedata.Promotiontypeid == nil {
+			break
+		}
+
+		return e.complexity.Typedata.Promotiontypeid(childComplexity), true
+
+	case "typedata.Tag":
+		if e.complexity.Typedata.Tag == nil {
+			break
+		}
+
+		return e.complexity.Typedata.Tag(childComplexity), true
+
+	case "typedata.Typename":
+		if e.complexity.Typedata.Typename == nil {
+			break
+		}
+
+		return e.complexity.Typedata.Typename(childComplexity), true
 
 	case "user.userid":
 		if e.complexity.User.Userid == nil {
@@ -1235,7 +1582,7 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 
 type Category {
- CategoryId: Int!
+ Categoryid: Int!
  Name: String!
  Type: Int!
  SortOrder: Int!
@@ -1311,7 +1658,7 @@ type subscribedData{
 }
 input subscription{
  TransactionDate:String!
- PackageId:Int!
+ PackageId:[Int!]!
  ModuleId:Int!
  CurrencyId:Int!
  CurrencyCode:String!
@@ -1451,12 +1798,20 @@ input businessupdatedata{
  tenantaccid:Int
 }
 input socialupdatedata{
+socialid:Int
+ socialprofile:String
+ sociallink:String
+ socialicon:String
+}
+input socialadddata{
+
  socialprofile:String
  sociallink:String
  socialicon:String
 }
 input business{
  businessupdate:businessupdatedata
+ socialadd:[socialadddata]
  socialupdate:[socialupdatedata]
 }
 type businessdata{
@@ -1481,15 +1836,77 @@ type info{
  social:[socialinfo]
 }
 type socialinfo{
+socialid:Int
  socialprofile:String
  sociallink:String
  socialicon:String
+}
+type Promotion {
+ Promotionid: Int!
+ Promotiontypeid:Int!
+ Promotionname: String
+ Tenantid:Int!
+ Tenantame: String
+ Promocode:String
+ Promoterms:String
+ Promovalue:String
+ Promotag: String
+ Promotype:String
+ Startdate:String
+ Enddate: String
+ Status:String
+}
+type getpromotiondata{
+ status:Boolean!
+ code:Int!
+ message:String!   
+ promotions:[Promotion]
+}
+type promotioncreateddata{
+ status:Boolean!
+ code:Int!
+ message:String!     
+}
+input promoinput{
+ Promotiontypeid:Int!
+ Promotionname: String
+ Tenantid:Int!  
+ Promocode:String
+ Promoterms:String
+ Promovalue:String
+ Startdate:String
+ Enddate: String 
+}
+type promotypesdata{
+ status:Boolean!
+ code:Int!
+ message:String! 
+ types:[typedata]    
+}
+type typedata{
+   Promotiontypeid:Int!  
+   Typename:String
+   Tag:String
+}
+type chargetypedata{
+status:Boolean!
+ code:Int!
+ message:String! 
+ types:[chargetype]
+}
+type chargetype{
+ Chargeid:Int!
+ Chargename:String!
+ Status:String
 }
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
  tenantusers(tenantid:Int!):usersdata!
  getBusiness(tenantid:Int!):getBusinessdata
+ getpromotions(tenantid:Int!):getpromotiondata
+ getpromotypes:promotypesdata
+ getchargetypes:chargetypedata
 }
 
 type Mutation {
@@ -1498,6 +1915,7 @@ type Mutation {
  updatetenantuser(update:updatetenant):tenantupdatedata
  updatetenantbusiness(businessinfo:business):businessdata
  createlocation(input:location):locationdata
+ createpromotion(input:promoinput):promotioncreateddata
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1513,6 +1931,21 @@ func (ec *executionContext) field_Mutation_createlocation_args(ctx context.Conte
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalOlocation2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocation(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createpromotion_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.Promoinput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOpromoinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromoinput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1611,6 +2044,21 @@ func (ec *executionContext) field_Query_getBusiness_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_getpromotions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["tenantid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tenantid"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_location_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1679,7 +2127,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Category_CategoryId(ctx context.Context, field graphql.CollectedField, obj *model.Category) (ret graphql.Marshaler) {
+func (ec *executionContext) _Category_Categoryid(ctx context.Context, field graphql.CollectedField, obj *model.Category) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1697,7 +2145,7 @@ func (ec *executionContext) _Category_CategoryId(ctx context.Context, field grap
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CategoryID, nil
+		return obj.Categoryid, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2402,6 +2850,45 @@ func (ec *executionContext) _Mutation_createlocation(ctx context.Context, field 
 	return ec.marshalOlocationdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocationdata(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_createpromotion(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createpromotion_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Createpromotion(rctx, args["input"].(*model.Promoinput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Promotioncreateddata)
+	fc.Result = res
+	return ec.marshalOpromotioncreateddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotioncreateddata(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Package_ModuleId(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2717,6 +3204,431 @@ func (ec *executionContext) _Package_PackageIcon(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Promotion_Promotionid(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promotionid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Promotiontypeid(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promotiontypeid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Promotionname(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promotionname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Tenantid(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Tenantame(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantame, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Promocode(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promocode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Promoterms(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promoterms, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Promovalue(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promovalue, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Promotag(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promotag, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Promotype(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promotype, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Startdate(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Startdate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Enddate(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Enddate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Promotion_Status(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_sparkle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2870,6 +3782,109 @@ func (ec *executionContext) _Query_getBusiness(ctx context.Context, field graphq
 	res := resTmp.(*model.GetBusinessdata)
 	fc.Result = res
 	return ec.marshalOgetBusinessdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetBusinessdata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getpromotions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getpromotions_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Getpromotions(rctx, args["tenantid"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Getpromotiondata)
+	fc.Result = res
+	return ec.marshalOgetpromotiondata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetpromotiondata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getpromotypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Getpromotypes(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Promotypesdata)
+	fc.Result = res
+	return ec.marshalOpromotypesdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotypesdata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getchargetypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Getchargetypes(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Chargetypedata)
+	fc.Result = res
+	return ec.marshalOchargetypedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargetypedata(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4656,6 +5671,245 @@ func (ec *executionContext) _businessdata_updated(ctx context.Context, field gra
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _chargetype_Chargeid(ctx context.Context, field graphql.CollectedField, obj *model.Chargetype) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "chargetype",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Chargeid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _chargetype_Chargename(ctx context.Context, field graphql.CollectedField, obj *model.Chargetype) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "chargetype",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Chargename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _chargetype_Status(ctx context.Context, field graphql.CollectedField, obj *model.Chargetype) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "chargetype",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _chargetypedata_status(ctx context.Context, field graphql.CollectedField, obj *model.Chargetypedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "chargetypedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _chargetypedata_code(ctx context.Context, field graphql.CollectedField, obj *model.Chargetypedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "chargetypedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _chargetypedata_message(ctx context.Context, field graphql.CollectedField, obj *model.Chargetypedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "chargetypedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _chargetypedata_types(ctx context.Context, field graphql.CollectedField, obj *model.Chargetypedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "chargetypedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Types, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Chargetype)
+	fc.Result = res
+	return ec.marshalOchargetype2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargetype(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _getBusinessdata_status(ctx context.Context, field graphql.CollectedField, obj *model.GetBusinessdata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4928,6 +6182,143 @@ func (ec *executionContext) _getalllocations_locations(ctx context.Context, fiel
 	res := resTmp.([]*model.Locationgetall)
 	fc.Result = res
 	return ec.marshalOlocationgetall2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocationgetall(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getpromotiondata_status(ctx context.Context, field graphql.CollectedField, obj *model.Getpromotiondata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getpromotiondata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getpromotiondata_code(ctx context.Context, field graphql.CollectedField, obj *model.Getpromotiondata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getpromotiondata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getpromotiondata_message(ctx context.Context, field graphql.CollectedField, obj *model.Getpromotiondata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getpromotiondata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getpromotiondata_promotions(ctx context.Context, field graphql.CollectedField, obj *model.Getpromotiondata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getpromotiondata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promotions, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Promotion)
+	fc.Result = res
+	return ec.marshalOPromotion2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotion(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _info_tenantid(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
@@ -5883,6 +7274,280 @@ func (ec *executionContext) _locationgetall_tenantusers(ctx context.Context, fie
 	return ec.marshalOusertenant2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUsertenant(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _promotioncreateddata_status(ctx context.Context, field graphql.CollectedField, obj *model.Promotioncreateddata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promotioncreateddata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promotioncreateddata_code(ctx context.Context, field graphql.CollectedField, obj *model.Promotioncreateddata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promotioncreateddata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promotioncreateddata_message(ctx context.Context, field graphql.CollectedField, obj *model.Promotioncreateddata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promotioncreateddata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promotypesdata_status(ctx context.Context, field graphql.CollectedField, obj *model.Promotypesdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promotypesdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promotypesdata_code(ctx context.Context, field graphql.CollectedField, obj *model.Promotypesdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promotypesdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promotypesdata_message(ctx context.Context, field graphql.CollectedField, obj *model.Promotypesdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promotypesdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promotypesdata_types(ctx context.Context, field graphql.CollectedField, obj *model.Promotypesdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promotypesdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Types, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Typedata)
+	fc.Result = res
+	return ec.marshalOtypedata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTypedata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _socialinfo_socialid(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "socialinfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Socialid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _socialinfo_socialprofile(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6397,6 +8062,105 @@ func (ec *executionContext) _tenantuserdata_tenantuser(ctx context.Context, fiel
 	res := resTmp.(*model.User)
 	fc.Result = res
 	return ec.marshalNuser2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _typedata_Promotiontypeid(ctx context.Context, field graphql.CollectedField, obj *model.Typedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "typedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promotiontypeid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _typedata_Typename(ctx context.Context, field graphql.CollectedField, obj *model.Typedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "typedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Typename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _typedata_Tag(ctx context.Context, field graphql.CollectedField, obj *model.Typedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "typedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tag, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _user_userid(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -7309,6 +9073,14 @@ func (ec *executionContext) unmarshalInputbusiness(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "socialadd":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialadd"))
+			it.Socialadd, err = ec.unmarshalOsocialadddata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialadddata(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "socialupdate":
 			var err error
 
@@ -7535,12 +9307,132 @@ func (ec *executionContext) unmarshalInputlocation(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputpromoinput(ctx context.Context, obj interface{}) (model.Promoinput, error) {
+	var it model.Promoinput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "Promotiontypeid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promotiontypeid"))
+			it.Promotiontypeid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Promotionname":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promotionname"))
+			it.Promotionname, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Tenantid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Tenantid"))
+			it.Tenantid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Promocode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promocode"))
+			it.Promocode, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Promoterms":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promoterms"))
+			it.Promoterms, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Promovalue":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promovalue"))
+			it.Promovalue, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Startdate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Startdate"))
+			it.Startdate, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Enddate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Enddate"))
+			it.Enddate, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputsocialadddata(ctx context.Context, obj interface{}) (model.Socialadddata, error) {
+	var it model.Socialadddata
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "socialprofile":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialprofile"))
+			it.Socialprofile, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sociallink":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sociallink"))
+			it.Sociallink, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "socialicon":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialicon"))
+			it.Socialicon, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputsocialupdatedata(ctx context.Context, obj interface{}) (model.Socialupdatedata, error) {
 	var it model.Socialupdatedata
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
 		switch k {
+		case "socialid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialid"))
+			it.Socialid, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "socialprofile":
 			var err error
 
@@ -7589,7 +9481,7 @@ func (ec *executionContext) unmarshalInputsubscription(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("PackageId"))
-			it.PackageID, err = ec.unmarshalNInt2int(ctx, v)
+			it.PackageID, err = ec.unmarshalNInt2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7842,8 +9734,8 @@ func (ec *executionContext) _Category(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Category")
-		case "CategoryId":
-			out.Values[i] = ec._Category_CategoryId(ctx, field, obj)
+		case "Categoryid":
+			out.Values[i] = ec._Category_Categoryid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -8000,6 +9892,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updatetenantbusiness(ctx, field)
 		case "createlocation":
 			out.Values[i] = ec._Mutation_createlocation(ctx, field)
+		case "createpromotion":
+			out.Values[i] = ec._Mutation_createpromotion(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8078,6 +9972,63 @@ func (ec *executionContext) _Package(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var promotionImplementors = []string{"Promotion"}
+
+func (ec *executionContext) _Promotion(ctx context.Context, sel ast.SelectionSet, obj *model.Promotion) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, promotionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Promotion")
+		case "Promotionid":
+			out.Values[i] = ec._Promotion_Promotionid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Promotiontypeid":
+			out.Values[i] = ec._Promotion_Promotiontypeid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Promotionname":
+			out.Values[i] = ec._Promotion_Promotionname(ctx, field, obj)
+		case "Tenantid":
+			out.Values[i] = ec._Promotion_Tenantid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Tenantame":
+			out.Values[i] = ec._Promotion_Tenantame(ctx, field, obj)
+		case "Promocode":
+			out.Values[i] = ec._Promotion_Promocode(ctx, field, obj)
+		case "Promoterms":
+			out.Values[i] = ec._Promotion_Promoterms(ctx, field, obj)
+		case "Promovalue":
+			out.Values[i] = ec._Promotion_Promovalue(ctx, field, obj)
+		case "Promotag":
+			out.Values[i] = ec._Promotion_Promotag(ctx, field, obj)
+		case "Promotype":
+			out.Values[i] = ec._Promotion_Promotype(ctx, field, obj)
+		case "Startdate":
+			out.Values[i] = ec._Promotion_Startdate(ctx, field, obj)
+		case "Enddate":
+			out.Values[i] = ec._Promotion_Enddate(ctx, field, obj)
+		case "Status":
+			out.Values[i] = ec._Promotion_Status(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -8141,6 +10092,39 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getBusiness(ctx, field)
+				return res
+			})
+		case "getpromotions":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getpromotions(ctx, field)
+				return res
+			})
+		case "getpromotypes":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getpromotypes(ctx, field)
+				return res
+			})
+		case "getchargetypes":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getchargetypes(ctx, field)
 				return res
 			})
 		case "__type":
@@ -8577,6 +10561,79 @@ func (ec *executionContext) _businessdata(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var chargetypeImplementors = []string{"chargetype"}
+
+func (ec *executionContext) _chargetype(ctx context.Context, sel ast.SelectionSet, obj *model.Chargetype) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, chargetypeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("chargetype")
+		case "Chargeid":
+			out.Values[i] = ec._chargetype_Chargeid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Chargename":
+			out.Values[i] = ec._chargetype_Chargename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Status":
+			out.Values[i] = ec._chargetype_Status(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var chargetypedataImplementors = []string{"chargetypedata"}
+
+func (ec *executionContext) _chargetypedata(ctx context.Context, sel ast.SelectionSet, obj *model.Chargetypedata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, chargetypedataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("chargetypedata")
+		case "status":
+			out.Values[i] = ec._chargetypedata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._chargetypedata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._chargetypedata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "types":
+			out.Values[i] = ec._chargetypedata_types(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var getBusinessdataImplementors = []string{"getBusinessdata"}
 
 func (ec *executionContext) _getBusinessdata(ctx context.Context, sel ast.SelectionSet, obj *model.GetBusinessdata) graphql.Marshaler {
@@ -8644,6 +10701,45 @@ func (ec *executionContext) _getalllocations(ctx context.Context, sel ast.Select
 			}
 		case "locations":
 			out.Values[i] = ec._getalllocations_locations(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var getpromotiondataImplementors = []string{"getpromotiondata"}
+
+func (ec *executionContext) _getpromotiondata(ctx context.Context, sel ast.SelectionSet, obj *model.Getpromotiondata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getpromotiondataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("getpromotiondata")
+		case "status":
+			out.Values[i] = ec._getpromotiondata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._getpromotiondata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._getpromotiondata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "promotions":
+			out.Values[i] = ec._getpromotiondata_promotions(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8834,6 +10930,82 @@ func (ec *executionContext) _locationgetall(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var promotioncreateddataImplementors = []string{"promotioncreateddata"}
+
+func (ec *executionContext) _promotioncreateddata(ctx context.Context, sel ast.SelectionSet, obj *model.Promotioncreateddata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, promotioncreateddataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("promotioncreateddata")
+		case "status":
+			out.Values[i] = ec._promotioncreateddata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._promotioncreateddata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._promotioncreateddata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var promotypesdataImplementors = []string{"promotypesdata"}
+
+func (ec *executionContext) _promotypesdata(ctx context.Context, sel ast.SelectionSet, obj *model.Promotypesdata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, promotypesdataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("promotypesdata")
+		case "status":
+			out.Values[i] = ec._promotypesdata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._promotypesdata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._promotypesdata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "types":
+			out.Values[i] = ec._promotypesdata_types(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var socialinfoImplementors = []string{"socialinfo"}
 
 func (ec *executionContext) _socialinfo(ctx context.Context, sel ast.SelectionSet, obj *model.Socialinfo) graphql.Marshaler {
@@ -8845,6 +11017,8 @@ func (ec *executionContext) _socialinfo(ctx context.Context, sel ast.SelectionSe
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("socialinfo")
+		case "socialid":
+			out.Values[i] = ec._socialinfo_socialid(ctx, field, obj)
 		case "socialprofile":
 			out.Values[i] = ec._socialinfo_socialprofile(ctx, field, obj)
 		case "sociallink":
@@ -8977,6 +11151,37 @@ func (ec *executionContext) _tenantuserdata(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var typedataImplementors = []string{"typedata"}
+
+func (ec *executionContext) _typedata(ctx context.Context, sel ast.SelectionSet, obj *model.Typedata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, typedataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("typedata")
+		case "Promotiontypeid":
+			out.Values[i] = ec._typedata_Promotiontypeid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Typename":
+			out.Values[i] = ec._typedata_Typename(ctx, field, obj)
+		case "Tag":
+			out.Values[i] = ec._typedata_Tag(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9247,6 +11452,36 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]int, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInt2int(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNInt2ᚕintᚄ(ctx context.Context, sel ast.SelectionSet, v []int) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNInt2int(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNLocationInfo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocationInfo(ctx context.Context, sel ast.SelectionSet, v *model.LocationInfo) graphql.Marshaler {
@@ -9712,6 +11947,53 @@ func (ec *executionContext) marshalOPackage2ᚖgithubᚗcomᚋengajerestᚋspark
 	return ec._Package(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOPromotion2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotion(ctx context.Context, sel ast.SelectionSet, v []*model.Promotion) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOPromotion2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotion(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOPromotion2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotion(ctx context.Context, sel ast.SelectionSet, v *model.Promotion) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Promotion(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -9940,6 +12222,60 @@ func (ec *executionContext) unmarshalObusinessupdatedata2ᚖgithubᚗcomᚋengaj
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOchargetype2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargetype(ctx context.Context, sel ast.SelectionSet, v []*model.Chargetype) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOchargetype2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargetype(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOchargetype2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargetype(ctx context.Context, sel ast.SelectionSet, v *model.Chargetype) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._chargetype(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOchargetypedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargetypedata(ctx context.Context, sel ast.SelectionSet, v *model.Chargetypedata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._chargetypedata(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOgetBusinessdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetBusinessdata(ctx context.Context, sel ast.SelectionSet, v *model.GetBusinessdata) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -9952,6 +12288,13 @@ func (ec *executionContext) marshalOgetalllocations2ᚖgithubᚗcomᚋengajerest
 		return graphql.Null
 	}
 	return ec._getalllocations(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOgetpromotiondata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetpromotiondata(ctx context.Context, sel ast.SelectionSet, v *model.Getpromotiondata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._getpromotiondata(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOinfo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐInfo(ctx context.Context, sel ast.SelectionSet, v *model.Info) graphql.Marshaler {
@@ -10021,6 +12364,60 @@ func (ec *executionContext) marshalOlocationgetall2ᚖgithubᚗcomᚋengajerest�
 		return graphql.Null
 	}
 	return ec._locationgetall(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOpromoinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromoinput(ctx context.Context, v interface{}) (*model.Promoinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputpromoinput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOpromotioncreateddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotioncreateddata(ctx context.Context, sel ast.SelectionSet, v *model.Promotioncreateddata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._promotioncreateddata(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOpromotypesdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotypesdata(ctx context.Context, sel ast.SelectionSet, v *model.Promotypesdata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._promotypesdata(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOsocialadddata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialadddata(ctx context.Context, v interface{}) ([]*model.Socialadddata, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Socialadddata, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOsocialadddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialadddata(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOsocialadddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialadddata(ctx context.Context, v interface{}) (*model.Socialadddata, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputsocialadddata(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOsocialinfo2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialinfo(ctx context.Context, sel ast.SelectionSet, v []*model.Socialinfo) graphql.Marshaler {
@@ -10122,6 +12519,53 @@ func (ec *executionContext) marshalOtenantuserdata2ᚖgithubᚗcomᚋengajerest�
 		return graphql.Null
 	}
 	return ec._tenantuserdata(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOtypedata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTypedata(ctx context.Context, sel ast.SelectionSet, v []*model.Typedata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOtypedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTypedata(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOtypedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTypedata(ctx context.Context, sel ast.SelectionSet, v *model.Typedata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._typedata(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOupdatetenant2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdatetenant(ctx context.Context, v interface{}) (*model.Updatetenant, error) {

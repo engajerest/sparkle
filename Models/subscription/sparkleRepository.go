@@ -3,14 +3,16 @@ package subscription
 import (
 	"context"
 	"database/sql"
-	"strings"
-	"time"
 	"fmt"
 	"log"
+	"strings"
+	"time"
+
 	"github.com/engajerest/auth/Models/users"
 	"github.com/engajerest/auth/utils/Errors"
 	"github.com/engajerest/auth/utils/dbconfig"
-     database "github.com/engajerest/auth/utils/dbconfig"
+	database "github.com/engajerest/auth/utils/dbconfig"
+	"github.com/engajerest/sparkle/graph/model"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -20,10 +22,10 @@ const (
 	getAllCategoryQuery            = "SELECT categoryid,categoryname,categorytype,sortorder,status FROM app_category WHERE STATUS='Active'"
 	getAllSubCategoryQuery         = "SELECT  subcategoryid,categorytypeid,categoryid,subcategoryname,status,icon FROM app_subcategory WHERE statuscode=1"
 	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename FROM app_package a,app_module b  WHERE a.STATUS='Active' AND a.moduleid=b.moduleid"
-	insertTenantInfoQuery          = "INSERT INTO tenantinfo (createdby,registrationno,tenantname,primaryemail,primarycontact,bizcategoryid,bizsubcategoryid,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,registrationno,tenantname,primaryemail,primarycontact,bizcategoryid,bizsubcategoryid,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,moduleid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamout,paymentstatus,paymentid) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
-	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid, c.name FROM tenantinfo a,tenantsubscription b,app_module c WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid=?"
+	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid, c.name FROM tenants a,tenantsubscription b,app_module c WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid=?"
 	createLocationQuery            = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND locationid=? "
 	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND tenantid=? "
@@ -32,12 +34,18 @@ const (
 	getAllTenantUsers              = "SELECT a.firstname,a.lastname,a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocation b, app_users c WHERE  a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=?"
 	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 	getAllTenantUserByLocationId   = ""
-	updateTenantBusiness           = "UPDATE tenantinfo SET brandname=?,tenantaccid=?,tenantinfo=?,paymode1=?,paymode2=? WHERE tenantid=?"
+	updateTenantBusiness           = "UPDATE tenant SET brandname=?,tenantaccid=?,tenantinfo=?,paymode1=?,paymode2=? WHERE tenantid=?"
 	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,sociallink,socialicon) VALUES"
+	updatesocialinfo               = "UPDATE tenantsocial SET socialprofile=?, sociallink=?,socialicon=? WHERE tenantid=? AND socialid=? "
 	updateauthuser                 = "UPDATE  app_users a,app_userprofiles b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
-	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid FROM tenantinfo WHERE tenantid=?"
-	getAllSocial                   = "SELECT  IFNULL(socialprofile,'') AS socialprofile , IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
+	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid FROM tenants WHERE tenantid=?"
+	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile , IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
 	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
+	Getpromotions          = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.promoname,a.promocode,a.promoterms,a.promovalue,a.startdate,a.enddate,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
+    createpromotion ="INSERT INTO promotions (promotiontypeid,tenantid,promoname,promocode,promoterms,promovalue,startdate,enddate,createdby) VALUES(?,?,?,?,?,?,?,?,?)"
+    insertsequence = "INSERT INTO ordersequence (tenantid,tablename,seqno,prefix,subprefix) VALUES(?,?,?,?,?)"
+
+
 )
 
 func GetAllCategory() []Category {
@@ -69,7 +77,6 @@ func GetAllCategory() []Category {
 	return categorylist
 
 }
-
 func GetAllSubCategory() []SubCategory {
 	stmt, err := database.Db.Prepare(getAllSubCategoryQuery)
 	if err != nil {
@@ -123,7 +130,6 @@ func GetAllPackages() []Packages {
 
 	return packageList
 }
-
 func (info *SubscriptionData) CreateTenant(userid int) (int64, error) {
 
 	fmt.Println("0")
@@ -171,7 +177,6 @@ func (info *SubscriptionData) InsertTenantLocation(tenantid int64, userid int) i
 	log.Print("Row inserted in tenant location!")
 	return id
 }
-
 func (info *TenantSubscription) InsertSubscription(tenantid int64) int64 {
 	statement, err := database.Db.Prepare(insertTenantSubscription)
 	print(statement)
@@ -192,7 +197,6 @@ func (info *TenantSubscription) InsertSubscription(tenantid int64) int64 {
 	log.Print("Row inserted in tenant subscription!")
 	return id
 }
-
 func (info *SubscribedData) GetSubscribedData(tenantid int64) (*SubscribedData, error) {
 	fmt.Println("enrty in getsubscription")
 	print(tenantid)
@@ -223,7 +227,6 @@ func (info *SubscribedData) GetSubscribedData(tenantid int64) (*SubscribedData, 
 	// user.Check=true
 	return &data, err
 }
-
 func (loco *Location) CreateLocation(id int64) (int64, error) {
 	statement, err := database.Db.Prepare(createLocationQuery)
 	print(statement)
@@ -243,7 +246,6 @@ func (loco *Location) CreateLocation(id int64) (int64, error) {
 	log.Print("Row inserted in createlocation!")
 	return id, nil
 }
-
 func (loco *Location) GetLocationById(id int64) (*Location, error) {
 	fmt.Println("enrty in getlocation")
 	print(id)
@@ -386,7 +388,6 @@ func LocationTest(id int) []Tenantlocation {
 	return orders
 
 }
-
 func userget(ids []int) ([]*users.User, []error) {
 	placeholders := make([]string, len(ids))
 	args := make([]interface{}, len(ids))
@@ -422,7 +423,6 @@ func userget(ids []int) ([]*users.User, []error) {
 
 	return users, nil
 }
-
 func (user *TenantUser) CreateTenantUser() int64 {
 	fmt.Println("0")
 	statement, err := database.Db.Prepare(createTenantUserQuery)
@@ -450,7 +450,6 @@ func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
-
 func (user *TenantUser) InsertTenantUserintoProfile(id int64) int64 {
 	statement, err := database.Db.Prepare(insertTenantUsertoProfileQuery)
 	print(statement)
@@ -567,7 +566,26 @@ func (info *BusinessUpdate) InsertTenantSocial(soc []Social, id int) error {
 	return nil
 
 }
+func (info *Social) UpdateTenantSocial(tenantid int) bool {
 
+	statement, err := database.Db.Prepare(updatesocialinfo)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+	defer statement.Close()
+	_, err = statement.Exec(&info.SociaProfile,&info.SocialLink,&info.SocialIcon,tenantid,&info.Socialid,)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	log.Print("Row updated in tenantsocial!")
+	return true
+
+}
 func (info *AuthUser) UpdateAuthUser(userid int) bool {
 	statement, err := database.Db.Prepare(updateauthuser)
 	print(statement)
@@ -628,6 +646,7 @@ func GetAllSocial(id int) []Social {
 	for rows.Next() {
 		var data Social
 		err = rows.Scan(
+			&data.Socialid,
 			&data.SociaProfile,
 			&data.SocialLink,
 			&data.SocialIcon,
@@ -674,4 +693,119 @@ func UserAuthentication(id int64) (*users.User, bool, error) {
 	}
 	// user.Check=true
 	return &data, true, err
+}
+func GetAllPromotions(tenantid int ) []Promotion {
+	print("st1")
+	stmt, err := database.Db.Prepare(Getpromotions)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(tenantid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	var promolist []Promotion
+
+	for rows.Next() {
+		var promo Promotion
+		err := rows.Scan(&promo.Promotionid,&promo.Promotiontypeid,&promo.Tenantid,&promo.Promoname,&promo.Promocode,&promo.Promoterms,&promo.Promovalue,
+		&promo.Startdate,&promo.Enddate,&promo.Status,&promo.Promotype,&promo.Promotag,&promo.Tenantname)
+		if err != nil {
+			log.Fatal(err)
+		}
+		promolist = append(promolist, promo)
+	}
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return promolist
+
+}
+func (p *Promotion) Createpromotion(created int ) int64 {
+	statement, err := database.Db.Prepare(createpromotion)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer statement.Close()
+	res, err := statement.Exec(&p.Promotiontypeid,&p.Tenantid,&p.Promoname,&p.Promocode,&p.Promoterms,
+	&p.Promovalue,&p.Startdate,&p.Enddate,created)
+	if err != nil {
+		log.Fatal(err)
+	}
+	id, err1 := res.LastInsertId()
+	if err1 != nil {
+		log.Fatal("Error:", err1.Error())
+	}
+	log.Print("Row inserted in promotion!")
+	return id
+}
+func Getpromotypes() []*model.Typedata {
+
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+
+	var data []*model.Typedata
+
+	DB.Table("promotiontypes").Find(&data)
+
+	fmt.Println(data)
+
+	return data
+
+}
+func Getchargetypes() []*model.Chargetype {
+
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+
+	var data []*model.Chargetype
+
+	DB.Table("chargetypes").Find(&data)
+
+	fmt.Println(data)
+
+	return data
+
+}
+func (o *Ordersequence) Insertsequence() (int64, error) {
+
+	fmt.Println("0")
+
+	statement, err := database.Db.Prepare(insertsequence)
+	print(statement)
+	fmt.Println("1")
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+	defer statement.Close()
+
+	fmt.Println("2")
+	res, err := statement.Exec(&o.Tenantid,&o.Tablename,&o.Seqno,&o.Prefix,&o.Subprefix)
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal("Error:", err.Error())
+
+	}
+	log.Print("Row inserted in sequence!")
+	return id, nil
 }

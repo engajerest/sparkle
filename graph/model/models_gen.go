@@ -3,7 +3,7 @@
 package model
 
 type Category struct {
-	CategoryID int    `json:"CategoryId"`
+	Categoryid int    `json:"Categoryid"`
 	Name       string `json:"Name"`
 	Type       int    `json:"Type"`
 	SortOrder  int    `json:"SortOrder"`
@@ -36,6 +36,22 @@ type Package struct {
 	PaymentMode    string `json:"PaymentMode"`
 	PackageContent string `json:"PackageContent"`
 	PackageIcon    string `json:"PackageIcon"`
+}
+
+type Promotion struct {
+	Promotionid     int     `json:"Promotionid"`
+	Promotiontypeid int     `json:"Promotiontypeid"`
+	Promotionname   *string `json:"Promotionname"`
+	Tenantid        int     `json:"Tenantid"`
+	Tenantame       *string `json:"Tenantame"`
+	Promocode       *string `json:"Promocode"`
+	Promoterms      *string `json:"Promoterms"`
+	Promovalue      *string `json:"Promovalue"`
+	Promotag        *string `json:"Promotag"`
+	Promotype       *string `json:"Promotype"`
+	Startdate       *string `json:"Startdate"`
+	Enddate         *string `json:"Enddate"`
+	Status          *string `json:"Status"`
 }
 
 type Sparkle struct {
@@ -86,6 +102,7 @@ type TenantDetails struct {
 
 type Business struct {
 	Businessupdate *Businessupdatedata `json:"businessupdate"`
+	Socialadd      []*Socialadddata    `json:"socialadd"`
 	Socialupdate   []*Socialupdatedata `json:"socialupdate"`
 }
 
@@ -103,6 +120,19 @@ type Businessupdatedata struct {
 	Cod         *int    `json:"cod"`
 	Digital     *int    `json:"digital"`
 	Tenantaccid *int    `json:"tenantaccid"`
+}
+
+type Chargetype struct {
+	Chargeid   int     `json:"Chargeid"`
+	Chargename string  `json:"Chargename"`
+	Status     *string `json:"Status"`
+}
+
+type Chargetypedata struct {
+	Status  bool          `json:"status"`
+	Code    int           `json:"code"`
+	Message string        `json:"message"`
+	Types   []*Chargetype `json:"types"`
 }
 
 type Data struct {
@@ -123,6 +153,13 @@ type Getalllocations struct {
 	Code      int               `json:"code"`
 	Message   string            `json:"message"`
 	Locations []*Locationgetall `json:"locations"`
+}
+
+type Getpromotiondata struct {
+	Status     bool         `json:"status"`
+	Code       int          `json:"code"`
+	Message    string       `json:"message"`
+	Promotions []*Promotion `json:"promotions"`
 }
 
 type Info struct {
@@ -178,13 +215,45 @@ type Locationgetall struct {
 	Tenantusers  []*Usertenant `json:"tenantusers"`
 }
 
+type Promoinput struct {
+	Promotiontypeid int     `json:"Promotiontypeid"`
+	Promotionname   *string `json:"Promotionname"`
+	Tenantid        int     `json:"Tenantid"`
+	Promocode       *string `json:"Promocode"`
+	Promoterms      *string `json:"Promoterms"`
+	Promovalue      *string `json:"Promovalue"`
+	Startdate       *string `json:"Startdate"`
+	Enddate         *string `json:"Enddate"`
+}
+
+type Promotioncreateddata struct {
+	Status  bool   `json:"status"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+type Promotypesdata struct {
+	Status  bool        `json:"status"`
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Types   []*Typedata `json:"types"`
+}
+
+type Socialadddata struct {
+	Socialprofile *string `json:"socialprofile"`
+	Sociallink    *string `json:"sociallink"`
+	Socialicon    *string `json:"socialicon"`
+}
+
 type Socialinfo struct {
+	Socialid      *int    `json:"socialid"`
 	Socialprofile *string `json:"socialprofile"`
 	Sociallink    *string `json:"sociallink"`
 	Socialicon    *string `json:"socialicon"`
 }
 
 type Socialupdatedata struct {
+	Socialid      *int    `json:"socialid"`
 	Socialprofile *string `json:"socialprofile"`
 	Sociallink    *string `json:"sociallink"`
 	Socialicon    *string `json:"socialicon"`
@@ -199,7 +268,7 @@ type SubscribedData struct {
 
 type Subscription struct {
 	TransactionDate string `json:"TransactionDate"`
-	PackageID       int    `json:"PackageId"`
+	PackageID       []int  `json:"PackageId"`
 	ModuleID        int    `json:"ModuleId"`
 	CurrencyID      int    `json:"CurrencyId"`
 	CurrencyCode    string `json:"CurrencyCode"`
@@ -235,6 +304,12 @@ type Tenantuserdata struct {
 	Code       int    `json:"code"`
 	Message    string `json:"message"`
 	Tenantuser *User  `json:"tenantuser"`
+}
+
+type Typedata struct {
+	Promotiontypeid int     `json:"Promotiontypeid"`
+	Typename        *string `json:"Typename"`
+	Tag             *string `json:"Tag"`
 }
 
 type Updatetenant struct {

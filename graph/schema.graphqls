@@ -3,7 +3,7 @@
 # https://gqlgen.com/getting-started/
 
 type Category {
- CategoryId: Int!
+ Categoryid: Int!
  Name: String!
  Type: Int!
  SortOrder: Int!
@@ -79,7 +79,7 @@ type subscribedData{
 }
 input subscription{
  TransactionDate:String!
- PackageId:Int!
+ PackageId:[Int!]!
  ModuleId:Int!
  CurrencyId:Int!
  CurrencyCode:String!
@@ -219,12 +219,20 @@ input businessupdatedata{
  tenantaccid:Int
 }
 input socialupdatedata{
+socialid:Int
+ socialprofile:String
+ sociallink:String
+ socialicon:String
+}
+input socialadddata{
+
  socialprofile:String
  sociallink:String
  socialicon:String
 }
 input business{
  businessupdate:businessupdatedata
+ socialadd:[socialadddata]
  socialupdate:[socialupdatedata]
 }
 type businessdata{
@@ -249,15 +257,77 @@ type info{
  social:[socialinfo]
 }
 type socialinfo{
+socialid:Int
  socialprofile:String
  sociallink:String
  socialicon:String
+}
+type Promotion {
+ Promotionid: Int!
+ Promotiontypeid:Int!
+ Promotionname: String
+ Tenantid:Int!
+ Tenantame: String
+ Promocode:String
+ Promoterms:String
+ Promovalue:String
+ Promotag: String
+ Promotype:String
+ Startdate:String
+ Enddate: String
+ Status:String
+}
+type getpromotiondata{
+ status:Boolean!
+ code:Int!
+ message:String!   
+ promotions:[Promotion]
+}
+type promotioncreateddata{
+ status:Boolean!
+ code:Int!
+ message:String!     
+}
+input promoinput{
+ Promotiontypeid:Int!
+ Promotionname: String
+ Tenantid:Int!  
+ Promocode:String
+ Promoterms:String
+ Promovalue:String
+ Startdate:String
+ Enddate: String 
+}
+type promotypesdata{
+ status:Boolean!
+ code:Int!
+ message:String! 
+ types:[typedata]    
+}
+type typedata{
+   Promotiontypeid:Int!  
+   Typename:String
+   Tag:String
+}
+type chargetypedata{
+status:Boolean!
+ code:Int!
+ message:String! 
+ types:[chargetype]
+}
+type chargetype{
+ Chargeid:Int!
+ Chargename:String!
+ Status:String
 }
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
  tenantusers(tenantid:Int!):usersdata!
  getBusiness(tenantid:Int!):getBusinessdata
+ getpromotions(tenantid:Int!):getpromotiondata
+ getpromotypes:promotypesdata
+ getchargetypes:chargetypedata
 }
 
 type Mutation {
@@ -266,4 +336,5 @@ type Mutation {
  updatetenantuser(update:updatetenant):tenantupdatedata
  updatetenantbusiness(businessinfo:business):businessdata
  createlocation(input:location):locationdata
+ createpromotion(input:promoinput):promotioncreateddata
 }

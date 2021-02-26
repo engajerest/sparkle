@@ -138,6 +138,7 @@ type AuthUser struct {
 	LocationId int `json:"locationid"`
 }
 type Social struct {
+	Socialid int `json:"socialid"`
 	SociaProfile string `json:"socialprofile"`
 	SocialLink   string `json:"sociallink"`
 	SocialIcon   string `json:"socialicon"`
@@ -171,4 +172,28 @@ type App_userprofiles struct {
 	Email          string `json:"email"`
 	Contactno      string `json:"contactno"`
 	Userlocationid int    `json:"userlocationid"`
+}
+type Promotion struct {
+	Promotionid     int       `json:"promotionid"`
+	Promotiontypeid int       `json:"promotionid"`
+	Tenantid        int       `json:"tenantid"`
+	Tenantname      string    `json:"tenantname"`
+	Promoname       string    `json:"promoname"`
+	Promocode       string    `json:"promocode"`
+	Promovalue      string   `json:"promovalue"`
+	Promoterms      string    `json:"promoterms"`
+	Promotype       string    `json:"promotype"`
+	Promotag        string    `json:"promotag"`
+	Startdate       string `json:"startdate"`
+	Enddate         string `json:"enddate"`
+	Status          string    `json:"status"`
+	
+}
+type Ordersequence struct {
+	Sequenceid int    `json:"sequenceid"`
+	Tenantid   int    `json:"tenantid"`
+	Tablename  string `json:"tablename"`
+	Seqno      int `json:"seqno"`
+	Prefix     string `json:"prefix"`
+	Subprefix  int    `json:"subprefix"`
 }
