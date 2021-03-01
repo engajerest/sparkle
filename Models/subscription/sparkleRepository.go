@@ -22,7 +22,7 @@ const (
 	getAllCategoryQuery            = "SELECT categoryid,categoryname,categorytype,sortorder,status FROM app_category WHERE STATUS='Active'"
 	getAllSubCategoryQuery         = "SELECT  subcategoryid,categorytypeid,categoryid,subcategoryname,status,icon FROM app_subcategory WHERE statuscode=1"
 	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename FROM app_package a,app_module b  WHERE a.STATUS='Active' AND a.moduleid=b.moduleid"
-	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,registrationno,tenantname,primaryemail,primarycontact,bizcategoryid,bizsubcategoryid,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,registrationno,tenantname,primaryemail,primarycontact,bizcategoryid,bizsubcategoryid,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,moduleid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamout,paymentstatus,paymentid) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
 	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid, c.name FROM tenants a,tenantsubscription b,app_module c WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid=?"
@@ -38,13 +38,18 @@ const (
 	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,sociallink,socialicon) VALUES"
 	updatesocialinfo               = "UPDATE tenantsocial SET socialprofile=?, sociallink=?,socialicon=? WHERE tenantid=? AND socialid=? "
 	updateauthuser                 = "UPDATE  app_users a,app_userprofiles b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
-	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid FROM tenants WHERE tenantid=?"
+	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid,IFNULL(address,'') AS address,IFNULL(primaryemail,'') AS primaryemail,IFNULL(primarycontact,'') AS  primarycontact,IFNULL(tenanttoken,'') AS tenanttoken FROM tenants WHERE tenantid=?"
 	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile , IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
 	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
 	Getpromotions          = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.promoname,a.promocode,a.promoterms,a.promovalue,a.startdate,a.enddate,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
     createpromotion ="INSERT INTO promotions (promotiontypeid,tenantid,promoname,promocode,promoterms,promovalue,startdate,enddate,createdby) VALUES(?,?,?,?,?,?,?,?,?)"
     insertsequence = "INSERT INTO ordersequence (tenantid,tablename,seqno,prefix,subprefix) VALUES(?,?,?,?,?)"
-
+insertcharge = "INSERT INTO tenantcharges (tenantid,locationid,chargeid,chargetype,chargevalue,createdby) VALUES"
+insertdelivery = "INSERT INTO tenantsettings (tenantid,locationid,slabtype,slab,slablimit,slabcharge,createdby) VALUES"
+updatecharge = "UPDATE tenantcharges SET locationid=?,chargeid=?,chargetype=?, chargevalue=? WHERE tenantchargeid=? AND tenantid=?"
+updatedelivery="UPDATE  tenantsettings SET locationid=?,slabtype=?,slab=?,slablimit=?,slabcharge=? WHERE settingsid=? AND tenantid=?"
+deletecharge = "DELETE FROM tenantcharges WHERE tenantchargeid=?"
+deletedelivery = "DELETE FROM  tenantsettings WHERE settingsid=?"
 
 )
 
@@ -145,7 +150,7 @@ func (info *SubscriptionData) CreateTenant(userid int) (int64, error) {
 
 	fmt.Println("2")
 	res, err := statement.Exec(userid, &info.Info.Regno, &info.Info.Name, &info.Info.Email, &info.Info.Mobile, &info.Info.CategoryId, &info.Info.SubCategoryID,
-		&info.Address.Address, &info.Address.State, &info.Address.Suburb, &info.Address.Latitude, &info.Address.Longitude, &info.Address.Zip, &info.Address.Countrycode, &info.Address.TimeZone, &info.Address.CurrencyCode)
+		&info.Address.Address, &info.Address.State, &info.Address.Suburb, &info.Address.Latitude, &info.Address.Longitude, &info.Address.Zip, &info.Address.Countrycode, &info.Address.TimeZone, &info.Address.CurrencyCode,&info.Info.Tenanttoken)
 	if err != nil {
 		log.Fatal(err)
 
@@ -614,7 +619,7 @@ func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) 
 	defer stmt.Close()
 	row := stmt.QueryRow(id)
 	// print(row)
-	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId)
+	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId,&data.Address,&data.Email,&data.Phone,&data.Tenanttoken)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -808,4 +813,150 @@ func (o *Ordersequence) Insertsequence() (int64, error) {
 	}
 	log.Print("Row inserted in sequence!")
 	return id, nil
+}
+func (info *Charge) Insertothercharges(soc []Charge) error {
+
+	var inserts []string
+	var params []interface{}
+	for _, v := range soc {
+		inserts = append(inserts, "(?, ?, ?, ?,?,?)")
+		params = append(params,v.Tenantid,v.Locationid,v.Chargeid,v.Chargetype,v.Chargevalue,v.Createdby )
+	}
+	queryVals := strings.Join(inserts, ",")
+	query := insertcharge + queryVals
+	log.Println("query is", query)
+
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelfunc()
+	stmt, err := database.Db.PrepareContext(ctx, query)
+	if err != nil {
+		log.Printf("Error %s when preparing SQL statement", err)
+		return err
+	}
+	defer stmt.Close()
+	res, err := stmt.ExecContext(ctx, params...)
+	if err != nil {
+		log.Printf("Error %s when inserting row into products table", err)
+		return err
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		log.Printf("Error %s when finding rows affected", err)
+		return err
+	}
+	log.Printf("%d charges created simulatneously", rows)
+	return nil
+
+}
+func (info *Delivery) Insertdeliverycharges(soc []Delivery) error {
+
+	var inserts []string
+	var params []interface{}
+	for _, v := range soc {
+		inserts = append(inserts, "(?, ?, ?, ?,?,?,?)")
+		params = append(params,v.Tenantid,v.Locationid,v.Slabtype,v.Slab,v.Slablimit,v.Slabcharge,v.Createdby )
+	}
+	queryVals := strings.Join(inserts, ",")
+	query := insertdelivery + queryVals
+	log.Println("query is", query)
+
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelfunc()
+	stmt, err := database.Db.PrepareContext(ctx, query)
+	if err != nil {
+		log.Printf("Error %s when preparing SQL statement", err)
+		return err
+	}
+	defer stmt.Close()
+	res, err := stmt.ExecContext(ctx, params...)
+	if err != nil {
+		log.Printf("Error %s when inserting row into products table", err)
+		return err
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		log.Printf("Error %s when finding rows affected", err)
+		return err
+	}
+	log.Printf("%d delivery created simulatneously", rows)
+	return nil
+
+}
+func (o *Charge) Updateothercharge() bool {
+	fmt.Println("0")
+	statement, err := database.Db.Prepare(updatecharge)
+	fmt.Println("1")
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+	defer statement.Close()
+	_, err = statement.Exec(&o.Locationid,&o.Chargeid,&o.Chargetype,&o.Chargevalue,&o.Tenantchargeid,&o.Tenantid)
+	if err != nil {
+
+		log.Fatal(err)
+		return false
+	}
+
+	log.Print("Row updated in charges!")
+	return true
+}
+func (o *Delivery) Updatedeliverycharge() bool {
+	fmt.Println("0")
+	statement, err := database.Db.Prepare(updatedelivery)
+	fmt.Println("1")
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+	defer statement.Close()
+	_, err = statement.Exec(&o.Locationid,&o.Slabtype,&o.Slab,&o.Slablimit,&o.Slabcharge,&o.Settingsid,&o.Tenantid)
+	if err != nil {
+
+		log.Fatal(err)
+		return false
+	}
+
+	log.Print("Row updated in charges!")
+	return true
+}
+func (c *Charge) Deleteothercharge() bool {
+
+	statement, err := database.Db.Prepare(deletecharge)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	_, err = statement.Exec(&c.Tenantchargeid)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	log.Print("Row deleted in charges!")
+	return true
+
+}
+func (c *Delivery) Deletedeliverycharge() bool {
+
+	statement, err := database.Db.Prepare(deletedelivery)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	_, err = statement.Exec(&c.Settingsid)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	log.Print("Row deleted in delivery!")
+	return true
+
 }

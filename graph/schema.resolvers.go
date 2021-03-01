@@ -34,6 +34,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	data.Info.Email = input.Tenantinfo.Email
 	data.Info.Mobile = input.Tenantinfo.Mobile
 	data.Info.SubCategoryID = input.Tenantinfo.SubCategoryID
+	data.Info.Tenanttoken=input.Tenantinfo.Tenanttoken
 	data.Address.Address = input.Tenantlocation.Address
 	data.Address.State = input.Tenantlocation.State
 	data.Address.Suburb = input.Tenantlocation.Suburb
@@ -86,17 +87,16 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 			}
 		}
 		var seq subscription.Ordersequence
-		seq.Tenantid=int(tenantId)
-		seq.Tablename="order"
-		seq.Seqno=0
-		seq.Prefix="ORD"
-		seq.Subprefix=2021
-		seqid,err:=seq.Insertsequence()
-		if err!=nil{
+		seq.Tenantid = int(tenantId)
+		seq.Tablename = "order"
+		seq.Seqno = 0
+		seq.Prefix = "ORD"
+		seq.Subprefix = 2021
+		seqid, err := seq.Insertsequence()
+		if err != nil {
 			print(err)
-			print("seqid==",seqid)
+			print("seqid==", seqid)
 		}
-
 
 	}
 	subscribed, Error := data2.GetSubscribedData(tenantId)
@@ -316,6 +316,125 @@ func (r *mutationResolver) Createpromotion(ctx context.Context, input *model.Pro
 	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Promotion created Successfully"}, nil
 }
 
+func (r *mutationResolver) Createcharges(ctx context.Context, input *model.Chargecreate) (*model.Promotioncreateddata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("raju")
+	print(id.ID)
+	var c []subscription.Charge
+	var d []subscription.Delivery
+	var other subscription.Charge
+	var delivery subscription.Delivery
+	othercharge := *&input.Othercharges
+	deliverycharges := *&input.Deliverycharges
+	for _, k := range othercharge {
+		c = append(c, subscription.Charge{Tenantid: k.Tenantid, Locationid: k.Locationid, Chargeid: k.Chargeid, Chargetype: k.Chargetype, Chargevalue: k.Chargevalue, Createdby: id.ID})
+	}
+	if len(c) != 0 {
+		er := other.Insertothercharges(c)
+		if er != nil {
+			return nil, er
+		}
+	}
+	for _, j := range deliverycharges {
+		d = append(d, subscription.Delivery{Tenantid: j.Tenantid, Locationid: j.Locationid, Slabtype: j.Slabtype, Slab: j.Slab, Slablimit: j.Slablimit, Slabcharge: j.Slabcharge, Createdby: id.ID})
+	}
+	if len(d) != 0 {
+		erd := delivery.Insertdeliverycharges(d)
+		if erd != nil {
+			return nil, erd
+		}
+	}
+
+	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "charges created successfully"}, nil
+}
+
+func (r *mutationResolver) Updatecharges(ctx context.Context, input *model.Chargeupdate) (*model.Promotioncreateddata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("raju")
+	print(id.ID)
+	othercreate := input.Updateothercharges.Create
+	otherupdate := input.Updateothercharges.Update
+	otherdelete := input.Updateothercharges.Delete
+	deliverycreate := input.Updatedeliverycharges.Create
+	deliveryupdate := input.Updatedeliverycharges.Update
+	deliverydelete := input.Updatedeliverycharges.Delete
+	var other []subscription.Charge
+	var del []subscription.Delivery
+	var o subscription.Charge
+	var d subscription.Delivery
+	if len(otherdelete) != 0 {
+		for i := 0; i < len(otherdelete); i++ {
+			o.Tenantchargeid = *otherdelete[i]
+			stat := o.Deleteothercharge()
+			print(stat)
+
+		}
+	}
+	if len(otherupdate) != 0 {
+		for i := 0; i < len(otherupdate); i++ {
+			o.Chargeid = otherupdate[i].Chargeid
+			o.Chargetype = otherupdate[i].Chargetype
+			o.Chargevalue = otherupdate[i].Chargevalue
+			o.Locationid = otherupdate[i].Locationid
+			o.Tenantchargeid = otherupdate[i].Tenantchargeid
+			o.Tenantid = otherupdate[i].Tenantid
+			st := o.Updateothercharge()
+			print(st)
+		}
+	}
+	if len(othercreate) != 0 {
+		for _, k := range othercreate {
+			other = append(other, subscription.Charge{Tenantid: k.Tenantid, Locationid: k.Locationid, Chargeid: k.Chargeid, Chargetype: k.Chargetype, Chargevalue: k.Chargevalue, Createdby: id.ID})
+		}
+		er := o.Insertothercharges(other)
+		if er != nil {
+			return nil, er
+		}
+
+	}
+
+	if len(deliverydelete) != 0 {
+		for i := 0; i < len(deliverydelete); i++ {
+			d.Settingsid = *deliverydelete[i]
+			stat := d.Deletedeliverycharge()
+			print(stat)
+
+		}
+	}
+	if len(deliveryupdate) != 0 {
+		for i := 0; i < len(deliveryupdate); i++ {
+			d.Locationid = deliveryupdate[i].Locationid
+			d.Settingsid = deliveryupdate[i].Settingsid
+			d.Slab = deliveryupdate[i].Slab
+			d.Slabcharge = deliveryupdate[i].Slabcharge
+			d.Slablimit = deliveryupdate[i].Slablimit
+			d.Slabtype = deliveryupdate[i].Slabtype
+			d.Tenantid = deliveryupdate[i].Tenantid
+			s := d.Updatedeliverycharge()
+			print(s)
+
+		}
+	}
+	if len(deliverycreate) != 0 {
+		for _, j := range deliverycreate {
+			del = append(del, subscription.Delivery{Tenantid: j.Tenantid, Locationid: j.Locationid, Slabtype: j.Slabtype, Slab: j.Slab, Slablimit: j.Slablimit, Slabcharge: j.Slabcharge, Createdby: id.ID})
+		}
+
+		erd := d.Insertdeliverycharges(del)
+		if erd != nil {
+			return nil, erd
+		}
+
+	}
+	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Charges updated"}, nil
+}
+
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	id, usererr := controller.ForContext(ctx)
 	if usererr != nil {
@@ -487,6 +606,10 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int) (*model.G
 			Cod:         &businessinfo.Paymode1,
 			Digital:     &businessinfo.Paymode2,
 			Tenantaccid: &businessinfo.TenantaccId,
+			Email:       &businessinfo.Email,
+			Phone:       &businessinfo.Phone,
+			Address:     &businessinfo.Address,
+			Tenanttoken: &businessinfo.Tenanttoken,
 			Social:      Result,
 		},
 	}, nil
@@ -535,9 +658,9 @@ func (r *queryResolver) Getchargetypes(ctx context.Context) (*model.Chargetypeda
 	print("userid==")
 	print(id.ID)
 	var data []*model.Chargetype
-	data=subscription.Getchargetypes()
+	data = subscription.Getchargetypes()
 
-	return &model.Chargetypedata{Status: true,Code: http.StatusOK,Message: "Success",Types: data},nil
+	return &model.Chargetypedata{Status: true, Code: http.StatusOK, Message: "Success", Types: data}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

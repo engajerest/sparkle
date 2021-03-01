@@ -52,6 +52,7 @@ input TenantDetails{
  CategoryId: Int!
  SubCategoryId: Int!
  Type: Int!
+ Tenanttoken:String!
 }
 input TenantAddress{
  Address:String!
@@ -122,6 +123,58 @@ input location{
  Openingtime:String!
  Closingtime:String!
 }
+input chargecreate{
+deliverycharges:[deliverychargeinput]
+othercharges:[chargecreateinput]
+
+}
+input chargecreateinput{
+Tenantid:Int!
+Locationid:Int!
+Chargeid:Int!
+Chargetype:String!
+Chargevalue:String!
+}
+input chargeupdateinput{
+Tenantchargeid:Int!
+Tenantid:Int!
+Locationid:Int!
+Chargeid:Int!
+Chargetype:String!
+Chargevalue:String!
+}
+input deliverychargeinput{
+Tenantid:Int!
+Locationid:Int!  
+Slabtype:String!
+Slab:String!
+Slablimit:Int!
+Slabcharge:String!
+}
+input updatedeliverychargeinput{
+Settingsid:Int!
+Tenantid:Int!
+Locationid:Int!  
+Slabtype:String!
+Slab:String!
+Slablimit:Int!
+Slabcharge:String!
+}
+input chargeupdate{
+updatedeliverycharges:updatedelivery
+updateothercharges:updateother
+}
+input updatedelivery{
+   create:[deliverychargeinput]
+   update:[updatedeliverychargeinput]
+   delete:[Int]
+}
+input updateother{
+create:[chargecreateinput]
+update:[chargeupdateinput]
+delete:[Int]
+}
+
 type LocationInfo{
  Locationid:Int!
  LocationName:String!
@@ -251,9 +304,13 @@ type info{
  tenantid:Int!
  brandname:String
  about:String
+ email:String
+ phone:String
+ address:String
  cod:Int
  digital:Int
  tenantaccid:Int
+ tenanttoken:String
  social:[socialinfo]
 }
 type socialinfo{
@@ -337,4 +394,6 @@ type Mutation {
  updatetenantbusiness(businessinfo:business):businessdata
  createlocation(input:location):locationdata
  createpromotion(input:promoinput):promotioncreateddata
+ createcharges(input:chargecreate):promotioncreateddata
+ updatecharges(input:chargeupdate):promotioncreateddata
 }

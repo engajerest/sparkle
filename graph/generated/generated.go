@@ -68,10 +68,12 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		Createcharges        func(childComplexity int, input *model.Chargecreate) int
 		Createlocation       func(childComplexity int, input *model.Location) int
 		Createpromotion      func(childComplexity int, input *model.Promoinput) int
 		Createtenantuser     func(childComplexity int, create *model.Tenantuser) int
 		Subscribe            func(childComplexity int, input model.Data) int
+		Updatecharges        func(childComplexity int, input *model.Chargeupdate) int
 		Updatetenantbusiness func(childComplexity int, businessinfo *model.Business) int
 		Updatetenantuser     func(childComplexity int, update *model.Updatetenant) int
 	}
@@ -180,12 +182,16 @@ type ComplexityRoot struct {
 
 	Info struct {
 		About       func(childComplexity int) int
+		Address     func(childComplexity int) int
 		Brandname   func(childComplexity int) int
 		Cod         func(childComplexity int) int
 		Digital     func(childComplexity int) int
+		Email       func(childComplexity int) int
+		Phone       func(childComplexity int) int
 		Social      func(childComplexity int) int
 		Tenantaccid func(childComplexity int) int
 		Tenantid    func(childComplexity int) int
+		Tenanttoken func(childComplexity int) int
 	}
 
 	Locationdata struct {
@@ -303,6 +309,8 @@ type MutationResolver interface {
 	Updatetenantbusiness(ctx context.Context, businessinfo *model.Business) (*model.Businessdata, error)
 	Createlocation(ctx context.Context, input *model.Location) (*model.Locationdata, error)
 	Createpromotion(ctx context.Context, input *model.Promoinput) (*model.Promotioncreateddata, error)
+	Createcharges(ctx context.Context, input *model.Chargecreate) (*model.Promotioncreateddata, error)
+	Updatecharges(ctx context.Context, input *model.Chargeupdate) (*model.Promotioncreateddata, error)
 }
 type QueryResolver interface {
 	Sparkle(ctx context.Context) (*model.Sparkle, error)
@@ -434,6 +442,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Module.Name(childComplexity), true
 
+	case "Mutation.createcharges":
+		if e.complexity.Mutation.Createcharges == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createcharges_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Createcharges(childComplexity, args["input"].(*model.Chargecreate)), true
+
 	case "Mutation.createlocation":
 		if e.complexity.Mutation.Createlocation == nil {
 			break
@@ -481,6 +501,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Subscribe(childComplexity, args["input"].(model.Data)), true
+
+	case "Mutation.updatecharges":
+		if e.complexity.Mutation.Updatecharges == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatecharges_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Updatecharges(childComplexity, args["input"].(*model.Chargeupdate)), true
 
 	case "Mutation.updatetenantbusiness":
 		if e.complexity.Mutation.Updatetenantbusiness == nil {
@@ -995,6 +1027,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Info.About(childComplexity), true
 
+	case "info.address":
+		if e.complexity.Info.Address == nil {
+			break
+		}
+
+		return e.complexity.Info.Address(childComplexity), true
+
 	case "info.brandname":
 		if e.complexity.Info.Brandname == nil {
 			break
@@ -1016,6 +1055,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Info.Digital(childComplexity), true
 
+	case "info.email":
+		if e.complexity.Info.Email == nil {
+			break
+		}
+
+		return e.complexity.Info.Email(childComplexity), true
+
+	case "info.phone":
+		if e.complexity.Info.Phone == nil {
+			break
+		}
+
+		return e.complexity.Info.Phone(childComplexity), true
+
 	case "info.social":
 		if e.complexity.Info.Social == nil {
 			break
@@ -1036,6 +1089,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Info.Tenantid(childComplexity), true
+
+	case "info.tenanttoken":
+		if e.complexity.Info.Tenanttoken == nil {
+			break
+		}
+
+		return e.complexity.Info.Tenanttoken(childComplexity), true
 
 	case "locationdata.code":
 		if e.complexity.Locationdata.Code == nil {
@@ -1631,6 +1691,7 @@ input TenantDetails{
  CategoryId: Int!
  SubCategoryId: Int!
  Type: Int!
+ Tenanttoken:String!
 }
 input TenantAddress{
  Address:String!
@@ -1701,6 +1762,58 @@ input location{
  Openingtime:String!
  Closingtime:String!
 }
+input chargecreate{
+deliverycharges:[deliverychargeinput]
+othercharges:[chargecreateinput]
+
+}
+input chargecreateinput{
+Tenantid:Int!
+Locationid:Int!
+Chargeid:Int!
+Chargetype:String!
+Chargevalue:String!
+}
+input chargeupdateinput{
+Tenantchargeid:Int!
+Tenantid:Int!
+Locationid:Int!
+Chargeid:Int!
+Chargetype:String!
+Chargevalue:String!
+}
+input deliverychargeinput{
+Tenantid:Int!
+Locationid:Int!  
+Slabtype:String!
+Slab:String!
+Slablimit:Int!
+Slabcharge:String!
+}
+input updatedeliverychargeinput{
+Settingsid:Int!
+Tenantid:Int!
+Locationid:Int!  
+Slabtype:String!
+Slab:String!
+Slablimit:Int!
+Slabcharge:String!
+}
+input chargeupdate{
+updatedeliverycharges:updatedelivery
+updateothercharges:updateother
+}
+input updatedelivery{
+   create:[deliverychargeinput]
+   update:[updatedeliverychargeinput]
+   delete:[Int]
+}
+input updateother{
+create:[chargecreateinput]
+update:[chargeupdateinput]
+delete:[Int]
+}
+
 type LocationInfo{
  Locationid:Int!
  LocationName:String!
@@ -1830,9 +1943,13 @@ type info{
  tenantid:Int!
  brandname:String
  about:String
+ email:String
+ phone:String
+ address:String
  cod:Int
  digital:Int
  tenantaccid:Int
+ tenanttoken:String
  social:[socialinfo]
 }
 type socialinfo{
@@ -1916,6 +2033,8 @@ type Mutation {
  updatetenantbusiness(businessinfo:business):businessdata
  createlocation(input:location):locationdata
  createpromotion(input:promoinput):promotioncreateddata
+ createcharges(input:chargecreate):promotioncreateddata
+ updatecharges(input:chargeupdate):promotioncreateddata
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1923,6 +2042,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_createcharges_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.Chargecreate
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOchargecreate2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargecreate(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_createlocation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -1976,6 +2110,21 @@ func (ec *executionContext) field_Mutation_subscribe_args(ctx context.Context, r
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNdata2githubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐData(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updatecharges_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.Chargeupdate
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOchargeupdate2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargeupdate(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2876,6 +3025,84 @@ func (ec *executionContext) _Mutation_createpromotion(ctx context.Context, field
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().Createpromotion(rctx, args["input"].(*model.Promoinput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Promotioncreateddata)
+	fc.Result = res
+	return ec.marshalOpromotioncreateddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotioncreateddata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createcharges(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createcharges_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Createcharges(rctx, args["input"].(*model.Chargecreate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Promotioncreateddata)
+	fc.Result = res
+	return ec.marshalOpromotioncreateddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotioncreateddata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updatecharges(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updatecharges_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Updatecharges(rctx, args["input"].(*model.Chargeupdate))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6420,6 +6647,102 @@ func (ec *executionContext) _info_about(ctx context.Context, field graphql.Colle
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _info_email(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_phone(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Phone, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_address(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Address, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _info_cod(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6514,6 +6837,38 @@ func (ec *executionContext) _info_tenantaccid(ctx context.Context, field graphql
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_tenanttoken(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenanttoken, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _info_social(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
@@ -9053,6 +9408,14 @@ func (ec *executionContext) unmarshalInputTenantDetails(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
+		case "Tenanttoken":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Tenanttoken"))
+			it.Tenanttoken, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -9155,6 +9518,174 @@ func (ec *executionContext) unmarshalInputbusinessupdatedata(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputchargecreate(ctx context.Context, obj interface{}) (model.Chargecreate, error) {
+	var it model.Chargecreate
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "deliverycharges":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deliverycharges"))
+			it.Deliverycharges, err = ec.unmarshalOdeliverychargeinput2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐDeliverychargeinput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "othercharges":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("othercharges"))
+			it.Othercharges, err = ec.unmarshalOchargecreateinput2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargecreateinput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputchargecreateinput(ctx context.Context, obj interface{}) (model.Chargecreateinput, error) {
+	var it model.Chargecreateinput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "Tenantid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Tenantid"))
+			it.Tenantid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Locationid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Locationid"))
+			it.Locationid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Chargeid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Chargeid"))
+			it.Chargeid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Chargetype":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Chargetype"))
+			it.Chargetype, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Chargevalue":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Chargevalue"))
+			it.Chargevalue, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputchargeupdate(ctx context.Context, obj interface{}) (model.Chargeupdate, error) {
+	var it model.Chargeupdate
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "updatedeliverycharges":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedeliverycharges"))
+			it.Updatedeliverycharges, err = ec.unmarshalOupdatedelivery2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdatedelivery(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updateothercharges":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updateothercharges"))
+			it.Updateothercharges, err = ec.unmarshalOupdateother2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdateother(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputchargeupdateinput(ctx context.Context, obj interface{}) (model.Chargeupdateinput, error) {
+	var it model.Chargeupdateinput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "Tenantchargeid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Tenantchargeid"))
+			it.Tenantchargeid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Tenantid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Tenantid"))
+			it.Tenantid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Locationid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Locationid"))
+			it.Locationid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Chargeid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Chargeid"))
+			it.Chargeid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Chargetype":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Chargetype"))
+			it.Chargetype, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Chargevalue":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Chargevalue"))
+			it.Chargevalue, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputdata(ctx context.Context, obj interface{}) (model.Data, error) {
 	var it model.Data
 	var asMap = obj.(map[string]interface{})
@@ -9182,6 +9713,66 @@ func (ec *executionContext) unmarshalInputdata(ctx context.Context, obj interfac
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptiondetails"))
 			it.Subscriptiondetails, err = ec.unmarshalNsubscription2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscription(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputdeliverychargeinput(ctx context.Context, obj interface{}) (model.Deliverychargeinput, error) {
+	var it model.Deliverychargeinput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "Tenantid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Tenantid"))
+			it.Tenantid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Locationid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Locationid"))
+			it.Locationid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Slabtype":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Slabtype"))
+			it.Slabtype, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Slab":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Slab"))
+			it.Slab, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Slablimit":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Slablimit"))
+			it.Slablimit, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Slabcharge":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Slabcharge"))
+			it.Slabcharge, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9647,6 +10238,146 @@ func (ec *executionContext) unmarshalInputtenantuser(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputupdatedelivery(ctx context.Context, obj interface{}) (model.Updatedelivery, error) {
+	var it model.Updatedelivery
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "create":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			it.Create, err = ec.unmarshalOdeliverychargeinput2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐDeliverychargeinput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "update":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("update"))
+			it.Update, err = ec.unmarshalOupdatedeliverychargeinput2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdatedeliverychargeinput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "delete":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			it.Delete, err = ec.unmarshalOInt2ᚕᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputupdatedeliverychargeinput(ctx context.Context, obj interface{}) (model.Updatedeliverychargeinput, error) {
+	var it model.Updatedeliverychargeinput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "Settingsid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Settingsid"))
+			it.Settingsid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Tenantid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Tenantid"))
+			it.Tenantid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Locationid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Locationid"))
+			it.Locationid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Slabtype":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Slabtype"))
+			it.Slabtype, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Slab":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Slab"))
+			it.Slab, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Slablimit":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Slablimit"))
+			it.Slablimit, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Slabcharge":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Slabcharge"))
+			it.Slabcharge, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputupdateother(ctx context.Context, obj interface{}) (model.Updateother, error) {
+	var it model.Updateother
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "create":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			it.Create, err = ec.unmarshalOchargecreateinput2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargecreateinput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "update":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("update"))
+			it.Update, err = ec.unmarshalOchargeupdateinput2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargeupdateinput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "delete":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			it.Delete, err = ec.unmarshalOInt2ᚕᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputupdatetenant(ctx context.Context, obj interface{}) (model.Updatetenant, error) {
 	var it model.Updatetenant
 	var asMap = obj.(map[string]interface{})
@@ -9894,6 +10625,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_createlocation(ctx, field)
 		case "createpromotion":
 			out.Values[i] = ec._Mutation_createpromotion(ctx, field)
+		case "createcharges":
+			out.Values[i] = ec._Mutation_createcharges(ctx, field)
+		case "updatecharges":
+			out.Values[i] = ec._Mutation_updatecharges(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10771,12 +11506,20 @@ func (ec *executionContext) _info(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._info_brandname(ctx, field, obj)
 		case "about":
 			out.Values[i] = ec._info_about(ctx, field, obj)
+		case "email":
+			out.Values[i] = ec._info_email(ctx, field, obj)
+		case "phone":
+			out.Values[i] = ec._info_phone(ctx, field, obj)
+		case "address":
+			out.Values[i] = ec._info_address(ctx, field, obj)
 		case "cod":
 			out.Values[i] = ec._info_cod(ctx, field, obj)
 		case "digital":
 			out.Values[i] = ec._info_digital(ctx, field, obj)
 		case "tenantaccid":
 			out.Values[i] = ec._info_tenantaccid(ctx, field, obj)
+		case "tenanttoken":
+			out.Values[i] = ec._info_tenanttoken(ctx, field, obj)
 		case "social":
 			out.Values[i] = ec._info_social(ctx, field, obj)
 		default:
@@ -11925,6 +12668,42 @@ func (ec *executionContext) marshalOCategory2ᚖgithubᚗcomᚋengajerestᚋspar
 	return ec._Category(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOInt2ᚕᚖint(ctx context.Context, v interface{}) ([]*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*int, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOInt2ᚖint(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOInt2ᚕᚖint(ctx context.Context, sel ast.SelectionSet, v []*int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOInt2ᚖint(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
 	if v == nil {
 		return nil, nil
@@ -12222,6 +13001,46 @@ func (ec *executionContext) unmarshalObusinessupdatedata2ᚖgithubᚗcomᚋengaj
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalOchargecreate2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargecreate(ctx context.Context, v interface{}) (*model.Chargecreate, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputchargecreate(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOchargecreateinput2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargecreateinput(ctx context.Context, v interface{}) ([]*model.Chargecreateinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Chargecreateinput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOchargecreateinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargecreateinput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOchargecreateinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargecreateinput(ctx context.Context, v interface{}) (*model.Chargecreateinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputchargecreateinput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalOchargetype2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargetype(ctx context.Context, sel ast.SelectionSet, v []*model.Chargetype) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -12274,6 +13093,78 @@ func (ec *executionContext) marshalOchargetypedata2ᚖgithubᚗcomᚋengajerest�
 		return graphql.Null
 	}
 	return ec._chargetypedata(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOchargeupdate2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargeupdate(ctx context.Context, v interface{}) (*model.Chargeupdate, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputchargeupdate(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOchargeupdateinput2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargeupdateinput(ctx context.Context, v interface{}) ([]*model.Chargeupdateinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Chargeupdateinput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOchargeupdateinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargeupdateinput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOchargeupdateinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargeupdateinput(ctx context.Context, v interface{}) (*model.Chargeupdateinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputchargeupdateinput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOdeliverychargeinput2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐDeliverychargeinput(ctx context.Context, v interface{}) ([]*model.Deliverychargeinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Deliverychargeinput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOdeliverychargeinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐDeliverychargeinput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOdeliverychargeinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐDeliverychargeinput(ctx context.Context, v interface{}) (*model.Deliverychargeinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputdeliverychargeinput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOgetBusinessdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetBusinessdata(ctx context.Context, sel ast.SelectionSet, v *model.GetBusinessdata) graphql.Marshaler {
@@ -12566,6 +13457,54 @@ func (ec *executionContext) marshalOtypedata2ᚖgithubᚗcomᚋengajerestᚋspar
 		return graphql.Null
 	}
 	return ec._typedata(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOupdatedelivery2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdatedelivery(ctx context.Context, v interface{}) (*model.Updatedelivery, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputupdatedelivery(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOupdatedeliverychargeinput2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdatedeliverychargeinput(ctx context.Context, v interface{}) ([]*model.Updatedeliverychargeinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Updatedeliverychargeinput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOupdatedeliverychargeinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdatedeliverychargeinput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOupdatedeliverychargeinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdatedeliverychargeinput(ctx context.Context, v interface{}) (*model.Updatedeliverychargeinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputupdatedeliverychargeinput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOupdateother2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdateother(ctx context.Context, v interface{}) (*model.Updateother, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputupdateother(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOupdatetenant2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdatetenant(ctx context.Context, v interface{}) (*model.Updatetenant, error) {

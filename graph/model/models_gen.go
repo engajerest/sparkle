@@ -98,6 +98,7 @@ type TenantDetails struct {
 	CategoryID    int    `json:"CategoryId"`
 	SubCategoryID int    `json:"SubCategoryId"`
 	Type          int    `json:"Type"`
+	Tenanttoken   string `json:"Tenanttoken"`
 }
 
 type Business struct {
@@ -122,6 +123,19 @@ type Businessupdatedata struct {
 	Tenantaccid *int    `json:"tenantaccid"`
 }
 
+type Chargecreate struct {
+	Deliverycharges []*Deliverychargeinput `json:"deliverycharges"`
+	Othercharges    []*Chargecreateinput   `json:"othercharges"`
+}
+
+type Chargecreateinput struct {
+	Tenantid    int    `json:"Tenantid"`
+	Locationid  int    `json:"Locationid"`
+	Chargeid    int    `json:"Chargeid"`
+	Chargetype  string `json:"Chargetype"`
+	Chargevalue string `json:"Chargevalue"`
+}
+
 type Chargetype struct {
 	Chargeid   int     `json:"Chargeid"`
 	Chargename string  `json:"Chargename"`
@@ -135,10 +149,33 @@ type Chargetypedata struct {
 	Types   []*Chargetype `json:"types"`
 }
 
+type Chargeupdate struct {
+	Updatedeliverycharges *Updatedelivery `json:"updatedeliverycharges"`
+	Updateothercharges    *Updateother    `json:"updateothercharges"`
+}
+
+type Chargeupdateinput struct {
+	Tenantchargeid int    `json:"Tenantchargeid"`
+	Tenantid       int    `json:"Tenantid"`
+	Locationid     int    `json:"Locationid"`
+	Chargeid       int    `json:"Chargeid"`
+	Chargetype     string `json:"Chargetype"`
+	Chargevalue    string `json:"Chargevalue"`
+}
+
 type Data struct {
 	Tenantinfo          *TenantDetails `json:"tenantinfo"`
 	Tenantlocation      *TenantAddress `json:"tenantlocation"`
 	Subscriptiondetails *Subscription  `json:"subscriptiondetails"`
+}
+
+type Deliverychargeinput struct {
+	Tenantid   int    `json:"Tenantid"`
+	Locationid int    `json:"Locationid"`
+	Slabtype   string `json:"Slabtype"`
+	Slab       string `json:"Slab"`
+	Slablimit  int    `json:"Slablimit"`
+	Slabcharge string `json:"Slabcharge"`
 }
 
 type GetBusinessdata struct {
@@ -166,9 +203,13 @@ type Info struct {
 	Tenantid    int           `json:"tenantid"`
 	Brandname   *string       `json:"brandname"`
 	About       *string       `json:"about"`
+	Email       *string       `json:"email"`
+	Phone       *string       `json:"phone"`
+	Address     *string       `json:"address"`
 	Cod         *int          `json:"cod"`
 	Digital     *int          `json:"digital"`
 	Tenantaccid *int          `json:"tenantaccid"`
+	Tenanttoken *string       `json:"tenanttoken"`
 	Social      []*Socialinfo `json:"social"`
 }
 
@@ -310,6 +351,28 @@ type Typedata struct {
 	Promotiontypeid int     `json:"Promotiontypeid"`
 	Typename        *string `json:"Typename"`
 	Tag             *string `json:"Tag"`
+}
+
+type Updatedelivery struct {
+	Create []*Deliverychargeinput       `json:"create"`
+	Update []*Updatedeliverychargeinput `json:"update"`
+	Delete []*int                       `json:"delete"`
+}
+
+type Updatedeliverychargeinput struct {
+	Settingsid int    `json:"Settingsid"`
+	Tenantid   int    `json:"Tenantid"`
+	Locationid int    `json:"Locationid"`
+	Slabtype   string `json:"Slabtype"`
+	Slab       string `json:"Slab"`
+	Slablimit  int    `json:"Slablimit"`
+	Slabcharge string `json:"Slabcharge"`
+}
+
+type Updateother struct {
+	Create []*Chargecreateinput `json:"create"`
+	Update []*Chargeupdateinput `json:"update"`
+	Delete []*int               `json:"delete"`
 }
 
 type Updatetenant struct {
