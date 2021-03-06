@@ -26,8 +26,8 @@ const (
 	insertTenantLocationQuery      = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,moduleid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamout,paymentstatus,paymentid) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
 	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid, c.name FROM tenants a,tenantsubscription b,app_module c WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid=?"
-	createLocationQuery            = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND locationid=? "
+	createLocationQuery            = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocation WHERE status='Active' AND locationid=? "
 	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND tenantid=? "
 	createTenantUserQuery          = "INSERT INTO app_users (authname,password,hashsalt,contactno,roleid,referenceid) VALUES(?,?,?,?,?,?)"
 	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofiles (userid,firstname,lastname,email,contactno,userlocationid) VALUES(?,?,?,?,?,?)"
@@ -41,16 +41,15 @@ const (
 	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid,IFNULL(address,'') AS address,IFNULL(primaryemail,'') AS primaryemail,IFNULL(primarycontact,'') AS  primarycontact,IFNULL(tenanttoken,'') AS tenanttoken FROM tenants WHERE tenantid=?"
 	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile , IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
 	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
-	Getpromotions          = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.promoname,a.promocode,a.promoterms,a.promovalue,a.startdate,a.enddate,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
-    createpromotion ="INSERT INTO promotions (promotiontypeid,tenantid,promoname,promocode,promoterms,promovalue,startdate,enddate,createdby) VALUES(?,?,?,?,?,?,?,?,?)"
-    insertsequence = "INSERT INTO ordersequence (tenantid,tablename,seqno,prefix,subprefix) VALUES(?,?,?,?,?)"
-insertcharge = "INSERT INTO tenantcharges (tenantid,locationid,chargeid,chargetype,chargevalue,createdby) VALUES"
-insertdelivery = "INSERT INTO tenantsettings (tenantid,locationid,slabtype,slab,slablimit,slabcharge,createdby) VALUES"
-updatecharge = "UPDATE tenantcharges SET locationid=?,chargeid=?,chargetype=?, chargevalue=? WHERE tenantchargeid=? AND tenantid=?"
-updatedelivery="UPDATE  tenantsettings SET locationid=?,slabtype=?,slab=?,slablimit=?,slabcharge=? WHERE settingsid=? AND tenantid=?"
-deletecharge = "DELETE FROM tenantcharges WHERE tenantchargeid=?"
-deletedelivery = "DELETE FROM  tenantsettings WHERE settingsid=?"
-
+	Getpromotions                  = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.promoname,a.promocode,a.promoterms,a.promovalue,a.startdate,a.enddate,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
+	createpromotion                = "INSERT INTO promotions (promotiontypeid,tenantid,promoname,promocode,promoterms,promovalue,startdate,enddate,createdby) VALUES(?,?,?,?,?,?,?,?,?)"
+	insertsequence                 = "INSERT INTO ordersequence (tenantid,tablename,seqno,prefix,subprefix) VALUES(?,?,?,?,?)"
+	insertcharge                   = "INSERT INTO tenantcharges (tenantid,locationid,chargeid,chargename,chargetype,chargevalue,createdby) VALUES"
+	insertdelivery                 = "INSERT INTO tenantsettings (tenantid,locationid,slabtype,slab,slablimit,slabcharge,createdby) VALUES"
+	updatecharge                   = "UPDATE tenantcharges SET locationid=?,chargeid=?,chargename=?,chargetype=?, chargevalue=? WHERE tenantchargeid=? AND tenantid=?"
+	updatedelivery                 = "UPDATE  tenantsettings SET locationid=?,slabtype=?,slab=?,slablimit=?,slabcharge=? WHERE settingsid=? AND tenantid=?"
+	deletecharge                   = "DELETE FROM tenantcharges WHERE tenantchargeid=?"
+	deletedelivery                 = "DELETE FROM  tenantsettings WHERE settingsid=?"
 )
 
 func GetAllCategory() []Category {
@@ -150,7 +149,7 @@ func (info *SubscriptionData) CreateTenant(userid int) (int64, error) {
 
 	fmt.Println("2")
 	res, err := statement.Exec(userid, &info.Info.Regno, &info.Info.Name, &info.Info.Email, &info.Info.Mobile, &info.Info.CategoryId, &info.Info.SubCategoryID,
-		&info.Address.Address, &info.Address.State, &info.Address.Suburb, &info.Address.Latitude, &info.Address.Longitude, &info.Address.Zip, &info.Address.Countrycode, &info.Address.TimeZone, &info.Address.CurrencyCode,&info.Info.Tenanttoken)
+		&info.Address.Address, &info.Address.State, &info.Address.Suburb, &info.Address.Latitude, &info.Address.Longitude, &info.Address.Zip, &info.Address.Countrycode, &info.Address.TimeZone, &info.Address.CurrencyCode, &info.Info.Tenanttoken)
 	if err != nil {
 		log.Fatal(err)
 
@@ -240,7 +239,7 @@ func (loco *Location) CreateLocation(id int64) (int64, error) {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(&loco.TenantID, &loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, id)
+	res, err := statement.Exec(&loco.TenantID, &loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, id, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -262,7 +261,7 @@ func (loco *Location) GetLocationById(id int64) (*Location, error) {
 	defer stmt.Close()
 	row := stmt.QueryRow(id)
 	// print(row)
-	err = row.Scan(&data.LocationId, &data.LocationName, &data.Address, &data.Suburb, &data.State, &data.Zip, &data.Latitude, &data.Longitude, &data.Countrycode, &data.OpeningTime, &data.ClosingTime, &data.Createdby, &data.Status)
+	err = row.Scan(&data.LocationId, &data.LocationName, &data.Address, &data.Suburb, &data.State, &data.Zip, &data.Latitude, &data.Longitude, &data.Countrycode, &data.OpeningTime, &data.ClosingTime, &data.Createdby, &data.Status, &data.Delivery, &data.Deliverytype, &data.Deliverymins)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -335,8 +334,9 @@ func LocationTest(id int) []Tenantlocation {
 	// // user.Appuserprofiles = emails
 	// fmt.Println(user)
 	var orders []Tenantlocation
-
-	DB.Table("tenantlocation").Preload("Appuserprofiles").Where("tenantid=?", id).Find(&orders)
+// 	var ord []Tenantcharge
+// DB.Table("tenantcharges").Where("tenantid=? AND locationid=?",128,148).Preload("Chargetypes").Find(&ord)
+	DB.Table("tenantlocation").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&orders)
 
 	fmt.Println(orders)
 	for index, value := range orders {
@@ -391,6 +391,28 @@ func LocationTest(id int) []Tenantlocation {
 	// }
 
 	return orders
+
+}
+
+
+
+func Locationbyid(tenantid,locationid int) *Tenantlocation {
+
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+
+	var data Tenantlocation
+
+	DB.Table("tenantlocation").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=? AND locationid=?", tenantid,locationid).Find(&data)
+
+	fmt.Println(data)
+
+	return &data
 
 }
 func userget(ids []int) ([]*users.User, []error) {
@@ -581,7 +603,7 @@ func (info *Social) UpdateTenantSocial(tenantid int) bool {
 		return false
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&info.SociaProfile,&info.SocialLink,&info.SocialIcon,tenantid,&info.Socialid,)
+	_, err = statement.Exec(&info.SociaProfile, &info.SocialLink, &info.SocialIcon, tenantid, &info.Socialid)
 	if err != nil {
 		log.Fatal(err)
 		return false
@@ -619,7 +641,7 @@ func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) 
 	defer stmt.Close()
 	row := stmt.QueryRow(id)
 	// print(row)
-	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId,&data.Address,&data.Email,&data.Phone,&data.Tenanttoken)
+	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone, &data.Tenanttoken)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -699,7 +721,7 @@ func UserAuthentication(id int64) (*users.User, bool, error) {
 	// user.Check=true
 	return &data, true, err
 }
-func GetAllPromotions(tenantid int ) []Promotion {
+func GetAllPromotions(tenantid int) []Promotion {
 	print("st1")
 	stmt, err := database.Db.Prepare(Getpromotions)
 	if err != nil {
@@ -715,8 +737,8 @@ func GetAllPromotions(tenantid int ) []Promotion {
 
 	for rows.Next() {
 		var promo Promotion
-		err := rows.Scan(&promo.Promotionid,&promo.Promotiontypeid,&promo.Tenantid,&promo.Promoname,&promo.Promocode,&promo.Promoterms,&promo.Promovalue,
-		&promo.Startdate,&promo.Enddate,&promo.Status,&promo.Promotype,&promo.Promotag,&promo.Tenantname)
+		err := rows.Scan(&promo.Promotionid, &promo.Promotiontypeid, &promo.Tenantid, &promo.Promoname, &promo.Promocode, &promo.Promoterms, &promo.Promovalue,
+			&promo.Startdate, &promo.Enddate, &promo.Status, &promo.Promotype, &promo.Promotag, &promo.Tenantname)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -729,7 +751,7 @@ func GetAllPromotions(tenantid int ) []Promotion {
 	return promolist
 
 }
-func (p *Promotion) Createpromotion(created int ) int64 {
+func (p *Promotion) Createpromotion(created int) int64 {
 	statement, err := database.Db.Prepare(createpromotion)
 	print(statement)
 
@@ -737,8 +759,8 @@ func (p *Promotion) Createpromotion(created int ) int64 {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(&p.Promotiontypeid,&p.Tenantid,&p.Promoname,&p.Promocode,&p.Promoterms,
-	&p.Promovalue,&p.Startdate,&p.Enddate,created)
+	res, err := statement.Exec(&p.Promotiontypeid, &p.Tenantid, &p.Promoname, &p.Promocode, &p.Promoterms,
+		&p.Promovalue, &p.Startdate, &p.Enddate, created)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -801,7 +823,7 @@ func (o *Ordersequence) Insertsequence() (int64, error) {
 	defer statement.Close()
 
 	fmt.Println("2")
-	res, err := statement.Exec(&o.Tenantid,&o.Tablename,&o.Seqno,&o.Prefix,&o.Subprefix)
+	res, err := statement.Exec(&o.Tenantid, &o.Tablename, &o.Seqno, &o.Prefix, &o.Subprefix)
 	if err != nil {
 		log.Fatal(err)
 
@@ -814,13 +836,13 @@ func (o *Ordersequence) Insertsequence() (int64, error) {
 	log.Print("Row inserted in sequence!")
 	return id, nil
 }
-func (info *Charge) Insertothercharges(soc []Charge) error {
+func (info *Tenantcharge) Insertothercharges(soc []Tenantcharge) error {
 
 	var inserts []string
 	var params []interface{}
 	for _, v := range soc {
-		inserts = append(inserts, "(?, ?, ?, ?,?,?)")
-		params = append(params,v.Tenantid,v.Locationid,v.Chargeid,v.Chargetype,v.Chargevalue,v.Createdby )
+		inserts = append(inserts, "(?, ?, ?, ?,?,?,?)")
+		params = append(params, v.Tenantid, v.Locationid, v.Chargeid,v.Chargename, v.Chargetype, v.Chargevalue, v.Createdby)
 	}
 	queryVals := strings.Join(inserts, ",")
 	query := insertcharge + queryVals
@@ -848,13 +870,13 @@ func (info *Charge) Insertothercharges(soc []Charge) error {
 	return nil
 
 }
-func (info *Delivery) Insertdeliverycharges(soc []Delivery) error {
+func (info *Tenantsetting) Insertdeliverycharges(soc []Tenantsetting) error {
 
 	var inserts []string
 	var params []interface{}
 	for _, v := range soc {
 		inserts = append(inserts, "(?, ?, ?, ?,?,?,?)")
-		params = append(params,v.Tenantid,v.Locationid,v.Slabtype,v.Slab,v.Slablimit,v.Slabcharge,v.Createdby )
+		params = append(params, v.Tenantid, v.Locationid, v.Slabtype, v.Slab, v.Slablimit, v.Slabcharge, v.Createdby)
 	}
 	queryVals := strings.Join(inserts, ",")
 	query := insertdelivery + queryVals
@@ -882,7 +904,7 @@ func (info *Delivery) Insertdeliverycharges(soc []Delivery) error {
 	return nil
 
 }
-func (o *Charge) Updateothercharge() bool {
+func (o *Tenantcharge) Updateothercharge() bool {
 	fmt.Println("0")
 	statement, err := database.Db.Prepare(updatecharge)
 	fmt.Println("1")
@@ -891,7 +913,7 @@ func (o *Charge) Updateothercharge() bool {
 		return false
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&o.Locationid,&o.Chargeid,&o.Chargetype,&o.Chargevalue,&o.Tenantchargeid,&o.Tenantid)
+	_, err = statement.Exec(&o.Locationid, &o.Chargeid,&o.Chargename, &o.Chargetype, &o.Chargevalue, &o.Tenantchargeid, &o.Tenantid)
 	if err != nil {
 
 		log.Fatal(err)
@@ -901,7 +923,7 @@ func (o *Charge) Updateothercharge() bool {
 	log.Print("Row updated in charges!")
 	return true
 }
-func (o *Delivery) Updatedeliverycharge() bool {
+func (o *Tenantsetting) Updatedeliverycharge() bool {
 	fmt.Println("0")
 	statement, err := database.Db.Prepare(updatedelivery)
 	fmt.Println("1")
@@ -910,7 +932,7 @@ func (o *Delivery) Updatedeliverycharge() bool {
 		return false
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&o.Locationid,&o.Slabtype,&o.Slab,&o.Slablimit,&o.Slabcharge,&o.Settingsid,&o.Tenantid)
+	_, err = statement.Exec(&o.Locationid, &o.Slabtype, &o.Slab, &o.Slablimit, &o.Slabcharge, &o.Settingsid, &o.Tenantid)
 	if err != nil {
 
 		log.Fatal(err)
@@ -920,7 +942,7 @@ func (o *Delivery) Updatedeliverycharge() bool {
 	log.Print("Row updated in charges!")
 	return true
 }
-func (c *Charge) Deleteothercharge() bool {
+func (c *Tenantcharge) Deleteothercharge() bool {
 
 	statement, err := database.Db.Prepare(deletecharge)
 	print(statement)
@@ -940,7 +962,7 @@ func (c *Charge) Deleteothercharge() bool {
 	return true
 
 }
-func (c *Delivery) Deletedeliverycharge() bool {
+func (c *Tenantsetting) Deletedeliverycharge() bool {
 
 	statement, err := database.Db.Prepare(deletedelivery)
 	print(statement)

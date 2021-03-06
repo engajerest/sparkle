@@ -1,6 +1,6 @@
 APP:
   ENV:  "development"
-  PORT: ":1111"
+  PORT: ":1112"
   DATABASE_NAME: "cegxbczruu"
   DATABASE_USERNAME: "cegxbczruu"
   DATABASE_PASSWORD: "Package@123#"

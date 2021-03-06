@@ -122,6 +122,10 @@ input location{
  Longitude:String!
  Openingtime:String!
  Closingtime:String!
+ Delivery:Boolean!
+ Deliverytype:String!
+ Deliverymins:Int!
+
 }
 input chargecreate{
 deliverycharges:[deliverychargeinput]
@@ -132,6 +136,7 @@ input chargecreateinput{
 Tenantid:Int!
 Locationid:Int!
 Chargeid:Int!
+Chargename:String!
 Chargetype:String!
 Chargevalue:String!
 }
@@ -140,6 +145,7 @@ Tenantchargeid:Int!
 Tenantid:Int!
 Locationid:Int!
 Chargeid:Int!
+Chargename:String!
 Chargetype:String!
 Chargevalue:String!
 }
@@ -204,9 +210,28 @@ type locationgetall {
  closingtime:String!
  status:String!
  createdby:Int!
- tenantusers:[usertenant] 
+ tenantusers:[usertenant]
+ othercharges:[othercharge]
+ deliverycharges:[deliverycharge]
 }
-
+type othercharge{
+Tenantchargeid:Int!
+Tenantid:Int!
+Locationid:Int!
+Chargeid:Int!
+Chargename:String!
+Chargetype:String!
+Chargevalue:String!
+}
+type deliverycharge{
+   Settingsid:Int!
+Tenantid:Int!
+Locationid:Int!  
+Slabtype:String!
+Slab:String!
+Slablimit:Int!
+Slabcharge:String!
+}
 type usertenant{
  userid:Int!
  firstname: String!
@@ -377,6 +402,13 @@ type chargetype{
  Chargename:String!
  Status:String
 }
+type locationbyiddata{
+status:Boolean!
+ code:Int!
+ message:String! 
+ locationdata:locationgetall
+
+}
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
@@ -385,6 +417,7 @@ type Query {
  getpromotions(tenantid:Int!):getpromotiondata
  getpromotypes:promotypesdata
  getchargetypes:chargetypedata
+ getlocationbyid(tenantid:Int!,locationid:Int!):locationbyiddata
 }
 
 type Mutation {

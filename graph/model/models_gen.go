@@ -132,6 +132,7 @@ type Chargecreateinput struct {
 	Tenantid    int    `json:"Tenantid"`
 	Locationid  int    `json:"Locationid"`
 	Chargeid    int    `json:"Chargeid"`
+	Chargename  string `json:"Chargename"`
 	Chargetype  string `json:"Chargetype"`
 	Chargevalue string `json:"Chargevalue"`
 }
@@ -159,6 +160,7 @@ type Chargeupdateinput struct {
 	Tenantid       int    `json:"Tenantid"`
 	Locationid     int    `json:"Locationid"`
 	Chargeid       int    `json:"Chargeid"`
+	Chargename     string `json:"Chargename"`
 	Chargetype     string `json:"Chargetype"`
 	Chargevalue    string `json:"Chargevalue"`
 }
@@ -167,6 +169,16 @@ type Data struct {
 	Tenantinfo          *TenantDetails `json:"tenantinfo"`
 	Tenantlocation      *TenantAddress `json:"tenantlocation"`
 	Subscriptiondetails *Subscription  `json:"subscriptiondetails"`
+}
+
+type Deliverycharge struct {
+	Settingsid int    `json:"Settingsid"`
+	Tenantid   int    `json:"Tenantid"`
+	Locationid int    `json:"Locationid"`
+	Slabtype   string `json:"Slabtype"`
+	Slab       string `json:"Slab"`
+	Slablimit  int    `json:"Slablimit"`
+	Slabcharge string `json:"Slabcharge"`
 }
 
 type Deliverychargeinput struct {
@@ -227,6 +239,16 @@ type Location struct {
 	Longitude    string `json:"Longitude"`
 	Openingtime  string `json:"Openingtime"`
 	Closingtime  string `json:"Closingtime"`
+	Delivery     bool   `json:"Delivery"`
+	Deliverytype string `json:"Deliverytype"`
+	Deliverymins int    `json:"Deliverymins"`
+}
+
+type Locationbyiddata struct {
+	Status       bool            `json:"status"`
+	Code         int             `json:"code"`
+	Message      string          `json:"message"`
+	Locationdata *Locationgetall `json:"locationdata"`
 }
 
 type Locationdata struct {
@@ -237,23 +259,35 @@ type Locationdata struct {
 }
 
 type Locationgetall struct {
-	Locationid   int           `json:"locationid"`
-	LocationName string        `json:"locationName"`
-	Tenantid     int           `json:"tenantid"`
-	Email        *string       `json:"email"`
-	Contact      *string       `json:"contact"`
-	Address      string        `json:"address"`
-	Suburb       string        `json:"suburb"`
-	State        string        `json:"state"`
-	Postcode     string        `json:"postcode"`
-	Countycode   string        `json:"countycode"`
-	Latitude     string        `json:"latitude"`
-	Longitude    string        `json:"longitude"`
-	Openingtime  string        `json:"openingtime"`
-	Closingtime  string        `json:"closingtime"`
-	Status       string        `json:"status"`
-	Createdby    int           `json:"createdby"`
-	Tenantusers  []*Usertenant `json:"tenantusers"`
+	Locationid      int               `json:"locationid"`
+	LocationName    string            `json:"locationName"`
+	Tenantid        int               `json:"tenantid"`
+	Email           *string           `json:"email"`
+	Contact         *string           `json:"contact"`
+	Address         string            `json:"address"`
+	Suburb          string            `json:"suburb"`
+	State           string            `json:"state"`
+	Postcode        string            `json:"postcode"`
+	Countycode      string            `json:"countycode"`
+	Latitude        string            `json:"latitude"`
+	Longitude       string            `json:"longitude"`
+	Openingtime     string            `json:"openingtime"`
+	Closingtime     string            `json:"closingtime"`
+	Status          string            `json:"status"`
+	Createdby       int               `json:"createdby"`
+	Tenantusers     []*Usertenant     `json:"tenantusers"`
+	Othercharges    []*Othercharge    `json:"othercharges"`
+	Deliverycharges []*Deliverycharge `json:"deliverycharges"`
+}
+
+type Othercharge struct {
+	Tenantchargeid int    `json:"Tenantchargeid"`
+	Tenantid       int    `json:"Tenantid"`
+	Locationid     int    `json:"Locationid"`
+	Chargeid       int    `json:"Chargeid"`
+	Chargename     string `json:"Chargename"`
+	Chargetype     string `json:"Chargetype"`
+	Chargevalue    string `json:"Chargevalue"`
 }
 
 type Promoinput struct {

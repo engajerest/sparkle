@@ -1,7 +1,5 @@
 package subscription
 
-// import "gorm.io/gorm"
-
 type Category struct {
 	CategoryID int    `json:"categoryId"`
 	Name       string `json:"name"`
@@ -45,7 +43,7 @@ type Tenantinfo struct {
 	CategoryId    int    `json:"categoryId"`
 	Typeid        int    `json:"typeId"`
 	SubCategoryID int    `json:"subcategoryId"`
-	Tenanttoken string `json:"tenanttoken"`
+	Tenanttoken   string `json:"tenanttoken"`
 }
 type TenantLocation struct {
 	Address      string `json:"address"`
@@ -118,6 +116,9 @@ type Location struct {
 	Longitude    string `json:"longitude"`
 	OpeningTime  string `json:""openingtime`
 	ClosingTime  string `json:"closingtime"`
+	Delivery     bool   `json:"delivery"`
+	Deliverytype string `json:"deliverytype"`
+	Deliverymins int    `json:"deliverymins"`
 	Createdby    int    `json:"createdby"`
 	Status       string `json:"status"`
 }
@@ -131,27 +132,47 @@ type BusinessUpdate struct {
 	Address     string   `json:"address"`
 	Paymode1    int      `json:"paymode1"`
 	Paymode2    int      `json:"paymode2"`
-	Tenanttoken string `json:"tenanttoken"`
+	Tenanttoken string   `json:"tenanttoken"`
 	SocialData  []Social `json:"social"`
 	// SociaProfile string `json:"socialprofile"`
 	// SocialLink string `json:"sociallink"`
 	// SocialIcon string `json:"socialicon"`
 
 }
+type Tenant struct {
+	Tenantid    int    `json:"tenantid" gorm:"primary_key"`
+	Brandname   string `json:"brandname"`
+	TenantaccId int    `json:"tenantaccid"`
+	About       string `json:"about"`
+	Email       string `json:"email"`
+	Phone       string `json:"phone"`
+	Address     string `json:"address"`
+	Paymode1    int    `json:"paymode1"`
+	Paymode2    int    `json:"paymode2"`
+	Tenanttoken string `json:"tenanttoken"`
+}
+
 type AuthUser struct {
 	TenantID   int `json:"tenantid"`
 	LocationId int `json:"locationid"`
 }
 type Social struct {
-	Socialid     int    `json:"socialid"`
+	Socialid     int    `json:"socialid" `
 	SociaProfile string `json:"socialprofile"`
 	SocialLink   string `json:"sociallink"`
 	SocialIcon   string `json:"socialicon"`
 }
+type Tenantsocial struct {
+	Socialid     int    `json:"socialid" gorm:"primary_key"`
+	Tenantid     int    `json:"tenantid"`
+	Sociaprofile string `json:"socialprofile"`
+	Sociallink   string `json:"sociallink"`
+	Socialicon   string `json:"socialicon"`
+}
 type Tenantlocation struct {
 	// gorm.Model
 	Locationid      int                `json:"locationid" gorm:"primary_key"`
-	Tenantid        int                `json:"tenantid"`
+	Tenantid        int                `json:"tenantid" gorm:"ForeignKey"`
 	Locationname    string             `json:"locationname"`
 	Email           string             `json:"email"`
 	Contactno       string             `json:"contactno"`
@@ -164,9 +185,16 @@ type Tenantlocation struct {
 	Longitude       string             `json:"longitude"`
 	Opentime        string             `json:""opentime`
 	Closetime       string             `json:"closetime"`
+	Delivery        bool               `json:"delivery"`
+	Deliverytype    string             `json:"deliverytype"`
+	Deliverymins    int                `json:"deliverymins"`
 	Createdby       int                `json:"createdby"`
 	Status          string             `json:"status"`
+	
 	Appuserprofiles []App_userprofiles `json:"appuserprofile" gorm:"ForeignKey:userlocationid"`
+	Tenantcharges   []Tenantcharge     `json:"tenantcharge" gorm:"ForeignKey:locationid"`
+	Tenantsettings  []Tenantsetting    `json:"tenantsetting" gorm:"ForeignKey:locationid"`
+	
 }
 type App_userprofiles struct {
 	// gorm.Model
@@ -201,17 +229,25 @@ type Ordersequence struct {
 	Prefix     string `json:"prefix"`
 	Subprefix  int    `json:"subprefix"`
 }
-type Charge struct {
-	Tenantchargeid int `json:"tenantchargeid"`
-	Tenantid   int    `json:"tenantid"`
-	Locationid int    `json:"locationid"`
-	Chargeid int `json:"chargeid"`
-	Chargetype string `json:"chargetype"`
-	Chargevalue string `json:"chargevalue"`
-	Createdby  int    `json:"createdby"`
+type Tenantcharge struct {
+	Tenantchargeid int    `json:"tenantchargeid" gorm:"primary_key"`
+	Tenantid       int    `json:"tenantid"`
+	Locationid     int    `json:"locationid"`
+	Chargeid       int    `json:"chargeid"`
+	Chargename     string `json:"chargename"`
+	Chargetype     string `json:"chargetype"`
+	Chargevalue    string `json:"chargevalue"`
+	Createdby      int    `json:"createdby"`
+	// Chargetypes *Chargetype `gorm:"ForeignKey:chargeid" `
+
+}
+type Chargetype struct {
+	Chargeid   int    `gorm:"primary_key"`
+	Chargename string `json:"chargename"`
+	Status     string `json:"status"`
 }
 
-type Delivery struct {
+type Tenantsetting struct {
 	Settingsid int    `json:"settinsid"`
 	Tenantid   int    `json:"tenantid"`
 	Locationid int    `json:"locationid"`

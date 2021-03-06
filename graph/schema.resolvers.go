@@ -34,7 +34,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	data.Info.Email = input.Tenantinfo.Email
 	data.Info.Mobile = input.Tenantinfo.Mobile
 	data.Info.SubCategoryID = input.Tenantinfo.SubCategoryID
-	data.Info.Tenanttoken=input.Tenantinfo.Tenanttoken
+	data.Info.Tenanttoken = input.Tenantinfo.Tenanttoken
 	data.Address.Address = input.Tenantlocation.Address
 	data.Address.State = input.Tenantlocation.State
 	data.Address.Suburb = input.Tenantlocation.Suburb
@@ -270,6 +270,9 @@ func (r *mutationResolver) Createlocation(ctx context.Context, input *model.Loca
 	loco.Longitude = input.Longitude
 	loco.OpeningTime = input.Openingtime
 	loco.ClosingTime = input.Closingtime
+	loco.Delivery = input.Delivery
+	loco.Deliverytype = input.Deliverytype
+	loco.Deliverymins = input.Deliverymins
 	locationid, er := loco.CreateLocation(int64(id.ID))
 	if er != nil {
 		return nil, errors.New("location not created")
@@ -323,14 +326,14 @@ func (r *mutationResolver) Createcharges(ctx context.Context, input *model.Charg
 	}
 	print("raju")
 	print(id.ID)
-	var c []subscription.Charge
-	var d []subscription.Delivery
-	var other subscription.Charge
-	var delivery subscription.Delivery
+	var c []subscription.Tenantcharge
+	var d []subscription.Tenantsetting
+	var other subscription.Tenantcharge
+	var delivery subscription.Tenantsetting
 	othercharge := *&input.Othercharges
 	deliverycharges := *&input.Deliverycharges
 	for _, k := range othercharge {
-		c = append(c, subscription.Charge{Tenantid: k.Tenantid, Locationid: k.Locationid, Chargeid: k.Chargeid, Chargetype: k.Chargetype, Chargevalue: k.Chargevalue, Createdby: id.ID})
+		c = append(c, subscription.Tenantcharge{Tenantid: k.Tenantid, Locationid: k.Locationid, Chargeid: k.Chargeid, Chargename: k.Chargename, Chargetype: k.Chargetype, Chargevalue: k.Chargevalue, Createdby: id.ID})
 	}
 	if len(c) != 0 {
 		er := other.Insertothercharges(c)
@@ -339,7 +342,7 @@ func (r *mutationResolver) Createcharges(ctx context.Context, input *model.Charg
 		}
 	}
 	for _, j := range deliverycharges {
-		d = append(d, subscription.Delivery{Tenantid: j.Tenantid, Locationid: j.Locationid, Slabtype: j.Slabtype, Slab: j.Slab, Slablimit: j.Slablimit, Slabcharge: j.Slabcharge, Createdby: id.ID})
+		d = append(d, subscription.Tenantsetting{Tenantid: j.Tenantid, Locationid: j.Locationid, Slabtype: j.Slabtype, Slab: j.Slab, Slablimit: j.Slablimit, Slabcharge: j.Slabcharge, Createdby: id.ID})
 	}
 	if len(d) != 0 {
 		erd := delivery.Insertdeliverycharges(d)
@@ -364,10 +367,10 @@ func (r *mutationResolver) Updatecharges(ctx context.Context, input *model.Charg
 	deliverycreate := input.Updatedeliverycharges.Create
 	deliveryupdate := input.Updatedeliverycharges.Update
 	deliverydelete := input.Updatedeliverycharges.Delete
-	var other []subscription.Charge
-	var del []subscription.Delivery
-	var o subscription.Charge
-	var d subscription.Delivery
+	var other []subscription.Tenantcharge
+	var del []subscription.Tenantsetting
+	var o subscription.Tenantcharge
+	var d subscription.Tenantsetting
 	if len(otherdelete) != 0 {
 		for i := 0; i < len(otherdelete); i++ {
 			o.Tenantchargeid = *otherdelete[i]
@@ -379,6 +382,7 @@ func (r *mutationResolver) Updatecharges(ctx context.Context, input *model.Charg
 	if len(otherupdate) != 0 {
 		for i := 0; i < len(otherupdate); i++ {
 			o.Chargeid = otherupdate[i].Chargeid
+			o.Chargename = otherupdate[i].Chargename
 			o.Chargetype = otherupdate[i].Chargetype
 			o.Chargevalue = otherupdate[i].Chargevalue
 			o.Locationid = otherupdate[i].Locationid
@@ -390,7 +394,7 @@ func (r *mutationResolver) Updatecharges(ctx context.Context, input *model.Charg
 	}
 	if len(othercreate) != 0 {
 		for _, k := range othercreate {
-			other = append(other, subscription.Charge{Tenantid: k.Tenantid, Locationid: k.Locationid, Chargeid: k.Chargeid, Chargetype: k.Chargetype, Chargevalue: k.Chargevalue, Createdby: id.ID})
+			other = append(other, subscription.Tenantcharge{Tenantid: k.Tenantid, Locationid: k.Locationid, Chargeid: k.Chargeid, Chargename: k.Chargename, Chargetype: k.Chargetype, Chargevalue: k.Chargevalue, Createdby: id.ID})
 		}
 		er := o.Insertothercharges(other)
 		if er != nil {
@@ -423,7 +427,7 @@ func (r *mutationResolver) Updatecharges(ctx context.Context, input *model.Charg
 	}
 	if len(deliverycreate) != 0 {
 		for _, j := range deliverycreate {
-			del = append(del, subscription.Delivery{Tenantid: j.Tenantid, Locationid: j.Locationid, Slabtype: j.Slabtype, Slab: j.Slab, Slablimit: j.Slablimit, Slabcharge: j.Slabcharge, Createdby: id.ID})
+			del = append(del, subscription.Tenantsetting{Tenantid: j.Tenantid, Locationid: j.Locationid, Slabtype: j.Slabtype, Slab: j.Slab, Slablimit: j.Slablimit, Slabcharge: j.Slabcharge, Createdby: id.ID})
 		}
 
 		erd := d.Insertdeliverycharges(del)
@@ -482,6 +486,8 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 
 	var Result []*model.Locationgetall
 	var userresult []*model.Usertenant
+	var otherchargeresult []*model.Othercharge
+	var deliverychargeresult []*model.Deliverycharge
 	var locationGetAll []subscription.Tenantlocation
 
 	locationGetAll = subscription.LocationTest(tenantid)
@@ -498,24 +504,36 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 				Email:          key.Email,
 			}
 		}
+		otherchargeresult = make([]*model.Othercharge, len(loco.Tenantcharges))
+		for j, k := range loco.Tenantcharges {
+			otherchargeresult[j] = &model.Othercharge{Tenantchargeid: k.Tenantchargeid, Tenantid: k.Tenantid, Locationid: k.Locationid,
+				Chargeid: k.Chargeid, Chargename: k.Chargename, Chargetype: k.Chargetype, Chargevalue: k.Chargevalue}
+		}
+		deliverychargeresult = make([]*model.Deliverycharge, len(loco.Tenantsettings))
+		for l, m := range loco.Tenantsettings {
+			deliverychargeresult[l] = &model.Deliverycharge{Settingsid: m.Settingsid, Tenantid: m.Tenantid, Locationid: m.Locationid,
+				Slabtype: m.Slabtype, Slab: m.Slab, Slablimit: m.Slablimit, Slabcharge: m.Slabcharge}
+		}
 		Result = append(Result, &model.Locationgetall{
-			Locationid:   loco.Locationid,
-			LocationName: loco.Locationname,
-			Tenantid:     loco.Tenantid,
-			Email:        &loco.Email,
-			Contact:      &loco.Contactno,
-			Address:      loco.Address,
-			Suburb:       loco.City,
-			State:        loco.State,
-			Countycode:   loco.Countrycode,
-			Postcode:     loco.Postcode,
-			Latitude:     loco.Latitude,
-			Longitude:    loco.Longitude,
-			Openingtime:  loco.Opentime,
-			Closingtime:  loco.Closetime,
-			Status:       loco.Status,
-			Createdby:    loco.Createdby,
-			Tenantusers:  userresult,
+			Locationid:      loco.Locationid,
+			LocationName:    loco.Locationname,
+			Tenantid:        loco.Tenantid,
+			Email:           &loco.Email,
+			Contact:         &loco.Contactno,
+			Address:         loco.Address,
+			Suburb:          loco.City,
+			State:           loco.State,
+			Countycode:      loco.Countrycode,
+			Postcode:        loco.Postcode,
+			Latitude:        loco.Latitude,
+			Longitude:       loco.Longitude,
+			Openingtime:     loco.Opentime,
+			Closingtime:     loco.Closetime,
+			Status:          loco.Status,
+			Createdby:       loco.Createdby,
+			Tenantusers:     userresult,
+			Othercharges:    otherchargeresult,
+			Deliverycharges: deliverychargeresult,
 		})
 
 	}
@@ -661,6 +679,60 @@ func (r *queryResolver) Getchargetypes(ctx context.Context) (*model.Chargetypeda
 	data = subscription.Getchargetypes()
 
 	return &model.Chargetypedata{Status: true, Code: http.StatusOK, Message: "Success", Types: data}, nil
+}
+
+func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locationid int) (*model.Locationbyiddata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)
+
+	var userresult []*model.Usertenant
+	var otherchargeresult []*model.Othercharge
+	var deliverychargeresult []*model.Deliverycharge
+	loco:=subscription.Locationbyid(tenantid,locationid)
+	if loco.Locationid==0{
+return &model.Locationbyiddata{Status: false,Code: http.StatusBadRequest,Message: "Unsuccess",Locationdata: nil},nil
+	}
+if len(loco.Appuserprofiles)!=0{
+	userresult = make([]*model.Usertenant, len(loco.Appuserprofiles))
+	for i, key := range loco.Appuserprofiles {
+		userresult[i] = &model.Usertenant{
+			Userid:         key.Userid,
+			Userlocationid: key.Userlocationid,
+			Firstname:      key.Firstname,
+			Lastname:       key.Lastname,
+			Mobile:         key.Contactno,
+			Email:          key.Email,
+		}
+	}
+}
+if len(loco.Tenantcharges)!=0{
+	otherchargeresult = make([]*model.Othercharge, len(loco.Tenantcharges))
+	for j, k := range loco.Tenantcharges {
+		otherchargeresult[j] = &model.Othercharge{Tenantchargeid: k.Tenantchargeid, Tenantid: k.Tenantid, Locationid: k.Locationid,
+			Chargeid: k.Chargeid, Chargename: k.Chargename, Chargetype: k.Chargetype, Chargevalue: k.Chargevalue}
+	}
+}
+	if len(loco.Tenantsettings)!=0{
+		deliverychargeresult = make([]*model.Deliverycharge, len(loco.Tenantsettings))
+	for l, m := range loco.Tenantsettings {
+		deliverychargeresult[l] = &model.Deliverycharge{Settingsid: m.Settingsid, Tenantid: m.Tenantid, Locationid: m.Locationid,
+			Slabtype: m.Slabtype, Slab: m.Slab, Slablimit: m.Slablimit, Slabcharge: m.Slabcharge}
+	}
+
+	}
+	return &model.Locationbyiddata{
+		Status: true,
+		Code: http.StatusOK,Message: "Success",Locationdata: &model.Locationgetall{
+			Locationid: loco.Locationid,LocationName: loco.Locationname,Tenantid: loco.Tenantid,Email: &loco.Email,Contact: &loco.Contactno,
+			Address: loco.Address,Suburb: loco.City,State: loco.State,Postcode: loco.Postcode,Countycode: loco.Countrycode,Latitude: loco.Latitude,
+			Longitude: loco.Longitude,Openingtime: loco.Opentime,Closingtime: loco.Closetime,Status: loco.Status,Tenantusers: userresult,Createdby: loco.Createdby,
+			Othercharges: otherchargeresult,Deliverycharges: deliverychargeresult,
+		},
+	},nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
