@@ -257,3 +257,9 @@ type Tenantsetting struct {
 	Slabcharge string `json:"slabcharge"`
 	Createdby  int    `json:"createdby"`
 }
+type Updatestatus struct{
+	Tenantid   int    `json:"tenantid"`
+	Locationid int    `json:"locationid"`	
+	Locationstatus string `json:"locationstatus"`
+	Deliverystatus bool `json:"deliverystatus"`
+}

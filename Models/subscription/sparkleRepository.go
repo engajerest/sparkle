@@ -27,6 +27,7 @@ const (
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,moduleid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamout,paymentstatus,paymentid) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
 	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid, c.name FROM tenants a,tenantsubscription b,app_module c WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid=?"
 	createLocationQuery            = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	updatelocation                = "UPDATE tenantlocation SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
 	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocation WHERE status='Active' AND locationid=? "
 	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND tenantid=? "
 	createTenantUserQuery          = "INSERT INTO app_users (authname,password,hashsalt,contactno,roleid,referenceid) VALUES(?,?,?,?,?,?)"
@@ -50,6 +51,8 @@ const (
 	updatedelivery                 = "UPDATE  tenantsettings SET locationid=?,slabtype=?,slab=?,slablimit=?,slabcharge=? WHERE settingsid=? AND tenantid=?"
 	deletecharge                   = "DELETE FROM tenantcharges WHERE tenantchargeid=?"
 	deletedelivery                 = "DELETE FROM  tenantsettings WHERE settingsid=?"
+	updatelocationstatus           = "UPDATE tenantlocation SET status=? WHERE tenantid= ? AND locationid=?"
+	updatedeliverystatus           = "UPDATE tenantlocation SET delivery=? WHERE tenantid= ? AND locationid=?"
 )
 
 func GetAllCategory() []Category {
@@ -250,6 +253,26 @@ func (loco *Location) CreateLocation(id int64) (int64, error) {
 	log.Print("Row inserted in createlocation!")
 	return id, nil
 }
+func (loco *Location) UpdateLocation() (bool, error) {
+	statement, err := database.Db.Prepare(updatelocation)
+	print(statement)
+
+	if err != nil {
+
+		log.Fatal(err)
+		return false, err
+	}
+	defer statement.Close()
+	_, err = statement.Exec(&loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins,&loco.TenantID,&loco.LocationId)
+	if err != nil {
+		log.Fatal(err)
+		return false, err
+	}
+
+	log.Print("Row updated in location!")
+	return true, nil
+}
+
 func (loco *Location) GetLocationById(id int64) (*Location, error) {
 	fmt.Println("enrty in getlocation")
 	print(id)
@@ -334,8 +357,8 @@ func LocationTest(id int) []Tenantlocation {
 	// // user.Appuserprofiles = emails
 	// fmt.Println(user)
 	var orders []Tenantlocation
-// 	var ord []Tenantcharge
-// DB.Table("tenantcharges").Where("tenantid=? AND locationid=?",128,148).Preload("Chargetypes").Find(&ord)
+	// 	var ord []Tenantcharge
+	// DB.Table("tenantcharges").Where("tenantid=? AND locationid=?",128,148).Preload("Chargetypes").Find(&ord)
 	DB.Table("tenantlocation").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&orders)
 
 	fmt.Println(orders)
@@ -394,9 +417,7 @@ func LocationTest(id int) []Tenantlocation {
 
 }
 
-
-
-func Locationbyid(tenantid,locationid int) *Tenantlocation {
+func Locationbyid(tenantid, locationid int) *Tenantlocation {
 
 	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
 	if err != nil {
@@ -408,7 +429,7 @@ func Locationbyid(tenantid,locationid int) *Tenantlocation {
 
 	var data Tenantlocation
 
-	DB.Table("tenantlocation").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=? AND locationid=?", tenantid,locationid).Find(&data)
+	DB.Table("tenantlocation").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=? AND locationid=?", tenantid, locationid).Find(&data)
 
 	fmt.Println(data)
 
@@ -842,7 +863,7 @@ func (info *Tenantcharge) Insertothercharges(soc []Tenantcharge) error {
 	var params []interface{}
 	for _, v := range soc {
 		inserts = append(inserts, "(?, ?, ?, ?,?,?,?)")
-		params = append(params, v.Tenantid, v.Locationid, v.Chargeid,v.Chargename, v.Chargetype, v.Chargevalue, v.Createdby)
+		params = append(params, v.Tenantid, v.Locationid, v.Chargeid, v.Chargename, v.Chargetype, v.Chargevalue, v.Createdby)
 	}
 	queryVals := strings.Join(inserts, ",")
 	query := insertcharge + queryVals
@@ -913,7 +934,7 @@ func (o *Tenantcharge) Updateothercharge() bool {
 		return false
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&o.Locationid, &o.Chargeid,&o.Chargename, &o.Chargetype, &o.Chargevalue, &o.Tenantchargeid, &o.Tenantid)
+	_, err = statement.Exec(&o.Locationid, &o.Chargeid, &o.Chargename, &o.Chargetype, &o.Chargevalue, &o.Tenantchargeid, &o.Tenantid)
 	if err != nil {
 
 		log.Fatal(err)
@@ -981,4 +1002,36 @@ func (c *Tenantsetting) Deletedeliverycharge() bool {
 	log.Print("Row deleted in delivery!")
 	return true
 
+}
+func (u *Updatestatus) Updatelocationstatus() bool {
+	statement, err := database.Db.Prepare(updatelocationstatus)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer statement.Close()
+	_, err = statement.Exec(&u.Locationstatus, &u.Tenantid, &u.Locationid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Print("Row updated in tenant location!")
+	return true
+}
+func (u *Updatestatus) Updatedeliverystatus() bool {
+	statement, err := database.Db.Prepare(updatedeliverystatus)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer statement.Close()
+	_, err = statement.Exec(&u.Deliverystatus, &u.Tenantid, &u.Locationid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Print("Row updated in tenant deliverystatus!")
+	return true
 }

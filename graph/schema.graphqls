@@ -127,6 +127,26 @@ input location{
  Deliverymins:Int!
 
 }
+input locationupdate{
+Locationid:Int!
+ TenantId:Int!
+ LocationName:String!
+ Email:String!
+ Contact:String!
+ Address:String!
+ Suburb:String!
+ State:String!
+ Zip:String!
+ Countrycode:String!
+ Latitude:String!
+ Longitude:String!
+ Openingtime:String!
+ Closingtime:String!
+ Delivery:Boolean!
+ Deliverytype:String!
+ Deliverymins:Int!
+
+}
 input chargecreate{
 deliverycharges:[deliverychargeinput]
 othercharges:[chargecreateinput]
@@ -180,7 +200,21 @@ create:[chargecreateinput]
 update:[chargeupdateinput]
 delete:[Int]
 }
-
+input locationstatusinput{
+ 
+  locationstatus:[locstatus]
+  deliverystatus:[delstatus]
+}
+input locstatus{
+ tenantid:Int!
+ locationid:Int!
+ status:String!
+}
+input delstatus{
+ tenantid:Int!
+ locationid:Int!
+ delivery:Boolean!
+}
 type LocationInfo{
  Locationid:Int!
  LocationName:String!
@@ -208,6 +242,9 @@ type locationgetall {
  longitude:String!
  openingtime:String!
  closingtime:String!
+ delivery:Boolean!
+ deliverytype:String
+ deliverymins:Int
  status:String!
  createdby:Int!
  tenantusers:[usertenant]
@@ -429,4 +466,6 @@ type Mutation {
  createpromotion(input:promoinput):promotioncreateddata
  createcharges(input:chargecreate):promotioncreateddata
  updatecharges(input:chargeupdate):promotioncreateddata
+ updatelocationstatus(input:locationstatusinput):promotioncreateddata
+ updatelocation(input:locationupdate):promotioncreateddata
 }

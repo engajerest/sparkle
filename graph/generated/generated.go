@@ -74,6 +74,8 @@ type ComplexityRoot struct {
 		Createtenantuser     func(childComplexity int, create *model.Tenantuser) int
 		Subscribe            func(childComplexity int, input model.Data) int
 		Updatecharges        func(childComplexity int, input *model.Chargeupdate) int
+		Updatelocation       func(childComplexity int, input *model.Locationupdate) int
+		Updatelocationstatus func(childComplexity int, input *model.Locationstatusinput) int
 		Updatetenantbusiness func(childComplexity int, businessinfo *model.Business) int
 		Updatetenantuser     func(childComplexity int, update *model.Updatetenant) int
 	}
@@ -225,7 +227,10 @@ type ComplexityRoot struct {
 		Contact         func(childComplexity int) int
 		Countycode      func(childComplexity int) int
 		Createdby       func(childComplexity int) int
+		Delivery        func(childComplexity int) int
 		Deliverycharges func(childComplexity int) int
+		Deliverymins    func(childComplexity int) int
+		Deliverytype    func(childComplexity int) int
 		Email           func(childComplexity int) int
 		Latitude        func(childComplexity int) int
 		LocationName    func(childComplexity int) int
@@ -341,6 +346,8 @@ type MutationResolver interface {
 	Createpromotion(ctx context.Context, input *model.Promoinput) (*model.Promotioncreateddata, error)
 	Createcharges(ctx context.Context, input *model.Chargecreate) (*model.Promotioncreateddata, error)
 	Updatecharges(ctx context.Context, input *model.Chargeupdate) (*model.Promotioncreateddata, error)
+	Updatelocationstatus(ctx context.Context, input *model.Locationstatusinput) (*model.Promotioncreateddata, error)
+	Updatelocation(ctx context.Context, input *model.Locationupdate) (*model.Promotioncreateddata, error)
 }
 type QueryResolver interface {
 	Sparkle(ctx context.Context) (*model.Sparkle, error)
@@ -544,6 +551,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Updatecharges(childComplexity, args["input"].(*model.Chargeupdate)), true
+
+	case "Mutation.updatelocation":
+		if e.complexity.Mutation.Updatelocation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatelocation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Updatelocation(childComplexity, args["input"].(*model.Locationupdate)), true
+
+	case "Mutation.updatelocationstatus":
+		if e.complexity.Mutation.Updatelocationstatus == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatelocationstatus_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Updatelocationstatus(childComplexity, args["input"].(*model.Locationstatusinput)), true
 
 	case "Mutation.updatetenantbusiness":
 		if e.complexity.Mutation.Updatetenantbusiness == nil {
@@ -1280,12 +1311,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Locationgetall.Createdby(childComplexity), true
 
+	case "locationgetall.delivery":
+		if e.complexity.Locationgetall.Delivery == nil {
+			break
+		}
+
+		return e.complexity.Locationgetall.Delivery(childComplexity), true
+
 	case "locationgetall.deliverycharges":
 		if e.complexity.Locationgetall.Deliverycharges == nil {
 			break
 		}
 
 		return e.complexity.Locationgetall.Deliverycharges(childComplexity), true
+
+	case "locationgetall.deliverymins":
+		if e.complexity.Locationgetall.Deliverymins == nil {
+			break
+		}
+
+		return e.complexity.Locationgetall.Deliverymins(childComplexity), true
+
+	case "locationgetall.deliverytype":
+		if e.complexity.Locationgetall.Deliverytype == nil {
+			break
+		}
+
+		return e.complexity.Locationgetall.Deliverytype(childComplexity), true
 
 	case "locationgetall.email":
 		if e.complexity.Locationgetall.Email == nil {
@@ -1949,6 +2001,26 @@ input location{
  Deliverymins:Int!
 
 }
+input locationupdate{
+Locationid:Int!
+ TenantId:Int!
+ LocationName:String!
+ Email:String!
+ Contact:String!
+ Address:String!
+ Suburb:String!
+ State:String!
+ Zip:String!
+ Countrycode:String!
+ Latitude:String!
+ Longitude:String!
+ Openingtime:String!
+ Closingtime:String!
+ Delivery:Boolean!
+ Deliverytype:String!
+ Deliverymins:Int!
+
+}
 input chargecreate{
 deliverycharges:[deliverychargeinput]
 othercharges:[chargecreateinput]
@@ -2002,7 +2074,21 @@ create:[chargecreateinput]
 update:[chargeupdateinput]
 delete:[Int]
 }
-
+input locationstatusinput{
+ 
+  locationstatus:[locstatus]
+  deliverystatus:[delstatus]
+}
+input locstatus{
+ tenantid:Int!
+ locationid:Int!
+ status:String!
+}
+input delstatus{
+ tenantid:Int!
+ locationid:Int!
+ delivery:Boolean!
+}
 type LocationInfo{
  Locationid:Int!
  LocationName:String!
@@ -2030,6 +2116,9 @@ type locationgetall {
  longitude:String!
  openingtime:String!
  closingtime:String!
+ delivery:Boolean!
+ deliverytype:String
+ deliverymins:Int
  status:String!
  createdby:Int!
  tenantusers:[usertenant]
@@ -2251,6 +2340,8 @@ type Mutation {
  createpromotion(input:promoinput):promotioncreateddata
  createcharges(input:chargecreate):promotioncreateddata
  updatecharges(input:chargeupdate):promotioncreateddata
+ updatelocationstatus(input:locationstatusinput):promotioncreateddata
+ updatelocation(input:locationupdate):promotioncreateddata
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -2341,6 +2432,36 @@ func (ec *executionContext) field_Mutation_updatecharges_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalOchargeupdate2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargeupdate(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updatelocation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.Locationupdate
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOlocationupdate2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocationupdate(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updatelocationstatus_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.Locationstatusinput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOlocationstatusinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocationstatusinput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3343,6 +3464,84 @@ func (ec *executionContext) _Mutation_updatecharges(ctx context.Context, field g
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().Updatecharges(rctx, args["input"].(*model.Chargeupdate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Promotioncreateddata)
+	fc.Result = res
+	return ec.marshalOpromotioncreateddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotioncreateddata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updatelocationstatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updatelocationstatus_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Updatelocationstatus(rctx, args["input"].(*model.Locationstatusinput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Promotioncreateddata)
+	fc.Result = res
+	return ec.marshalOpromotioncreateddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotioncreateddata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updatelocation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updatelocation_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Updatelocation(rctx, args["input"].(*model.Locationupdate))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8188,6 +8387,105 @@ func (ec *executionContext) _locationgetall_closingtime(ctx context.Context, fie
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _locationgetall_delivery(ctx context.Context, field graphql.CollectedField, obj *model.Locationgetall) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "locationgetall",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Delivery, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _locationgetall_deliverytype(ctx context.Context, field graphql.CollectedField, obj *model.Locationgetall) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "locationgetall",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Deliverytype, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _locationgetall_deliverymins(ctx context.Context, field graphql.CollectedField, obj *model.Locationgetall) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "locationgetall",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Deliverymins, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _locationgetall_status(ctx context.Context, field graphql.CollectedField, obj *model.Locationgetall) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10768,6 +11066,42 @@ func (ec *executionContext) unmarshalInputdeliverychargeinput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputdelstatus(ctx context.Context, obj interface{}) (model.Delstatus, error) {
+	var it model.Delstatus
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "tenantid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantid"))
+			it.Tenantid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "locationid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locationid"))
+			it.Locationid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "delivery":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delivery"))
+			it.Delivery, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputlocation(ctx context.Context, obj interface{}) (model.Location, error) {
 	var it model.Location
 	var asMap = obj.(map[string]interface{})
@@ -10899,6 +11233,218 @@ func (ec *executionContext) unmarshalInputlocation(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Deliverymins"))
 			it.Deliverymins, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputlocationstatusinput(ctx context.Context, obj interface{}) (model.Locationstatusinput, error) {
+	var it model.Locationstatusinput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "locationstatus":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locationstatus"))
+			it.Locationstatus, err = ec.unmarshalOlocstatus2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocstatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "deliverystatus":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deliverystatus"))
+			it.Deliverystatus, err = ec.unmarshalOdelstatus2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐDelstatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputlocationupdate(ctx context.Context, obj interface{}) (model.Locationupdate, error) {
+	var it model.Locationupdate
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "Locationid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Locationid"))
+			it.Locationid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "TenantId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TenantId"))
+			it.TenantID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "LocationName":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("LocationName"))
+			it.LocationName, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Email"))
+			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Contact":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Contact"))
+			it.Contact, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Address":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Address"))
+			it.Address, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Suburb":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Suburb"))
+			it.Suburb, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "State":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("State"))
+			it.State, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Zip":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Zip"))
+			it.Zip, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Countrycode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Countrycode"))
+			it.Countrycode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Latitude":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Latitude"))
+			it.Latitude, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Longitude":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Longitude"))
+			it.Longitude, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Openingtime":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Openingtime"))
+			it.Openingtime, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Closingtime":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Closingtime"))
+			it.Closingtime, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Delivery":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Delivery"))
+			it.Delivery, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Deliverytype":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Deliverytype"))
+			it.Deliverytype, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Deliverymins":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Deliverymins"))
+			it.Deliverymins, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputlocstatus(ctx context.Context, obj interface{}) (model.Locstatus, error) {
+	var it model.Locstatus
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "tenantid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantid"))
+			it.Tenantid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "locationid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locationid"))
+			it.Locationid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11639,6 +12185,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_createcharges(ctx, field)
 		case "updatecharges":
 			out.Values[i] = ec._Mutation_updatecharges(ctx, field)
+		case "updatelocationstatus":
+			out.Values[i] = ec._Mutation_updatelocationstatus(ctx, field)
+		case "updatelocation":
+			out.Values[i] = ec._Mutation_updatelocation(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12767,6 +13317,15 @@ func (ec *executionContext) _locationgetall(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "delivery":
+			out.Values[i] = ec._locationgetall_delivery(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deliverytype":
+			out.Values[i] = ec._locationgetall_deliverytype(ctx, field, obj)
+		case "deliverymins":
+			out.Values[i] = ec._locationgetall_deliverymins(ctx, field, obj)
 		case "status":
 			out.Values[i] = ec._locationgetall_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -14392,6 +14951,38 @@ func (ec *executionContext) unmarshalOdeliverychargeinput2ᚖgithubᚗcomᚋenga
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalOdelstatus2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐDelstatus(ctx context.Context, v interface{}) ([]*model.Delstatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Delstatus, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOdelstatus2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐDelstatus(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOdelstatus2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐDelstatus(ctx context.Context, v interface{}) (*model.Delstatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputdelstatus(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalOgetBusinessdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetBusinessdata(ctx context.Context, sel ast.SelectionSet, v *model.GetBusinessdata) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -14487,6 +15078,54 @@ func (ec *executionContext) marshalOlocationgetall2ᚖgithubᚗcomᚋengajerest�
 		return graphql.Null
 	}
 	return ec._locationgetall(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOlocationstatusinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocationstatusinput(ctx context.Context, v interface{}) (*model.Locationstatusinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputlocationstatusinput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOlocationupdate2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocationupdate(ctx context.Context, v interface{}) (*model.Locationupdate, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputlocationupdate(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOlocstatus2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocstatus(ctx context.Context, v interface{}) ([]*model.Locstatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Locstatus, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOlocstatus2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocstatus(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOlocstatus2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocstatus(ctx context.Context, v interface{}) (*model.Locstatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputlocstatus(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOothercharge2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐOthercharge(ctx context.Context, sel ast.SelectionSet, v []*model.Othercharge) graphql.Marshaler {

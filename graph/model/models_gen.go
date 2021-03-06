@@ -190,6 +190,12 @@ type Deliverychargeinput struct {
 	Slabcharge string `json:"Slabcharge"`
 }
 
+type Delstatus struct {
+	Tenantid   int  `json:"tenantid"`
+	Locationid int  `json:"locationid"`
+	Delivery   bool `json:"delivery"`
+}
+
 type GetBusinessdata struct {
 	Status       bool   `json:"status"`
 	Code         int    `json:"code"`
@@ -273,11 +279,45 @@ type Locationgetall struct {
 	Longitude       string            `json:"longitude"`
 	Openingtime     string            `json:"openingtime"`
 	Closingtime     string            `json:"closingtime"`
+	Delivery        bool              `json:"delivery"`
+	Deliverytype    *string           `json:"deliverytype"`
+	Deliverymins    *int              `json:"deliverymins"`
 	Status          string            `json:"status"`
 	Createdby       int               `json:"createdby"`
 	Tenantusers     []*Usertenant     `json:"tenantusers"`
 	Othercharges    []*Othercharge    `json:"othercharges"`
 	Deliverycharges []*Deliverycharge `json:"deliverycharges"`
+}
+
+type Locationstatusinput struct {
+	Locationstatus []*Locstatus `json:"locationstatus"`
+	Deliverystatus []*Delstatus `json:"deliverystatus"`
+}
+
+type Locationupdate struct {
+	Locationid   int    `json:"Locationid"`
+	TenantID     int    `json:"TenantId"`
+	LocationName string `json:"LocationName"`
+	Email        string `json:"Email"`
+	Contact      string `json:"Contact"`
+	Address      string `json:"Address"`
+	Suburb       string `json:"Suburb"`
+	State        string `json:"State"`
+	Zip          string `json:"Zip"`
+	Countrycode  string `json:"Countrycode"`
+	Latitude     string `json:"Latitude"`
+	Longitude    string `json:"Longitude"`
+	Openingtime  string `json:"Openingtime"`
+	Closingtime  string `json:"Closingtime"`
+	Delivery     bool   `json:"Delivery"`
+	Deliverytype string `json:"Deliverytype"`
+	Deliverymins int    `json:"Deliverymins"`
+}
+
+type Locstatus struct {
+	Tenantid   int    `json:"tenantid"`
+	Locationid int    `json:"locationid"`
+	Status     string `json:"status"`
 }
 
 type Othercharge struct {

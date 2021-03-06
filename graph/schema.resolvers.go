@@ -439,6 +439,77 @@ func (r *mutationResolver) Updatecharges(ctx context.Context, input *model.Charg
 	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Charges updated"}, nil
 }
 
+func (r *mutationResolver) Updatelocationstatus(ctx context.Context, input *model.Locationstatusinput) (*model.Promotioncreateddata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("raju")
+	print(id.ID)
+	loc := *&input.Locationstatus
+	del := input.Deliverystatus
+	var s subscription.Updatestatus
+	if len(loc) != 0 {
+
+		for i := 0; i < len(loc); i++ {
+
+			s.Locationstatus = *&loc[i].Status
+			s.Locationid = *&loc[i].Locationid
+			s.Tenantid = *&loc[i].Tenantid
+			stat := s.Updatelocationstatus()
+			if stat == false {
+				return nil, errors.New("location status not updated")
+			}
+		}
+	}
+	if len(del) != 0 {
+		for i := 0; i < len(del); i++ {
+			s.Deliverystatus = *&del[i].Delivery
+			s.Locationid = *&del[i].Locationid
+			s.Tenantid = *&del[i].Tenantid
+			stat1 := s.Updatedeliverystatus()
+			if stat1 == false {
+				return nil, errors.New("delivery not updated")
+			}
+
+		}
+	}
+	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "status updated"}, nil
+}
+
+func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Locationupdate) (*model.Promotioncreateddata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("update loc")
+	print(id.ID)
+	var loco subscription.Location
+	loco.LocationId=input.Locationid
+	loco.TenantID = input.TenantID
+	loco.LocationName = input.LocationName
+	loco.Email = input.Email
+	loco.Mobile = input.Contact
+	loco.Address = input.Address
+	loco.Suburb = input.Suburb
+	loco.State = input.State
+	loco.Zip = input.Zip
+	loco.Countrycode = input.Countrycode
+	loco.Latitude = input.Latitude
+	loco.Longitude = input.Longitude
+	loco.OpeningTime = input.Openingtime
+	loco.ClosingTime = input.Closingtime
+	loco.Delivery = input.Delivery
+	loco.Deliverytype = input.Deliverytype
+	loco.Deliverymins = input.Deliverymins
+	status, er := loco.UpdateLocation()
+	if er != nil || status==false {
+		return nil, errors.New("location not created")
+	}
+
+	return &model.Promotioncreateddata{Status: true,Code: http.StatusCreated,Message: "Location updated"},nil
+}
+
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	id, usererr := controller.ForContext(ctx)
 	if usererr != nil {
@@ -531,6 +602,9 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 			Closingtime:     loco.Closetime,
 			Status:          loco.Status,
 			Createdby:       loco.Createdby,
+			Delivery:        loco.Delivery,
+			Deliverytype:    &loco.Deliverytype,
+			Deliverymins:    &loco.Deliverymins,
 			Tenantusers:     userresult,
 			Othercharges:    otherchargeresult,
 			Deliverycharges: deliverychargeresult,
@@ -692,47 +766,48 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 	var userresult []*model.Usertenant
 	var otherchargeresult []*model.Othercharge
 	var deliverychargeresult []*model.Deliverycharge
-	loco:=subscription.Locationbyid(tenantid,locationid)
-	if loco.Locationid==0{
-return &model.Locationbyiddata{Status: false,Code: http.StatusBadRequest,Message: "Unsuccess",Locationdata: nil},nil
+	loco := subscription.Locationbyid(tenantid, locationid)
+	if loco.Locationid == 0 {
+		return &model.Locationbyiddata{Status: false, Code: http.StatusBadRequest, Message: "Unsuccess", Locationdata: nil}, nil
 	}
-if len(loco.Appuserprofiles)!=0{
-	userresult = make([]*model.Usertenant, len(loco.Appuserprofiles))
-	for i, key := range loco.Appuserprofiles {
-		userresult[i] = &model.Usertenant{
-			Userid:         key.Userid,
-			Userlocationid: key.Userlocationid,
-			Firstname:      key.Firstname,
-			Lastname:       key.Lastname,
-			Mobile:         key.Contactno,
-			Email:          key.Email,
+	if len(loco.Appuserprofiles) != 0 {
+		userresult = make([]*model.Usertenant, len(loco.Appuserprofiles))
+		for i, key := range loco.Appuserprofiles {
+			userresult[i] = &model.Usertenant{
+				Userid:         key.Userid,
+				Userlocationid: key.Userlocationid,
+				Firstname:      key.Firstname,
+				Lastname:       key.Lastname,
+				Mobile:         key.Contactno,
+				Email:          key.Email,
+			}
 		}
 	}
-}
-if len(loco.Tenantcharges)!=0{
-	otherchargeresult = make([]*model.Othercharge, len(loco.Tenantcharges))
-	for j, k := range loco.Tenantcharges {
-		otherchargeresult[j] = &model.Othercharge{Tenantchargeid: k.Tenantchargeid, Tenantid: k.Tenantid, Locationid: k.Locationid,
-			Chargeid: k.Chargeid, Chargename: k.Chargename, Chargetype: k.Chargetype, Chargevalue: k.Chargevalue}
+	if len(loco.Tenantcharges) != 0 {
+		otherchargeresult = make([]*model.Othercharge, len(loco.Tenantcharges))
+		for j, k := range loco.Tenantcharges {
+			otherchargeresult[j] = &model.Othercharge{Tenantchargeid: k.Tenantchargeid, Tenantid: k.Tenantid, Locationid: k.Locationid,
+				Chargeid: k.Chargeid, Chargename: k.Chargename, Chargetype: k.Chargetype, Chargevalue: k.Chargevalue}
+		}
 	}
-}
-	if len(loco.Tenantsettings)!=0{
+	if len(loco.Tenantsettings) != 0 {
 		deliverychargeresult = make([]*model.Deliverycharge, len(loco.Tenantsettings))
-	for l, m := range loco.Tenantsettings {
-		deliverychargeresult[l] = &model.Deliverycharge{Settingsid: m.Settingsid, Tenantid: m.Tenantid, Locationid: m.Locationid,
-			Slabtype: m.Slabtype, Slab: m.Slab, Slablimit: m.Slablimit, Slabcharge: m.Slabcharge}
-	}
+		for l, m := range loco.Tenantsettings {
+			deliverychargeresult[l] = &model.Deliverycharge{Settingsid: m.Settingsid, Tenantid: m.Tenantid, Locationid: m.Locationid,
+				Slabtype: m.Slabtype, Slab: m.Slab, Slablimit: m.Slablimit, Slabcharge: m.Slabcharge}
+		}
 
 	}
 	return &model.Locationbyiddata{
 		Status: true,
-		Code: http.StatusOK,Message: "Success",Locationdata: &model.Locationgetall{
-			Locationid: loco.Locationid,LocationName: loco.Locationname,Tenantid: loco.Tenantid,Email: &loco.Email,Contact: &loco.Contactno,
-			Address: loco.Address,Suburb: loco.City,State: loco.State,Postcode: loco.Postcode,Countycode: loco.Countrycode,Latitude: loco.Latitude,
-			Longitude: loco.Longitude,Openingtime: loco.Opentime,Closingtime: loco.Closetime,Status: loco.Status,Tenantusers: userresult,Createdby: loco.Createdby,
-			Othercharges: otherchargeresult,Deliverycharges: deliverychargeresult,
+		Code:   http.StatusOK, Message: "Success", Locationdata: &model.Locationgetall{
+			Locationid: loco.Locationid, LocationName: loco.Locationname, Tenantid: loco.Tenantid, Email: &loco.Email, Contact: &loco.Contactno,
+			Address: loco.Address, Suburb: loco.City, State: loco.State, Postcode: loco.Postcode, Countycode: loco.Countrycode, Latitude: loco.Latitude,
+			Delivery: loco.Delivery, Deliverytype: &loco.Deliverytype, Deliverymins: &loco.Deliverymins,
+			Longitude: loco.Longitude, Openingtime: loco.Opentime, Closingtime: loco.Closetime, Status: loco.Status, Tenantusers: userresult, Createdby: loco.Createdby,
+			Othercharges: otherchargeresult, Deliverycharges: deliverychargeresult,
 		},
-	},nil
+	}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
