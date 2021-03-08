@@ -485,7 +485,7 @@ func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Loca
 	print("update loc")
 	print(id.ID)
 	var loco subscription.Location
-	loco.LocationId=input.Locationid
+	loco.LocationId = input.Locationid
 	loco.TenantID = input.TenantID
 	loco.LocationName = input.LocationName
 	loco.Email = input.Email
@@ -503,11 +503,11 @@ func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Loca
 	loco.Deliverytype = input.Deliverytype
 	loco.Deliverymins = input.Deliverymins
 	status, er := loco.UpdateLocation()
-	if er != nil || status==false {
+	if er != nil || status == false {
 		return nil, errors.New("location not created")
 	}
 
-	return &model.Promotioncreateddata{Status: true,Code: http.StatusCreated,Message: "Location updated"},nil
+	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Location updated"}, nil
 }
 
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
@@ -808,6 +808,50 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 			Othercharges: otherchargeresult, Deliverycharges: deliverychargeresult,
 		},
 	}, nil
+}
+
+func (r *queryResolver) Getpayments(ctx context.Context, tenantid int, typeid int) (*model.Getpaymentdata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)
+
+	var data []*model.Paymentdata
+	var d []subscription.Payment
+	d = subscription.Payments(tenantid, typeid)
+	if len(d) != 0 {
+		for _, k := range d {
+			data = append(data, &model.Paymentdata{Paymentid: k.Paymentid, Packageid: k.Packageid, Tenantid: k.Tenantid,
+				Paymenttypeid: k.Paymenttypeid, Customerid: k.Customerid, Transactiondate: k.Transactiondate, Orderid: &k.Orderid,
+				Chargeid: k.Chargeid, Amount: k.Amount, Refundamt: &k.Refundamt, Paymentstatus: &k.Paymentstatus,
+				Created: &k.Created, Customerinfo: &model.Custinfo{Customerid: k.Customers.Customerid, Firstname: k.Customers.Firstname,
+					Lastname: k.Customers.Lastname, Email: k.Customers.Email, Contact: k.Customers.Contactno, Address: k.Customers.Address}})
+		}
+	}
+	return &model.Getpaymentdata{Status: true, Code: http.StatusOK, Message: "Success", Payments: data}, nil
+}
+
+func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*model.Getsubscriptionsdata, error) {
+	id, usererr := controller.ForContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)
+	var data []*model.Subscriptionsdata
+	var d []subscription.Subscribe
+	d=subscription.GetAllSubscription(tenantid)
+	if len(d)!=0{
+		for _,k:=range d{
+			data = append(data,&model.Subscriptionsdata{Packageid: &k.Packageid,Moduleid: &k.Moduleid,Tenantid: &k.Tenantid,Modulename: &k.Modulename,Packagename: &k.Packagename,
+				LogoURL: &k.Logourl,PackageIcon: &k.PackageIcon,PackageAmount: &k.PackageAmount,TotalAmount: &k.Totalamount,Customercount: &k.Customercount,Locationcount: &k.Locationcount,} )
+		}
+	}
+
+
+	return &model.Getsubscriptionsdata{Status: true,Code: http.StatusOK,Message: "Success",Subscribed:data },nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

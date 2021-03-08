@@ -10,6 +10,15 @@ type Category struct {
 	Status     string `json:"Status"`
 }
 
+type Custinfo struct {
+	Customerid int    `json:"Customerid"`
+	Firstname  string `json:"Firstname"`
+	Lastname   string `json:"Lastname"`
+	Email      string `json:"Email"`
+	Contact    string `json:"Contact"`
+	Address    string `json:"Address"`
+}
+
 type LocationInfo struct {
 	Locationid   int    `json:"Locationid"`
 	LocationName string `json:"LocationName"`
@@ -210,11 +219,25 @@ type Getalllocations struct {
 	Locations []*Locationgetall `json:"locations"`
 }
 
+type Getpaymentdata struct {
+	Status   bool           `json:"status"`
+	Code     int            `json:"code"`
+	Message  string         `json:"message"`
+	Payments []*Paymentdata `json:"payments"`
+}
+
 type Getpromotiondata struct {
 	Status     bool         `json:"status"`
 	Code       int          `json:"code"`
 	Message    string       `json:"message"`
 	Promotions []*Promotion `json:"promotions"`
+}
+
+type Getsubscriptionsdata struct {
+	Status     bool                 `json:"status"`
+	Code       int                  `json:"code"`
+	Message    string               `json:"message"`
+	Subscribed []*Subscriptionsdata `json:"subscribed"`
 }
 
 type Info struct {
@@ -330,6 +353,22 @@ type Othercharge struct {
 	Chargevalue    string `json:"Chargevalue"`
 }
 
+type Paymentdata struct {
+	Paymentid       int       `json:"Paymentid"`
+	Packageid       int       `json:"Packageid"`
+	Tenantid        int       `json:"Tenantid"`
+	Paymenttypeid   int       `json:"Paymenttypeid"`
+	Customerid      int       `json:"Customerid"`
+	Transactiondate string    `json:"Transactiondate"`
+	Orderid         *int      `json:"Orderid"`
+	Chargeid        string    `json:"Chargeid"`
+	Amount          float64   `json:"Amount"`
+	Refundamt       *float64  `json:"Refundamt"`
+	Paymentstatus   *string   `json:"Paymentstatus"`
+	Created         *string   `json:"Created"`
+	Customerinfo    *Custinfo `json:"Customerinfo"`
+}
+
 type Promoinput struct {
 	Promotiontypeid int     `json:"Promotiontypeid"`
 	Promotionname   *string `json:"Promotionname"`
@@ -394,6 +433,20 @@ type Subscription struct {
 	TotalAmount     string `json:"TotalAmount"`
 	PaymentStatus   int    `json:"PaymentStatus"`
 	PaymentID       *int   `json:"PaymentId"`
+}
+
+type Subscriptionsdata struct {
+	Packageid     *int     `json:"Packageid"`
+	Moduleid      *int     `json:"Moduleid"`
+	Tenantid      *int     `json:"Tenantid"`
+	Modulename    *string  `json:"Modulename"`
+	Packagename   *string  `json:"Packagename"`
+	LogoURL       *string  `json:"LogoUrl"`
+	PackageIcon   *string  `json:"PackageIcon"`
+	PackageAmount *float64 `json:"PackageAmount"`
+	TotalAmount   *float64 `json:"TotalAmount"`
+	Customercount *int     `json:"Customercount"`
+	Locationcount *int     `json:"Locationcount"`
 }
 
 type Tenantupdatedata struct {

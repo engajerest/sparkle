@@ -171,30 +171,29 @@ type Tenantsocial struct {
 }
 type Tenantlocation struct {
 	// gorm.Model
-	Locationid      int                `json:"locationid" gorm:"primary_key"`
-	Tenantid        int                `json:"tenantid" gorm:"ForeignKey"`
-	Locationname    string             `json:"locationname"`
-	Email           string             `json:"email"`
-	Contactno       string             `json:"contactno"`
-	Address         string             `json:"address"`
-	City            string             `json:"city"`
-	State           string             `json:"state"`
-	Postcode        string             `json:"postcode"`
-	Countrycode     string             `json:"countrycode"`
-	Latitude        string             `json:"latitude"`
-	Longitude       string             `json:"longitude"`
-	Opentime        string             `json:""opentime`
-	Closetime       string             `json:"closetime"`
-	Delivery        bool               `json:"delivery"`
-	Deliverytype    string             `json:"deliverytype"`
-	Deliverymins    int                `json:"deliverymins"`
-	Createdby       int                `json:"createdby"`
-	Status          string             `json:"status"`
-	
+	Locationid   int    `json:"locationid" gorm:"primary_key"`
+	Tenantid     int    `json:"tenantid" gorm:"ForeignKey"`
+	Locationname string `json:"locationname"`
+	Email        string `json:"email"`
+	Contactno    string `json:"contactno"`
+	Address      string `json:"address"`
+	City         string `json:"city"`
+	State        string `json:"state"`
+	Postcode     string `json:"postcode"`
+	Countrycode  string `json:"countrycode"`
+	Latitude     string `json:"latitude"`
+	Longitude    string `json:"longitude"`
+	Opentime     string `json:""opentime`
+	Closetime    string `json:"closetime"`
+	Delivery     bool   `json:"delivery"`
+	Deliverytype string `json:"deliverytype"`
+	Deliverymins int    `json:"deliverymins"`
+	Createdby    int    `json:"createdby"`
+	Status       string `json:"status"`
+
 	Appuserprofiles []App_userprofiles `json:"appuserprofile" gorm:"ForeignKey:userlocationid"`
 	Tenantcharges   []Tenantcharge     `json:"tenantcharge" gorm:"ForeignKey:locationid"`
 	Tenantsettings  []Tenantsetting    `json:"tenantsetting" gorm:"ForeignKey:locationid"`
-	
 }
 type App_userprofiles struct {
 	// gorm.Model
@@ -257,9 +256,45 @@ type Tenantsetting struct {
 	Slabcharge string `json:"slabcharge"`
 	Createdby  int    `json:"createdby"`
 }
-type Updatestatus struct{
-	Tenantid   int    `json:"tenantid"`
-	Locationid int    `json:"locationid"`	
+type Updatestatus struct {
+	Tenantid       int    `json:"tenantid"`
+	Locationid     int    `json:"locationid"`
 	Locationstatus string `json:"locationstatus"`
-	Deliverystatus bool `json:"deliverystatus"`
+	Deliverystatus bool   `json:"deliverystatus"`
+}
+type Payment struct {
+	Paymentid       int      `json:"paymentid" gorm:"primary_key"`
+	Packageid       int      `json:"packageid"`
+	Paymenttypeid   int      `json:"paymenttypeid"`
+	Tenantid        int      `json:"tenantid"`
+	Customerid      int      `gorm:"ForeignKey"`
+	Transactiondate string   `json:"transactiondate"`
+	Chargeid        string   `json:"chargeid"`
+	Amount          float64  `json:"amount"`
+	Paymentstatus   string   `json:"paymentstatus"`
+	Refundamt       float64  `json:"refundamount"`
+	Orderid         int      `json:"orderid"`
+	Created         string   `json:"created"`
+	Customers       Customer `json:"customers" gorm:"ForeignKey:customerid"`
+}
+type Customer struct {
+	Customerid int    `gorm:"primary_key"`
+	Firstname  string `json:"firstname"`
+	Lastname   string `json:"lastname"`
+	Contactno  string `json:"contactno"`
+	Email      string `json:"email"`
+	Address    string `json:"address"`
+}
+type Subscribe struct {
+	Packageid  int    `json:"packageid"`
+	Tenantid   int    `json:"tenantid"`
+	Moduleid   int    `json:"moduleId"`
+	Modulename string `json:"modulename"`
+	Packagename string `json:"packagename"`
+	PackageAmount float64 `json:"packageamount"`
+	Totalamount   float64 `json:"totalamount"`
+	Logourl       string  `json:"logourl"`
+	PackageIcon   string  `json:"packageicon"`
+	Customercount int     `json:"customercount"`
+	Locationcount int     `json:"locationcount"`
 }

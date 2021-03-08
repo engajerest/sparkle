@@ -24,10 +24,10 @@ const (
 	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename FROM app_package a,app_module b  WHERE a.STATUS='Active' AND a.moduleid=b.moduleid"
 	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,registrationno,tenantname,primaryemail,primarycontact,bizcategoryid,bizsubcategoryid,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,moduleid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamout,paymentstatus,paymentid) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
+	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,moduleid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
 	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid, c.name FROM tenants a,tenantsubscription b,app_module c WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid=?"
 	createLocationQuery            = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	updatelocation                = "UPDATE tenantlocation SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
+	updatelocation                 = "UPDATE tenantlocation SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
 	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocation WHERE status='Active' AND locationid=? "
 	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND tenantid=? "
 	createTenantUserQuery          = "INSERT INTO app_users (authname,password,hashsalt,contactno,roleid,referenceid) VALUES(?,?,?,?,?,?)"
@@ -53,6 +53,8 @@ const (
 	deletedelivery                 = "DELETE FROM  tenantsettings WHERE settingsid=?"
 	updatelocationstatus           = "UPDATE tenantlocation SET status=? WHERE tenantid= ? AND locationid=?"
 	updatedeliverystatus           = "UPDATE tenantlocation SET delivery=? WHERE tenantid= ? AND locationid=?"
+	getCustomerByid                = "SELECT customerid,firstname,lastname,contactno,email,IFNULL(configid,0) AS configid  FROM customers WHERE customerid=?"
+	getsubscription="SELECT a.packageid,a.moduleid,a.tenantid,a.totalamount,b.modulename,b.logourl,c.packagename,c.packageamount,c.packageicon, (SELECT COUNT(locationid)  FROM tenantlocation where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,app_package c   WHERE a.moduleid=b.moduleid AND a.packageid=c.packageid AND  a.tenantid=?"
 )
 
 func GetAllCategory() []Category {
@@ -263,7 +265,7 @@ func (loco *Location) UpdateLocation() (bool, error) {
 		return false, err
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins,&loco.TenantID,&loco.LocationId)
+	_, err = statement.Exec(&loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins, &loco.TenantID, &loco.LocationId)
 	if err != nil {
 		log.Fatal(err)
 		return false, err
@@ -361,11 +363,11 @@ func LocationTest(id int) []Tenantlocation {
 	// DB.Table("tenantcharges").Where("tenantid=? AND locationid=?",128,148).Preload("Chargetypes").Find(&ord)
 	DB.Table("tenantlocation").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&orders)
 
-	fmt.Println(orders)
-	for index, value := range orders {
-		fmt.Println(index, " = ", value)
+	// fmt.Println(orders)
+	// for index, value := range orders {
+	// 	fmt.Println(index, " = ", value)
 
-	}
+	// }
 
 	// Tlocations := &Tenantlocations{}
 
@@ -742,6 +744,40 @@ func UserAuthentication(id int64) (*users.User, bool, error) {
 	// user.Check=true
 	return &data, true, err
 }
+func Customerauthenticate(id int64) (*users.User, bool, error) {
+
+	fmt.Println("enrty in customergetbyid")
+	print(id)
+	var data users.User
+	stmt, err := database.Db.Prepare(getCustomerByid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	row := stmt.QueryRow(id)
+	// print(row)
+	err = row.Scan(&data.ID, &data.FirstName, &data.LastName, &data.Mobile, &data.Email, &data.Configid)
+	print(err)
+	fmt.Println("2")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("no rows found")
+			data1 := Errors.RestError{}
+			data1.Error = err
+			return &data, false, err
+		} else {
+			log.Fatal(err)
+			fmt.Println("nodata")
+			var data1 *Errors.RestError
+			data1.Error = err
+			return &data, false, err
+		}
+
+	}
+	data.From = "CUSTOMER"
+	fmt.Println("completed")
+	return &data, true, nil
+}
 func GetAllPromotions(tenantid int) []Promotion {
 	print("st1")
 	stmt, err := database.Db.Prepare(Getpromotions)
@@ -1034,4 +1070,51 @@ func (u *Updatestatus) Updatedeliverystatus() bool {
 
 	log.Print("Row updated in tenant deliverystatus!")
 	return true
+}
+func Payments(tenantid,typeid int) []Payment {
+
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+
+	var data []Payment
+
+	DB.Table("payments").Preload("Customers").Where("tenantid=? AND paymenttypeid=?", tenantid,typeid).Find(&data)
+	for index, value := range data {
+		fmt.Println(index, " = ", value)
+
+	}
+	return data
+
+}
+func GetAllSubscription(tenantid int) []Subscribe {
+	stmt, err := database.Db.Prepare(getsubscription)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(tenantid,tenantid,tenantid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	var Subscribelist []Subscribe
+
+	for rows.Next() {
+		var s Subscribe
+		err := rows.Scan(&s.Packageid,&s.Moduleid,&s.Tenantid,&s.Totalamount,&s.Modulename,&s.Logourl,&s.Packagename,
+		&s.PackageAmount,&s.PackageIcon,&s.Locationcount,&s.Customercount)
+		if err != nil {
+			log.Fatal(err)
+		}
+		Subscribelist = append(Subscribelist, s)
+	}
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return Subscribelist
 }

@@ -446,6 +446,56 @@ status:Boolean!
  locationdata:locationgetall
 
 }
+type getpaymentdata{
+status:Boolean!
+code:Int!
+message:String!   
+payments:[paymentdata] 
+}
+type paymentdata{
+Paymentid:Int!
+Packageid:Int!
+Tenantid:Int!
+Paymenttypeid:Int!
+Customerid:Int!
+Transactiondate:String!
+Orderid:Int
+Chargeid:String!
+Amount:Float!
+Refundamt:Float
+Paymentstatus:String
+Created:String
+Customerinfo:Custinfo
+
+}
+type Custinfo{
+   Customerid:Int!
+   Firstname:String!
+   Lastname:String!
+   Email:String!
+   Contact:String!
+   Address:String!
+}
+type getsubscriptionsdata{
+  status:Boolean!
+code:Int!
+message:String! 
+subscribed:[subscriptionsdata]  
+}
+type subscriptionsdata{
+Packageid:Int
+Moduleid:Int
+Tenantid:Int
+Modulename:String
+Packagename:String
+LogoUrl:String
+PackageIcon:String
+PackageAmount:Float
+TotalAmount:Float
+Customercount:Int
+Locationcount:Int
+
+}
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
@@ -455,6 +505,8 @@ type Query {
  getpromotypes:promotypesdata
  getchargetypes:chargetypedata
  getlocationbyid(tenantid:Int!,locationid:Int!):locationbyiddata
+ getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
+ getsubscriptions(tenantid:Int!):getsubscriptionsdata
 }
 
 type Mutation {

@@ -54,40 +54,48 @@ func TokenAuthMiddleware(contextkey string) gin.HandlerFunc {
 			return
 		}
 		fmt.Println("tkn3")
-		userId, err := accesstoken.ParseToken(token)
-		fmt.Println("5")
+	
+		userId, configid, err := accesstoken.ParseToken(token)
+		// fmt.Println("5")
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, "token denied")
 			c.Abort()
 			return
 		}
-		fmt.Println("tkn4")
+		// fmt.Println("tkn4")
 		id := int(userId)
-		// create user and check if user exists in db
-		// data1 := users.User{}
-		user, status, errrr := subscription.UserAuthentication(int64(id))
-		print(status)
-		// print("testing")
-		// user, err := data1.GetByUserId(int64(id))
-		if errrr != nil {
-			c.JSON(http.StatusBadRequest, "user not found")
-			c.Abort()
-			return
+		id1 := int(configid)
+		print("confiid", id1)
+		if id1 == 1 {
+			print("configid==1")
+			
+			user, status, errrr := subscription.UserAuthentication(int64(id))
+			print(status)
+			if errrr != nil {
+				c.JSON(http.StatusBadRequest, "user not found")
+				c.Abort()
+				return
+			}
+			print(user.CreatedDate)
+			ctx := context.WithValue(c.Request.Context(), contextkey, user)
+			c.Request = c.Request.WithContext(ctx)
+			c.Next()
+		} else {
+			print("configid>1")
+			
+			user, status, errrr := subscription.Customerauthenticate(int64(id))
+			print(status)
+			if errrr != nil {
+				c.JSON(http.StatusBadRequest, "user not found")
+				c.Abort()
+				return
+			}
+			print(user.CreatedDate)
+			ctx := context.WithValue(c.Request.Context(), contextkey, user)
+			c.Request = c.Request.WithContext(ctx)
+			c.Next()
+
 		}
-		print(user.CreatedDate)
-
-		ctx := context.WithValue(c.Request.Context(), contextkey, user)
-
-		// and call the next with our new context
-		c.Request = c.Request.WithContext(ctx)
-		c.Next()
-		// put it in context
-		// ctx := context.WithValue(c.Request.Context(), userCtxKey, user)
-
-		// 	// and call the next with our new context
-		// 	r= c.Request.WithContext(ctx)
-
-		// 		c.Next()
 
 	}
 }
@@ -121,9 +129,4 @@ func ForSparkleContext(ctx context.Context) (*users.User, *Errors.RestError) {
 	}
 	return user, nil
 }
-// func Location(c *gin.Context) {
 
-// 	var locationGetAll []subscription.Tenantlocation
-//     locationGetAll = subscription.LocationTest(37)
-// 	c.JSON(http.StatusOK, locationGetAll)
-// }
