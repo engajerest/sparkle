@@ -11,16 +11,15 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/engajerest/auth/Models/users"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/engajerest/auth/utils/Errors"
-	"github.com/engajerest/auth/utils/accesstoken"
 
 	"github.com/engajerest/sparkle/Models/subscription"
 	"github.com/engajerest/sparkle/graph"
 	"github.com/engajerest/sparkle/graph/generated"
+	"github.com/engajerest/sparkle/helper"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 )
@@ -55,7 +54,7 @@ func TokenAuthMiddleware(contextkey string) gin.HandlerFunc {
 		}
 		fmt.Println("tkn3")
 	
-		userId, configid, err := accesstoken.ParseToken(token)
+		userId, configid, err := helper.ParseToken(token)
 		// fmt.Println("5")
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, "token denied")
@@ -101,7 +100,7 @@ func TokenAuthMiddleware(contextkey string) gin.HandlerFunc {
 }
 
 // ForContext finds the user from the context. REQUIRES Middleware to have run.
-func ForSparkleContext(ctx context.Context) (*users.User, *Errors.RestError) {
+func ForSparkleContext1(ctx context.Context) (*subscription.User, *Errors.RestError) {
 	viper.SetConfigName("config") // config file name without extension
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
@@ -119,7 +118,7 @@ func ForSparkleContext(ctx context.Context) (*users.User, *Errors.RestError) {
 			Code:    http.StatusBadRequest,
 		}
 	}
-	user, ok := ctx.Value(userCtxKey).(*users.User)
+	user, ok := ctx.Value(userCtxKey).(*subscription.User)
 	if !ok || user.ID == 0 {
 		return nil, &Errors.RestError{
 			Error:   noUserFoundError,

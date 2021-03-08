@@ -714,10 +714,10 @@ func GetAllSocial(id int) []Social {
 	return sociallist
 }
 
-func UserAuthentication(id int64) (*users.User, bool, error) {
+func UserAuthentication(id int64) (*User, bool, error) {
 	fmt.Println("enrty in sparkleauth")
 	print(id)
-	var data users.User
+	var data User
 	stmt, err := database.Db.Prepare(userAuthentication)
 	if err != nil {
 		log.Fatal(err)
@@ -744,11 +744,11 @@ func UserAuthentication(id int64) (*users.User, bool, error) {
 	// user.Check=true
 	return &data, true, err
 }
-func Customerauthenticate(id int64) (*users.User, bool, error) {
+func Customerauthenticate(id int64) (*User, bool, error) {
 
 	fmt.Println("enrty in customergetbyid")
 	print(id)
-	var data users.User
+	var data User
 	stmt, err := database.Db.Prepare(getCustomerByid)
 	if err != nil {
 		log.Fatal(err)

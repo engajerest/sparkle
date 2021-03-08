@@ -298,3 +298,22 @@ type Subscribe struct {
 	Customercount int     `json:"customercount"`
 	Locationcount int     `json:"locationcount"`
 }
+type User struct {
+	ID          int    `json:"id"`
+	FirstName   string `json:"firstname"`
+	LastName    string `json:"lastname"`
+	Password    string `json:"password"`
+	Email       string `json:"email"`
+	Mobile      string `json:"mobile"`
+	CreatedDate string `json:"created"`
+	Status      string `json:"status"`
+	Roleid      int    `json:"roleid"`
+	Configid    int    `json:"configid"`
+	Referenceid int    `json:"referenceid"`
+	LocationId  int    `json:"locationid"`
+	Moduleid    int    `json:"moduleid"`
+	Packageid   int    `json:"packageid"`
+	Modulename  string `json:"modulename"`
+	Tenantname  string `json:"tenantname"`
+	From        string `json:"from"`
+}
