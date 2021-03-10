@@ -90,15 +90,22 @@ type ComplexityRoot struct {
 	}
 
 	Package struct {
-		ModuleID       func(childComplexity int) int
-		Modulename     func(childComplexity int) int
-		Name           func(childComplexity int) int
-		PackageAmount  func(childComplexity int) int
-		PackageContent func(childComplexity int) int
-		PackageID      func(childComplexity int) int
-		PackageIcon    func(childComplexity int) int
-		PaymentMode    func(childComplexity int) int
-		Status         func(childComplexity int) int
+		ModuleID         func(childComplexity int) int
+		Modulename       func(childComplexity int) int
+		Name             func(childComplexity int) int
+		PackageAmount    func(childComplexity int) int
+		PackageContent   func(childComplexity int) int
+		PackageID        func(childComplexity int) int
+		PackageIcon      func(childComplexity int) int
+		PaymentMode      func(childComplexity int) int
+		Promocodeid      func(childComplexity int) int
+		Promodescription func(childComplexity int) int
+		Promonname       func(childComplexity int) int
+		Promotype        func(childComplexity int) int
+		Promovalue       func(childComplexity int) int
+		Status           func(childComplexity int) int
+		Validity         func(childComplexity int) int
+		Validitydate     func(childComplexity int) int
 	}
 
 	Promotion struct {
@@ -121,6 +128,7 @@ type ComplexityRoot struct {
 		GetBusiness      func(childComplexity int, tenantid int) int
 		Getchargetypes   func(childComplexity int) int
 		Getlocationbyid  func(childComplexity int, tenantid int, locationid int) int
+		Getnonsubscribed func(childComplexity int, tenantid int) int
 		Getpayments      func(childComplexity int, tenantid int, typeid int) int
 		Getpromotions    func(childComplexity int, tenantid int) int
 		Getpromotypes    func(childComplexity int) int
@@ -195,6 +203,13 @@ type ComplexityRoot struct {
 		Locations func(childComplexity int) int
 		Message   func(childComplexity int) int
 		Status    func(childComplexity int) int
+	}
+
+	Getnonsubscribeddata struct {
+		Code          func(childComplexity int) int
+		Message       func(childComplexity int) int
+		Nonsubscribed func(childComplexity int) int
+		Status        func(childComplexity int) int
 	}
 
 	Getpaymentdata struct {
@@ -284,11 +299,15 @@ type ComplexityRoot struct {
 	Paymentdata struct {
 		Amount          func(childComplexity int) int
 		Chargeid        func(childComplexity int) int
+		Contact         func(childComplexity int) int
 		Created         func(childComplexity int) int
 		Customerid      func(childComplexity int) int
-		Customerinfo    func(childComplexity int) int
+		Email           func(childComplexity int) int
+		Firstname       func(childComplexity int) int
+		Lastname        func(childComplexity int) int
 		Orderid         func(childComplexity int) int
 		Packageid       func(childComplexity int) int
+		Packagename     func(childComplexity int) int
 		Paymentid       func(childComplexity int) int
 		Paymentstatus   func(childComplexity int) int
 		Paymenttypeid   func(childComplexity int) int
@@ -415,6 +434,7 @@ type QueryResolver interface {
 	Getlocationbyid(ctx context.Context, tenantid int, locationid int) (*model.Locationbyiddata, error)
 	Getpayments(ctx context.Context, tenantid int, typeid int) (*model.Getpaymentdata, error)
 	Getsubscriptions(ctx context.Context, tenantid int) (*model.Getsubscriptionsdata, error)
+	Getnonsubscribed(ctx context.Context, tenantid int) (*model.Getnonsubscribeddata, error)
 }
 
 type executableSchema struct {
@@ -755,12 +775,61 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Package.PaymentMode(childComplexity), true
 
+	case "Package.Promocodeid":
+		if e.complexity.Package.Promocodeid == nil {
+			break
+		}
+
+		return e.complexity.Package.Promocodeid(childComplexity), true
+
+	case "Package.Promodescription":
+		if e.complexity.Package.Promodescription == nil {
+			break
+		}
+
+		return e.complexity.Package.Promodescription(childComplexity), true
+
+	case "Package.Promonname":
+		if e.complexity.Package.Promonname == nil {
+			break
+		}
+
+		return e.complexity.Package.Promonname(childComplexity), true
+
+	case "Package.Promotype":
+		if e.complexity.Package.Promotype == nil {
+			break
+		}
+
+		return e.complexity.Package.Promotype(childComplexity), true
+
+	case "Package.Promovalue":
+		if e.complexity.Package.Promovalue == nil {
+			break
+		}
+
+		return e.complexity.Package.Promovalue(childComplexity), true
+
 	case "Package.Status":
 		if e.complexity.Package.Status == nil {
 			break
 		}
 
 		return e.complexity.Package.Status(childComplexity), true
+
+	case "Package.Validity":
+		if e.complexity.Package.Validity == nil {
+			break
+		}
+
+		return e.complexity.Package.Validity(childComplexity), true
+
+	case "Package.Validitydate":
+		if e.complexity.Package.Validitydate == nil {
+			break
+		}
+
+		return e.complexity.Package.Validitydate(childComplexity), true
 
 	case "Promotion.Enddate":
 		if e.complexity.Promotion.Enddate == nil {
@@ -883,6 +952,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Getlocationbyid(childComplexity, args["tenantid"].(int), args["locationid"].(int)), true
+
+	case "Query.getnonsubscribed":
+		if e.complexity.Query.Getnonsubscribed == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getnonsubscribed_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Getnonsubscribed(childComplexity, args["tenantid"].(int)), true
 
 	case "Query.getpayments":
 		if e.complexity.Query.Getpayments == nil {
@@ -1237,6 +1318,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Getalllocations.Status(childComplexity), true
+
+	case "getnonsubscribeddata.code":
+		if e.complexity.Getnonsubscribeddata.Code == nil {
+			break
+		}
+
+		return e.complexity.Getnonsubscribeddata.Code(childComplexity), true
+
+	case "getnonsubscribeddata.message":
+		if e.complexity.Getnonsubscribeddata.Message == nil {
+			break
+		}
+
+		return e.complexity.Getnonsubscribeddata.Message(childComplexity), true
+
+	case "getnonsubscribeddata.nonsubscribed":
+		if e.complexity.Getnonsubscribeddata.Nonsubscribed == nil {
+			break
+		}
+
+		return e.complexity.Getnonsubscribeddata.Nonsubscribed(childComplexity), true
+
+	case "getnonsubscribeddata.status":
+		if e.complexity.Getnonsubscribeddata.Status == nil {
+			break
+		}
+
+		return e.complexity.Getnonsubscribeddata.Status(childComplexity), true
 
 	case "getpaymentdata.code":
 		if e.complexity.Getpaymentdata.Code == nil {
@@ -1672,6 +1781,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Paymentdata.Chargeid(childComplexity), true
 
+	case "paymentdata.Contact":
+		if e.complexity.Paymentdata.Contact == nil {
+			break
+		}
+
+		return e.complexity.Paymentdata.Contact(childComplexity), true
+
 	case "paymentdata.Created":
 		if e.complexity.Paymentdata.Created == nil {
 			break
@@ -1686,12 +1802,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Paymentdata.Customerid(childComplexity), true
 
-	case "paymentdata.Customerinfo":
-		if e.complexity.Paymentdata.Customerinfo == nil {
+	case "paymentdata.Email":
+		if e.complexity.Paymentdata.Email == nil {
 			break
 		}
 
-		return e.complexity.Paymentdata.Customerinfo(childComplexity), true
+		return e.complexity.Paymentdata.Email(childComplexity), true
+
+	case "paymentdata.Firstname":
+		if e.complexity.Paymentdata.Firstname == nil {
+			break
+		}
+
+		return e.complexity.Paymentdata.Firstname(childComplexity), true
+
+	case "paymentdata.Lastname":
+		if e.complexity.Paymentdata.Lastname == nil {
+			break
+		}
+
+		return e.complexity.Paymentdata.Lastname(childComplexity), true
 
 	case "paymentdata.Orderid":
 		if e.complexity.Paymentdata.Orderid == nil {
@@ -1706,6 +1836,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Paymentdata.Packageid(childComplexity), true
+
+	case "paymentdata.Packagename":
+		if e.complexity.Paymentdata.Packagename == nil {
+			break
+		}
+
+		return e.complexity.Paymentdata.Packagename(childComplexity), true
 
 	case "paymentdata.Paymentid":
 		if e.complexity.Paymentdata.Paymentid == nil {
@@ -2264,6 +2401,15 @@ type Package{
  PaymentMode:String! 
  PackageContent:String!
  PackageIcon: String!
+ Promocodeid:Int!
+ Promonname:String!
+ Promodescription:String!
+ Promotype:String!
+ Promovalue:Float!
+ Validitydate:String!
+ Validity:Boolean!
+
+
 }
 input TenantDetails{
  Name:String!
@@ -2677,6 +2823,7 @@ type paymentdata{
 Paymentid:Int!
 Packageid:Int!
 Tenantid:Int!
+Packagename:String!
 Paymenttypeid:Int!
 Customerid:Int!
 Transactiondate:String!
@@ -2686,7 +2833,10 @@ Amount:Float!
 Refundamt:Float
 Paymentstatus:String
 Created:String
-Customerinfo:Custinfo
+ Firstname:String!
+   Lastname:String!
+   Email:String!
+   Contact:String!
 
 }
 type Custinfo{
@@ -2715,7 +2865,12 @@ PackageAmount:Float
 TotalAmount:Float
 Customercount:Int
 Locationcount:Int
-
+}
+type getnonsubscribeddata{
+status:Boolean!
+code:Int!
+message:String!  
+ nonsubscribed:[Package]
 }
 type Query {
  sparkle: Sparkle!
@@ -2728,6 +2883,7 @@ type Query {
  getlocationbyid(tenantid:Int!,locationid:Int!):locationbyiddata
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
+ getnonsubscribed(tenantid:Int!):getnonsubscribeddata
 }
 
 type Mutation {
@@ -2950,6 +3106,21 @@ func (ec *executionContext) field_Query_getlocationbyid_args(ctx context.Context
 		}
 	}
 	args["locationid"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getnonsubscribed_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["tenantid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tenantid"] = arg0
 	return args, nil
 }
 
@@ -4518,6 +4689,251 @@ func (ec *executionContext) _Package_PackageIcon(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Package_Promocodeid(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Package",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promocodeid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Package_Promonname(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Package",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promonname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Package_Promodescription(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Package",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promodescription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Package_Promotype(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Package",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promotype, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Package_Promovalue(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Package",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promovalue, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Package_Validitydate(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Package",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Validitydate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Package_Validity(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Package",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Validity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Promotion_Promotionid(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -5316,6 +5732,45 @@ func (ec *executionContext) _Query_getsubscriptions(ctx context.Context, field g
 	res := resTmp.(*model.Getsubscriptionsdata)
 	fc.Result = res
 	return ec.marshalOgetsubscriptionsdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetsubscriptionsdata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getnonsubscribed(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getnonsubscribed_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Getnonsubscribed(rctx, args["tenantid"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Getnonsubscribeddata)
+	fc.Result = res
+	return ec.marshalOgetnonsubscribeddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetnonsubscribeddata(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7860,6 +8315,143 @@ func (ec *executionContext) _getalllocations_locations(ctx context.Context, fiel
 	return ec.marshalOlocationgetall2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocationgetall(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _getnonsubscribeddata_status(ctx context.Context, field graphql.CollectedField, obj *model.Getnonsubscribeddata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getnonsubscribeddata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getnonsubscribeddata_code(ctx context.Context, field graphql.CollectedField, obj *model.Getnonsubscribeddata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getnonsubscribeddata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getnonsubscribeddata_message(ctx context.Context, field graphql.CollectedField, obj *model.Getnonsubscribeddata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getnonsubscribeddata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getnonsubscribeddata_nonsubscribed(ctx context.Context, field graphql.CollectedField, obj *model.Getnonsubscribeddata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getnonsubscribeddata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nonsubscribed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Package)
+	fc.Result = res
+	return ec.marshalOPackage2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPackage(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _getpaymentdata_status(ctx context.Context, field graphql.CollectedField, obj *model.Getpaymentdata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10002,6 +10594,41 @@ func (ec *executionContext) _paymentdata_Tenantid(ctx context.Context, field gra
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _paymentdata_Packagename(ctx context.Context, field graphql.CollectedField, obj *model.Paymentdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "paymentdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Packagename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _paymentdata_Paymenttypeid(ctx context.Context, field graphql.CollectedField, obj *model.Paymentdata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10305,7 +10932,7 @@ func (ec *executionContext) _paymentdata_Created(ctx context.Context, field grap
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _paymentdata_Customerinfo(ctx context.Context, field graphql.CollectedField, obj *model.Paymentdata) (ret graphql.Marshaler) {
+func (ec *executionContext) _paymentdata_Firstname(ctx context.Context, field graphql.CollectedField, obj *model.Paymentdata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10323,18 +10950,126 @@ func (ec *executionContext) _paymentdata_Customerinfo(ctx context.Context, field
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Customerinfo, nil
+		return obj.Firstname, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Custinfo)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOCustinfo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐCustinfo(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _paymentdata_Lastname(ctx context.Context, field graphql.CollectedField, obj *model.Paymentdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "paymentdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Lastname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _paymentdata_Email(ctx context.Context, field graphql.CollectedField, obj *model.Paymentdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "paymentdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _paymentdata_Contact(ctx context.Context, field graphql.CollectedField, obj *model.Paymentdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "paymentdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Contact, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _promotioncreateddata_status(ctx context.Context, field graphql.CollectedField, obj *model.Promotioncreateddata) (ret graphql.Marshaler) {
@@ -14100,6 +14835,41 @@ func (ec *executionContext) _Package(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "Promocodeid":
+			out.Values[i] = ec._Package_Promocodeid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Promonname":
+			out.Values[i] = ec._Package_Promonname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Promodescription":
+			out.Values[i] = ec._Package_Promodescription(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Promotype":
+			out.Values[i] = ec._Package_Promotype(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Promovalue":
+			out.Values[i] = ec._Package_Promovalue(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Validitydate":
+			out.Values[i] = ec._Package_Validitydate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Validity":
+			out.Values[i] = ec._Package_Validity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -14297,6 +15067,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getsubscriptions(ctx, field)
+				return res
+			})
+		case "getnonsubscribed":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getnonsubscribed(ctx, field)
 				return res
 			})
 		case "__type":
@@ -14941,6 +15722,45 @@ func (ec *executionContext) _getalllocations(ctx context.Context, sel ast.Select
 	return out
 }
 
+var getnonsubscribeddataImplementors = []string{"getnonsubscribeddata"}
+
+func (ec *executionContext) _getnonsubscribeddata(ctx context.Context, sel ast.SelectionSet, obj *model.Getnonsubscribeddata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getnonsubscribeddataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("getnonsubscribeddata")
+		case "status":
+			out.Values[i] = ec._getnonsubscribeddata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._getnonsubscribeddata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._getnonsubscribeddata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "nonsubscribed":
+			out.Values[i] = ec._getnonsubscribeddata_nonsubscribed(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var getpaymentdataImplementors = []string{"getpaymentdata"}
 
 func (ec *executionContext) _getpaymentdata(ctx context.Context, sel ast.SelectionSet, obj *model.Getpaymentdata) graphql.Marshaler {
@@ -15380,6 +16200,11 @@ func (ec *executionContext) _paymentdata(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "Packagename":
+			out.Values[i] = ec._paymentdata_Packagename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Paymenttypeid":
 			out.Values[i] = ec._paymentdata_Paymenttypeid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -15413,8 +16238,26 @@ func (ec *executionContext) _paymentdata(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._paymentdata_Paymentstatus(ctx, field, obj)
 		case "Created":
 			out.Values[i] = ec._paymentdata_Created(ctx, field, obj)
-		case "Customerinfo":
-			out.Values[i] = ec._paymentdata_Customerinfo(ctx, field, obj)
+		case "Firstname":
+			out.Values[i] = ec._paymentdata_Firstname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Lastname":
+			out.Values[i] = ec._paymentdata_Lastname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Email":
+			out.Values[i] = ec._paymentdata_Email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Contact":
+			out.Values[i] = ec._paymentdata_Contact(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16480,13 +17323,6 @@ func (ec *executionContext) marshalOCategory2ᚖgithubᚗcomᚋengajerestᚋspar
 	return ec._Category(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCustinfo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐCustinfo(ctx context.Context, sel ast.SelectionSet, v *model.Custinfo) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Custinfo(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
 	if v == nil {
 		return nil, nil
@@ -16551,6 +17387,46 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 		return graphql.Null
 	}
 	return graphql.MarshalInt(*v)
+}
+
+func (ec *executionContext) marshalOPackage2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPackage(ctx context.Context, sel ast.SelectionSet, v []*model.Package) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOPackage2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPackage(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOPackage2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPackage(ctx context.Context, sel ast.SelectionSet, v *model.Package) graphql.Marshaler {
@@ -17092,6 +17968,13 @@ func (ec *executionContext) marshalOgetalllocations2ᚖgithubᚗcomᚋengajerest
 		return graphql.Null
 	}
 	return ec._getalllocations(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOgetnonsubscribeddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetnonsubscribeddata(ctx context.Context, sel ast.SelectionSet, v *model.Getnonsubscribeddata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._getnonsubscribeddata(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOgetpaymentdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetpaymentdata(ctx context.Context, sel ast.SelectionSet, v *model.Getpaymentdata) graphql.Marshaler {

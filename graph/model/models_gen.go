@@ -36,15 +36,22 @@ type Module struct {
 }
 
 type Package struct {
-	ModuleID       int    `json:"ModuleId"`
-	Modulename     string `json:"Modulename"`
-	Name           string `json:"Name"`
-	PackageID      int    `json:"PackageId"`
-	Status         string `json:"Status"`
-	PackageAmount  string `json:"PackageAmount"`
-	PaymentMode    string `json:"PaymentMode"`
-	PackageContent string `json:"PackageContent"`
-	PackageIcon    string `json:"PackageIcon"`
+	ModuleID         int     `json:"ModuleId"`
+	Modulename       string  `json:"Modulename"`
+	Name             string  `json:"Name"`
+	PackageID        int     `json:"PackageId"`
+	Status           string  `json:"Status"`
+	PackageAmount    string  `json:"PackageAmount"`
+	PaymentMode      string  `json:"PaymentMode"`
+	PackageContent   string  `json:"PackageContent"`
+	PackageIcon      string  `json:"PackageIcon"`
+	Promocodeid      int     `json:"Promocodeid"`
+	Promonname       string  `json:"Promonname"`
+	Promodescription string  `json:"Promodescription"`
+	Promotype        string  `json:"Promotype"`
+	Promovalue       float64 `json:"Promovalue"`
+	Validitydate     string  `json:"Validitydate"`
+	Validity         bool    `json:"Validity"`
 }
 
 type Promotion struct {
@@ -219,6 +226,13 @@ type Getalllocations struct {
 	Locations []*Locationgetall `json:"locations"`
 }
 
+type Getnonsubscribeddata struct {
+	Status        bool       `json:"status"`
+	Code          int        `json:"code"`
+	Message       string     `json:"message"`
+	Nonsubscribed []*Package `json:"nonsubscribed"`
+}
+
 type Getpaymentdata struct {
 	Status   bool           `json:"status"`
 	Code     int            `json:"code"`
@@ -354,19 +368,23 @@ type Othercharge struct {
 }
 
 type Paymentdata struct {
-	Paymentid       int       `json:"Paymentid"`
-	Packageid       int       `json:"Packageid"`
-	Tenantid        int       `json:"Tenantid"`
-	Paymenttypeid   int       `json:"Paymenttypeid"`
-	Customerid      int       `json:"Customerid"`
-	Transactiondate string    `json:"Transactiondate"`
-	Orderid         *int      `json:"Orderid"`
-	Chargeid        string    `json:"Chargeid"`
-	Amount          float64   `json:"Amount"`
-	Refundamt       *float64  `json:"Refundamt"`
-	Paymentstatus   *string   `json:"Paymentstatus"`
-	Created         *string   `json:"Created"`
-	Customerinfo    *Custinfo `json:"Customerinfo"`
+	Paymentid       int      `json:"Paymentid"`
+	Packageid       int      `json:"Packageid"`
+	Tenantid        int      `json:"Tenantid"`
+	Packagename     string   `json:"Packagename"`
+	Paymenttypeid   int      `json:"Paymenttypeid"`
+	Customerid      int      `json:"Customerid"`
+	Transactiondate string   `json:"Transactiondate"`
+	Orderid         *int     `json:"Orderid"`
+	Chargeid        string   `json:"Chargeid"`
+	Amount          float64  `json:"Amount"`
+	Refundamt       *float64 `json:"Refundamt"`
+	Paymentstatus   *string  `json:"Paymentstatus"`
+	Created         *string  `json:"Created"`
+	Firstname       string   `json:"Firstname"`
+	Lastname        string   `json:"Lastname"`
+	Email           string   `json:"Email"`
+	Contact         string   `json:"Contact"`
 }
 
 type Promoinput struct {

@@ -21,7 +21,7 @@ import (
 const (
 	getAllCategoryQuery            = "SELECT categoryid,categoryname,categorytype,sortorder,status FROM app_category WHERE STATUS='Active'"
 	getAllSubCategoryQuery         = "SELECT  subcategoryid,categorytypeid,categoryid,subcategoryname,status,icon FROM app_subcategory WHERE statuscode=1"
-	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename FROM app_package a,app_module b  WHERE a.STATUS='Active' AND a.moduleid=b.moduleid"
+	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(c.promocodeid,0) AS promocodeid,IFNULL(c.promoname ,'') AS promoname,IFNULL(c.promodescription,'') AS promodescription,IFNULL(c.promotype ,'') AS promotype,IFNULL(c.promovalue,0) AS promovalue,IFNULL(c.validity,'') AS validity,IF(c.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid LEFT OUTER JOIN  app_promocodes c ON a.packageid=c.packageid WHERE a.`status`='Active' "
 	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,registrationno,tenantname,primaryemail,primarycontact,bizcategoryid,bizsubcategoryid,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,moduleid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
@@ -44,7 +44,7 @@ const (
 	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
 	Getpromotions                  = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.promoname,a.promocode,a.promoterms,a.promovalue,a.startdate,a.enddate,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
 	createpromotion                = "INSERT INTO promotions (promotiontypeid,tenantid,promoname,promocode,promoterms,promovalue,startdate,enddate,createdby) VALUES(?,?,?,?,?,?,?,?,?)"
-	insertsequence                 = "INSERT INTO ordersequence (tenantid,tablename,seqno,prefix,subprefix) VALUES(?,?,?,?,?)"
+	insertsequence                 = "INSERT INTO ordersequence (tenantid,sequencename,seqno,prefix,subprefix) VALUES(?,?,?,?,?)"
 	insertcharge                   = "INSERT INTO tenantcharges (tenantid,locationid,chargeid,chargename,chargetype,chargevalue,createdby) VALUES"
 	insertdelivery                 = "INSERT INTO tenantsettings (tenantid,locationid,slabtype,slab,slablimit,slabcharge,createdby) VALUES"
 	updatecharge                   = "UPDATE tenantcharges SET locationid=?,chargeid=?,chargename=?,chargetype=?, chargevalue=? WHERE tenantchargeid=? AND tenantid=?"
@@ -55,10 +55,12 @@ const (
 	updatedeliverystatus           = "UPDATE tenantlocation SET delivery=? WHERE tenantid= ? AND locationid=?"
 	getCustomerByid                = "SELECT customerid,firstname,lastname,contactno,email,IFNULL(configid,0) AS configid  FROM customers WHERE customerid=?"
 	getsubscription="SELECT a.packageid,a.moduleid,a.tenantid,a.totalamount,b.modulename,b.logourl,c.packagename,c.packageamount,c.packageicon, (SELECT COUNT(locationid)  FROM tenantlocation where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,app_package c   WHERE a.moduleid=b.moduleid AND a.packageid=c.packageid AND  a.tenantid=?"
+	nonsubscribed = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(d.promocodeid,0) AS promocodeid,IFNULL(d.promoname ,'') AS promoname,IFNULL(d.promodescription,'') AS promodescription,IFNULL(d.promotype ,'') AS promotype,IFNULL(d.promovalue,0) AS promovalue,IFNULL(d.validity,'') AS validity,IF(d.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid INNER JOIN tenantsubscription c ON a.packageid<>c.packageid LEFT OUTER JOIN  app_promocodes d ON a.packageid=d.packageid  WHERE a.`status`='Active' AND c.tenantid=?"
+	getpayments = "SELECT a.paymentid,a.packageid,IFNULL(a.paymentref,'') AS paymentref,IFNULL(a.locationid,0) AS locationid,a.paymenttypeid,a.tenantid,IFNULL(a.customerid,0) AS customerid,a.transactiondate,IFNULL(a.orderid,0) AS orderid,a.chargeid,a.amount,a.refundamt,a.paymentstatus,a.created,b.packagename,IFNULL(c.firstname,'') AS firstname,IFNULL(c.lastname,'')AS lastname,IFNULL(c.contactno,'')AS contactno,IFNULL(c.email,'')AS email FROM payments a LEFT OUTER JOIN  app_package b ON a.packageid=b.packageid LEFT OUTER JOIN customers c ON  a.customerid=c.customerid WHERE tenantid=? AND paymenttypeid=?"
 )
 
 func GetAllCategory() []Category {
-	print("st1")
+	print("st1c")
 	stmt, err := database.Db.Prepare(getAllCategoryQuery)
 	if err != nil {
 		log.Fatal(err)
@@ -87,6 +89,7 @@ func GetAllCategory() []Category {
 
 }
 func GetAllSubCategory() []SubCategory {
+	print("st1s")
 	stmt, err := database.Db.Prepare(getAllSubCategoryQuery)
 	if err != nil {
 		log.Fatal(err)
@@ -113,6 +116,7 @@ func GetAllSubCategory() []SubCategory {
 	return subcategorylist
 }
 func GetAllPackages() []Packages {
+	print("st1p")
 	stmt, err := database.Db.Prepare(getAllPackageQuery)
 	if err != nil {
 		log.Fatal(err)
@@ -127,7 +131,38 @@ func GetAllPackages() []Packages {
 
 	for rows.Next() {
 		var pack Packages
-		err := rows.Scan(&pack.PackageID, &pack.ModuleID, &pack.Name, &pack.PackageAmount, &pack.PaymentMode, &pack.PackageContent, &pack.PackageIcon, &pack.ModuleName)
+		err := rows.Scan(&pack.PackageID, &pack.ModuleID, &pack.Name, &pack.PackageAmount, &pack.PaymentMode, &pack.PackageContent, &pack.PackageIcon, &pack.ModuleName,
+		&pack.Promocodeid,&pack.Promoname,&pack.Promodescription,&pack.Promotype,&pack.Promovalue,&pack.Promovaliditydate,&pack.Validity)
+		if err != nil {
+			log.Fatal(err)
+		}
+		packageList = append(packageList, pack)
+	}
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return packageList
+}
+
+func Getallnonsubscribedpackages(tenantid int ) []Packages {
+	print("st1p")
+	stmt, err := database.Db.Prepare(nonsubscribed)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(tenantid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	var packageList []Packages
+
+	for rows.Next() {
+		var pack Packages
+		err := rows.Scan(&pack.PackageID, &pack.ModuleID, &pack.Name, &pack.PackageAmount, &pack.PaymentMode, &pack.PackageContent, &pack.PackageIcon, &pack.ModuleName,
+		&pack.Promocodeid,&pack.Promoname,&pack.Promodescription,&pack.Promotype,&pack.Promovalue,&pack.Promovaliditydate,&pack.Validity)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -893,6 +928,33 @@ func (o *Ordersequence) Insertsequence() (int64, error) {
 	log.Print("Row inserted in sequence!")
 	return id, nil
 }
+func (o *Ordersequence) Insertpaysequence() (int64, error) {
+
+	fmt.Println("0")
+
+	statement, err := database.Db.Prepare(insertsequence)
+	print(statement)
+	fmt.Println("1")
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+	defer statement.Close()
+
+	fmt.Println("2")
+	res, err := statement.Exec(&o.Tenantid, "payment", &o.Seqno, "REC", &o.Subprefix)
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal("Error:", err.Error())
+
+	}
+	log.Print("Row inserted in paysequence!")
+	return id, nil
+}
 func (info *Tenantcharge) Insertothercharges(soc []Tenantcharge) error {
 
 	var inserts []string
@@ -1071,26 +1133,7 @@ func (u *Updatestatus) Updatedeliverystatus() bool {
 	log.Print("Row updated in tenant deliverystatus!")
 	return true
 }
-func Payments(tenantid,typeid int) []Payment {
 
-	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
-	if err != nil {
-		log.Println("Connection Failed to Open")
-
-	} else {
-		log.Println("Connection Established")
-	}
-
-	var data []Payment
-
-	DB.Table("payments").Preload("Customers").Where("tenantid=? AND paymenttypeid=?", tenantid,typeid).Find(&data)
-	for index, value := range data {
-		fmt.Println(index, " = ", value)
-
-	}
-	return data
-
-}
 func GetAllSubscription(tenantid int) []Subscribe {
 	stmt, err := database.Db.Prepare(getsubscription)
 	if err != nil {
@@ -1117,4 +1160,35 @@ func GetAllSubscription(tenantid int) []Subscribe {
 		log.Fatal(err)
 	}
 	return Subscribelist
+}
+func Payments(tenantid,typeid int) []Payment {
+	print("st1c")
+	stmt, err := database.Db.Prepare(getpayments)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(tenantid,typeid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	var paylist []Payment
+
+	for rows.Next() {
+		var p Payment
+		err := rows.Scan(&p.Paymentid,&p.Packageid,&p.Paymentref,&p.Locationid,&p.Paymenttypeid,&p.Tenantid,&p.Customerid,
+		&p.Transactiondate,&p.Orderid,&p.Chargeid,&p.Amount,&p.Refundamt,&p.Paymentstatus,&p.Created,&p.Packagename,&p.Firstname,
+	&p.Lastname,&p.Contactno,&p.Email)
+		if err != nil {
+			log.Fatal(err)
+		}
+		paylist = append(paylist, p)
+	}
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return paylist
+
 }

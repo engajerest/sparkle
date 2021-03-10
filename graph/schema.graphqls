@@ -43,6 +43,15 @@ type Package{
  PaymentMode:String! 
  PackageContent:String!
  PackageIcon: String!
+ Promocodeid:Int!
+ Promonname:String!
+ Promodescription:String!
+ Promotype:String!
+ Promovalue:Float!
+ Validitydate:String!
+ Validity:Boolean!
+
+
 }
 input TenantDetails{
  Name:String!
@@ -456,6 +465,7 @@ type paymentdata{
 Paymentid:Int!
 Packageid:Int!
 Tenantid:Int!
+Packagename:String!
 Paymenttypeid:Int!
 Customerid:Int!
 Transactiondate:String!
@@ -465,7 +475,10 @@ Amount:Float!
 Refundamt:Float
 Paymentstatus:String
 Created:String
-Customerinfo:Custinfo
+ Firstname:String!
+   Lastname:String!
+   Email:String!
+   Contact:String!
 
 }
 type Custinfo{
@@ -494,7 +507,12 @@ PackageAmount:Float
 TotalAmount:Float
 Customercount:Int
 Locationcount:Int
-
+}
+type getnonsubscribeddata{
+status:Boolean!
+code:Int!
+message:String!  
+ nonsubscribed:[Package]
 }
 type Query {
  sparkle: Sparkle!
@@ -507,6 +525,7 @@ type Query {
  getlocationbyid(tenantid:Int!,locationid:Int!):locationbyiddata
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
+ getnonsubscribed(tenantid:Int!):getnonsubscribeddata
 }
 
 type Mutation {

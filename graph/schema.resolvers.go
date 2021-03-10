@@ -10,7 +10,6 @@ import (
 	"net/http"
 
 	"github.com/engajerest/auth/Models/users"
-	// "github.com/engajerest/auth/controller"
 	"github.com/engajerest/sparkle/Models/subscription"
 	"github.com/engajerest/sparkle/graph/generated"
 	"github.com/engajerest/sparkle/graph/model"
@@ -19,7 +18,7 @@ import (
 
 func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*model.SubscribedData, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -99,6 +98,11 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 			print(err)
 			print("seqid==", seqid)
 		}
+		seqid1, err := seq.Insertpaysequence()
+		if err != nil {
+			print(err)
+			print("seqid==", seqid1)
+		}
 
 	}
 	subscribed, Error := data2.GetSubscribedData(tenantId)
@@ -127,7 +131,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 
 func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.Tenantuser) (*model.Tenantuserdata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -160,7 +164,7 @@ func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.T
 
 func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.Updatetenant) (*model.Tenantupdatedata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -194,7 +198,7 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 
 func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinfo *model.Business) (*model.Businessdata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -256,7 +260,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 
 func (r *mutationResolver) Createlocation(ctx context.Context, input *model.Location) (*model.Locationdata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -303,7 +307,7 @@ func (r *mutationResolver) Createlocation(ctx context.Context, input *model.Loca
 
 func (r *mutationResolver) Createpromotion(ctx context.Context, input *model.Promoinput) (*model.Promotioncreateddata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -328,7 +332,7 @@ func (r *mutationResolver) Createpromotion(ctx context.Context, input *model.Pro
 
 func (r *mutationResolver) Createcharges(ctx context.Context, input *model.Chargecreate) (*model.Promotioncreateddata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -364,7 +368,7 @@ func (r *mutationResolver) Createcharges(ctx context.Context, input *model.Charg
 
 func (r *mutationResolver) Updatecharges(ctx context.Context, input *model.Chargeupdate) (*model.Promotioncreateddata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -450,7 +454,7 @@ func (r *mutationResolver) Updatecharges(ctx context.Context, input *model.Charg
 
 func (r *mutationResolver) Updatelocationstatus(ctx context.Context, input *model.Locationstatusinput) (*model.Promotioncreateddata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -489,7 +493,7 @@ func (r *mutationResolver) Updatelocationstatus(ctx context.Context, input *mode
 
 func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Locationupdate) (*model.Promotioncreateddata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -523,7 +527,7 @@ func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Loca
 
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -548,7 +552,8 @@ func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	}
 	packageGetAll = subscription.GetAllPackages()
 	for _, packdata := range packageGetAll {
-		pack = append(pack, &model.Package{ModuleID: packdata.ModuleID, Modulename: packdata.ModuleName, Name: packdata.Name, PackageID: packdata.PackageID, Status: packdata.Status, PackageAmount: packdata.PackageAmount, PaymentMode: packdata.PaymentMode, PackageContent: packdata.PackageContent, PackageIcon: packdata.PackageIcon})
+		pack = append(pack, &model.Package{ModuleID: packdata.ModuleID, Modulename: packdata.ModuleName, Name: packdata.Name, PackageID: packdata.PackageID, Status: packdata.Status, PackageAmount: packdata.PackageAmount, PaymentMode: packdata.PaymentMode, PackageContent: packdata.PackageContent, PackageIcon: packdata.PackageIcon,
+			Promocodeid: packdata.Promocodeid, Promonname: packdata.Promoname, Promodescription: packdata.Promodescription, Promotype: packdata.Promotype, Promovalue: packdata.Promovalue, Validitydate: packdata.Promovaliditydate, Validity: packdata.Validity})
 
 	}
 
@@ -561,7 +566,7 @@ func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 
 func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Getalllocations, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -635,7 +640,7 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 
 func (r *queryResolver) Tenantusers(ctx context.Context, tenantid int) (*model.Usersdata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -672,7 +677,7 @@ func (r *queryResolver) Tenantusers(ctx context.Context, tenantid int) (*model.U
 
 func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int) (*model.GetBusinessdata, error) {
 	// id, usererr := helper.ForSparkleContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -724,7 +729,7 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int) (*model.G
 
 func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int) (*model.Getpromotiondata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -746,7 +751,7 @@ func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int) (*model
 
 func (r *queryResolver) Getpromotypes(ctx context.Context) (*model.Promotypesdata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -761,7 +766,7 @@ func (r *queryResolver) Getpromotypes(ctx context.Context) (*model.Promotypesdat
 
 func (r *queryResolver) Getchargetypes(ctx context.Context) (*model.Chargetypedata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -775,7 +780,7 @@ func (r *queryResolver) Getchargetypes(ctx context.Context) (*model.Chargetypeda
 
 func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locationid int) (*model.Locationbyiddata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -831,7 +836,7 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 
 func (r *queryResolver) Getpayments(ctx context.Context, tenantid int, typeid int) (*model.Getpaymentdata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -846,8 +851,8 @@ func (r *queryResolver) Getpayments(ctx context.Context, tenantid int, typeid in
 			data = append(data, &model.Paymentdata{Paymentid: k.Paymentid, Packageid: k.Packageid, Tenantid: k.Tenantid,
 				Paymenttypeid: k.Paymenttypeid, Customerid: k.Customerid, Transactiondate: k.Transactiondate, Orderid: &k.Orderid,
 				Chargeid: k.Chargeid, Amount: k.Amount, Refundamt: &k.Refundamt, Paymentstatus: &k.Paymentstatus,
-				Created: &k.Created, Customerinfo: &model.Custinfo{Customerid: k.Customers.Customerid, Firstname: k.Customers.Firstname,
-					Lastname: k.Customers.Lastname, Email: k.Customers.Email, Contact: k.Customers.Contactno, Address: k.Customers.Address}})
+				Created: &k.Created,Packagename: k.Packagename,Firstname: k.Firstname,Lastname: k.Lastname,
+			Email: k.Email,Contact: k.Contactno})
 		}
 	}
 	return &model.Getpaymentdata{Status: true, Code: http.StatusOK, Message: "Success", Payments: data}, nil
@@ -855,7 +860,7 @@ func (r *queryResolver) Getpayments(ctx context.Context, tenantid int, typeid in
 
 func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*model.Getsubscriptionsdata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=helper.ForSparkleContext(ctx)
+	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -863,16 +868,32 @@ func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*mo
 	print(id.ID)
 	var data []*model.Subscriptionsdata
 	var d []subscription.Subscribe
-	d=subscription.GetAllSubscription(tenantid)
-	if len(d)!=0{
-		for _,k:=range d{
-			data = append(data,&model.Subscriptionsdata{Packageid: &k.Packageid,Moduleid: &k.Moduleid,Tenantid: &k.Tenantid,Modulename: &k.Modulename,Packagename: &k.Packagename,
-				LogoURL: &k.Logourl,PackageIcon: &k.PackageIcon,PackageAmount: &k.PackageAmount,TotalAmount: &k.Totalamount,Customercount: &k.Customercount,Locationcount: &k.Locationcount,} )
+	d = subscription.GetAllSubscription(tenantid)
+	if len(d) != 0 {
+		for _, k := range d {
+			data = append(data, &model.Subscriptionsdata{Packageid: &k.Packageid, Moduleid: &k.Moduleid, Tenantid: &k.Tenantid, Modulename: &k.Modulename, Packagename: &k.Packagename,
+				LogoURL: &k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: &k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
 		}
 	}
 
+	return &model.Getsubscriptionsdata{Status: true, Code: http.StatusOK, Message: "Success", Subscribed: data}, nil
+}
 
-	return &model.Getsubscriptionsdata{Status: true,Code: http.StatusOK,Message: "Success",Subscribed:data },nil
+func (r *queryResolver) Getnonsubscribed(ctx context.Context, tenantid int) (*model.Getnonsubscribeddata, error) {
+	id, usererr := helper.ForSparkleContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)
+	var pack []*model.Package
+	var packageGetAll []subscription.Packages
+	packageGetAll = subscription.Getallnonsubscribedpackages(tenantid)
+	for _, packdata := range packageGetAll {
+		pack = append(pack, &model.Package{ModuleID: packdata.ModuleID, Modulename: packdata.ModuleName, Name: packdata.Name, PackageID: packdata.PackageID, Status: packdata.Status, PackageAmount: packdata.PackageAmount, PaymentMode: packdata.PaymentMode, PackageContent: packdata.PackageContent, PackageIcon: packdata.PackageIcon,
+			Promocodeid: packdata.Promocodeid, Promonname: packdata.Promoname, Promodescription: packdata.Promodescription, Promotype: packdata.Promotype, Promovalue: packdata.Promovalue, Validitydate: packdata.Promovaliditydate, Validity: packdata.Validity})
+	}
+	return &model.Getnonsubscribeddata{Status: true, Code: http.StatusCreated, Message: "Success", Nonsubscribed: pack}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

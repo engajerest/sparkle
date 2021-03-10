@@ -34,6 +34,15 @@ type Packages struct {
 	PaymentMode    string `json:"paymentmode"`
 	PackageContent string `json:"packagecontent"`
 	PackageIcon    string `json:"packageicon"`
+	Promocodeid int `json:"promocodeid"`
+	Promoname string `json:"promoname"`
+	Promodescription string `json:"promodescription"`
+	Promotype string `json:"promotype"`
+	Promovalue float64 `json:"promovalue"`
+	Promovaliditydate string `json:"promovaliditydate"`
+	Validity bool `json:"validity"`
+
+
 }
 type Tenantinfo struct {
 	Name          string `json:"name"`
@@ -265,7 +274,10 @@ type Updatestatus struct {
 type Payment struct {
 	Paymentid       int      `json:"paymentid" gorm:"primary_key"`
 	Packageid       int      `json:"packageid"`
+	Packagename    string `json:"packagename"`
+	Locationid int `json:"locationid"`
 	Paymenttypeid   int      `json:"paymenttypeid"`
+	Paymentref string `json:"paymentref"`
 	Tenantid        int      `json:"tenantid"`
 	Customerid      int      `gorm:"ForeignKey"`
 	Transactiondate string   `json:"transactiondate"`
@@ -275,7 +287,14 @@ type Payment struct {
 	Refundamt       float64  `json:"refundamount"`
 	Orderid         int      `json:"orderid"`
 	Created         string   `json:"created"`
-	Customers       Customer `json:"customers" gorm:"ForeignKey:customerid"`
+	
+	Firstname  string `json:"firstname"`
+	Lastname   string `json:"lastname"`
+	Contactno  string `json:"contactno"`
+	Email      string `json:"email"`
+	Address    string `json:"address"`
+
+
 }
 type Customer struct {
 	Customerid int    `gorm:"primary_key"`
