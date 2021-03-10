@@ -385,6 +385,7 @@ type Paymentdata struct {
 	Lastname        string   `json:"Lastname"`
 	Email           string   `json:"Email"`
 	Contact         string   `json:"Contact"`
+	Paymentref      string   `json:"Paymentref"`
 }
 
 type Promoinput struct {

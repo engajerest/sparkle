@@ -476,9 +476,11 @@ Refundamt:Float
 Paymentstatus:String
 Created:String
  Firstname:String!
-   Lastname:String!
-   Email:String!
-   Contact:String!
+ Lastname:String!
+Email:String!
+Contact:String!
+Paymentref:String!
+
 
 }
 type Custinfo{

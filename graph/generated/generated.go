@@ -309,6 +309,7 @@ type ComplexityRoot struct {
 		Packageid       func(childComplexity int) int
 		Packagename     func(childComplexity int) int
 		Paymentid       func(childComplexity int) int
+		Paymentref      func(childComplexity int) int
 		Paymentstatus   func(childComplexity int) int
 		Paymenttypeid   func(childComplexity int) int
 		Refundamt       func(childComplexity int) int
@@ -1851,6 +1852,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Paymentdata.Paymentid(childComplexity), true
 
+	case "paymentdata.Paymentref":
+		if e.complexity.Paymentdata.Paymentref == nil {
+			break
+		}
+
+		return e.complexity.Paymentdata.Paymentref(childComplexity), true
+
 	case "paymentdata.Paymentstatus":
 		if e.complexity.Paymentdata.Paymentstatus == nil {
 			break
@@ -2834,9 +2842,11 @@ Refundamt:Float
 Paymentstatus:String
 Created:String
  Firstname:String!
-   Lastname:String!
-   Email:String!
-   Contact:String!
+ Lastname:String!
+Email:String!
+Contact:String!
+Paymentref:String!
+
 
 }
 type Custinfo{
@@ -11072,6 +11082,41 @@ func (ec *executionContext) _paymentdata_Contact(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _paymentdata_Paymentref(ctx context.Context, field graphql.CollectedField, obj *model.Paymentdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "paymentdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Paymentref, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _promotioncreateddata_status(ctx context.Context, field graphql.CollectedField, obj *model.Promotioncreateddata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -16255,6 +16300,11 @@ func (ec *executionContext) _paymentdata(ctx context.Context, sel ast.SelectionS
 			}
 		case "Contact":
 			out.Values[i] = ec._paymentdata_Contact(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Paymentref":
+			out.Values[i] = ec._paymentdata_Paymentref(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
