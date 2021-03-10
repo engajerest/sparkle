@@ -23,19 +23,19 @@ const (
 	getAllSubCategoryQuery         = "SELECT  subcategoryid,categorytypeid,categoryid,subcategoryname,status,icon FROM app_subcategory WHERE statuscode=1"
 	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(c.promocodeid,0) AS promocodeid,IFNULL(c.promoname ,'') AS promoname,IFNULL(c.promodescription,'') AS promodescription,IFNULL(c.promotype ,'') AS promotype,IFNULL(c.promovalue,0) AS promovalue,IFNULL(c.validity,'') AS validity,IF(c.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid LEFT OUTER JOIN  app_promocodes c ON a.packageid=c.packageid WHERE a.`status`='Active' "
 	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,registrationno,tenantname,primaryemail,primarycontact,bizcategoryid,bizsubcategoryid,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	insertTenantLocationQuery      = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	insertTenantLocationQuery      = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,moduleid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
 	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid, c.name FROM tenants a,tenantsubscription b,app_module c WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid=?"
-	createLocationQuery            = "INSERT INTO tenantlocation (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	updatelocation                 = "UPDATE tenantlocation SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
-	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocation WHERE status='Active' AND locationid=? "
-	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocation WHERE status='Active' AND tenantid=? "
+	createLocationQuery            = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	updatelocation                 = "UPDATE tenantlocations SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
+	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocations WHERE status='Active' AND locationid=? "
+	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocations WHERE status='Active' AND tenantid=? "
 	createTenantUserQuery          = "INSERT INTO app_users (authname,password,hashsalt,contactno,roleid,referenceid) VALUES(?,?,?,?,?,?)"
 	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofiles (userid,firstname,lastname,email,contactno,userlocationid) VALUES(?,?,?,?,?,?)"
-	getAllTenantUsers              = "SELECT a.firstname,a.lastname,a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocation b, app_users c WHERE  a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=?"
+	getAllTenantUsers              = "SELECT a.firstname,a.lastname,a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocations b, app_users c WHERE  a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=?"
 	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 	getAllTenantUserByLocationId   = ""
-	updateTenantBusiness           = "UPDATE tenant SET brandname=?,tenantaccid=?,tenantinfo=?,paymode1=?,paymode2=? WHERE tenantid=?"
+	updateTenantBusiness           = "UPDATE tenants SET brandname=?,tenantaccid=?,tenantinfo=?,paymode1=?,paymode2=? WHERE tenantid=?"
 	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,sociallink,socialicon) VALUES"
 	updatesocialinfo               = "UPDATE tenantsocial SET socialprofile=?, sociallink=?,socialicon=? WHERE tenantid=? AND socialid=? "
 	updateauthuser                 = "UPDATE  app_users a,app_userprofiles b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
@@ -51,10 +51,10 @@ const (
 	updatedelivery                 = "UPDATE  tenantsettings SET locationid=?,slabtype=?,slab=?,slablimit=?,slabcharge=? WHERE settingsid=? AND tenantid=?"
 	deletecharge                   = "DELETE FROM tenantcharges WHERE tenantchargeid=?"
 	deletedelivery                 = "DELETE FROM  tenantsettings WHERE settingsid=?"
-	updatelocationstatus           = "UPDATE tenantlocation SET status=? WHERE tenantid= ? AND locationid=?"
-	updatedeliverystatus           = "UPDATE tenantlocation SET delivery=? WHERE tenantid= ? AND locationid=?"
+	updatelocationstatus           = "UPDATE tenantlocations SET status=? WHERE tenantid= ? AND locationid=?"
+	updatedeliverystatus           = "UPDATE tenantlocations SET delivery=? WHERE tenantid= ? AND locationid=?"
 	getCustomerByid                = "SELECT customerid,firstname,lastname,contactno,email,IFNULL(configid,0) AS configid  FROM customers WHERE customerid=?"
-	getsubscription="SELECT a.packageid,a.moduleid,a.tenantid,a.totalamount,b.modulename,b.logourl,c.packagename,c.packageamount,c.packageicon, (SELECT COUNT(locationid)  FROM tenantlocation where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,app_package c   WHERE a.moduleid=b.moduleid AND a.packageid=c.packageid AND  a.tenantid=?"
+	getsubscription="SELECT a.packageid,a.moduleid,a.tenantid,a.totalamount,b.modulename,b.logourl,c.packagename,c.packageamount,c.packageicon, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,app_package c   WHERE a.moduleid=b.moduleid AND a.packageid=c.packageid AND  a.tenantid=?"
 	nonsubscribed = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(d.promocodeid,0) AS promocodeid,IFNULL(d.promoname ,'') AS promoname,IFNULL(d.promodescription,'') AS promodescription,IFNULL(d.promotype ,'') AS promotype,IFNULL(d.promovalue,0) AS promovalue,IFNULL(d.validity,'') AS validity,IF(d.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid INNER JOIN tenantsubscription c ON a.packageid<>c.packageid LEFT OUTER JOIN  app_promocodes d ON a.packageid=d.packageid  WHERE a.`status`='Active' AND c.tenantid=?"
 	getpayments = "SELECT a.paymentid,a.packageid,IFNULL(a.paymentref,'') AS paymentref,IFNULL(a.locationid,0) AS locationid,a.paymenttypeid,a.tenantid,IFNULL(a.customerid,0) AS customerid,a.transactiondate,IFNULL(a.orderid,0) AS orderid,a.chargeid,a.amount,a.refundamt,a.paymentstatus,a.created,b.packagename,IFNULL(c.firstname,'') AS firstname,IFNULL(c.lastname,'')AS lastname,IFNULL(c.contactno,'')AS contactno,IFNULL(c.email,'')AS email FROM payments a LEFT OUTER JOIN  app_package b ON a.packageid=b.packageid LEFT OUTER JOIN customers c ON  a.customerid=c.customerid WHERE tenantid=? AND paymenttypeid=?"
 )
@@ -377,79 +377,15 @@ func LocationTest(id int) []Tenantlocation {
 	} else {
 		log.Println("Connection Established")
 	}
-	// var user []Tenantlocation
-	// err = DB.Debug().Where(&Tenantlocation{Tenantid:37}).Find(&user).Error
-	// if err != nil {
-	//     fmt.Println("Query failed")
-	// }
-	// fmt.Println(user)
 
-	// var emails []App_userprofile
-	// err = DB.Debug().Model(&user[1]).Related(&emails, "Appuserprofiles").Error
-	// if err != nil {
-	//     fmt.Println("Query failed")
-	// }
-	// fmt.Println(emails)
-
-	// // user.Appuserprofiles = emails
-	// fmt.Println(user)
 	var orders []Tenantlocation
-	// 	var ord []Tenantcharge
-	// DB.Table("tenantcharges").Where("tenantid=? AND locationid=?",128,148).Preload("Chargetypes").Find(&ord)
-	DB.Table("tenantlocation").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&orders)
+
+	DB.Table("tenantlocations").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&orders)
 
 	// fmt.Println(orders)
 	// for index, value := range orders {
 	// 	fmt.Println(index, " = ", value)
-
-	// }
-
-	// Tlocations := &Tenantlocations{}
-
-	// rows, err := DB.Table("tenantlocation").Where("tenantlocation.tenantid= ? and tenantlocation.status = ?", id, "Active").
-	// 	Joins("Join app_userprofile on app_userprofile.userlocationid = tenantlocation.locationid").
-	// 	// Joins("Join items on items.id = order_items.id").
-	// 	Select("tenantlocation.locationid,tenantlocation.locationname,tenantlocation.tenantid,tenantlocation.email,tenantlocation.contactno,tenantlocation.address,tenantlocation.city,tenantlocation.state,tenantlocation.postcode,tenantlocation.latitude,tenantlocation.longitude,tenantlocation.countrycode,tenantlocation.opentime,tenantlocation.closetime,tenantlocation.createdby,tenantlocation.status,app_userprofile.userid,app_userprofile.firstname,app_userprofile.lastname,app_userprofile.email,app_userprofile.contactno,app_userprofile.userlocationid").Rows()
-	// if err != nil {
-	// 	log.Panic(err)
-	// }
-
-	// defer rows.Close()
-	// // Values to load into
-	// print("1.1")
-	// tentlocation := &Tenantlocation{}
-	// tentlocation.Tenantusers = make([]Appprofile, 0)
-	// print("1.2")
-	// for rows.Next() {
-	// 	print("1.3")
-	// 	profile := Appprofile{}
-	// 	// item := Item{}
-	// 	err = rows.Scan(&tentlocation.LocationId, &tentlocation.LocationName, &tentlocation.TenantID, &tentlocation.Email, &tentlocation.Mobile, &tentlocation.Address, &tentlocation.Suburb, &tentlocation.State, &tentlocation.Zip, &tentlocation.Latitude, &tentlocation.Longitude, &tentlocation.Countrycode, &tentlocation.OpeningTime, &tentlocation.ClosingTime, &tentlocation.Createdby, &tentlocation.Status,&profile.Userid,&profile.FirstName,&profile.LastName,&profile.Email,&profile.Mobile,&profile.Userlocationid)
-	// 	if err != nil {
-	// 		print("1.4")
-	// 		log.Panic(err)
-	// 	}
-	// 	print("1.5")
-	// 	// orderItem.Item = item
-	// 	tentlocation.Tenantusers = append(tentlocation.Tenantusers, profile)
-	// 	print("1.6")
-	// }
 	// log.Print(pretty.Sprint(tentlocation))
-
-	// print("st1")
-	// rows, err := DB.Table("tenantlocation").Select("locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status").Where("tenantid", id).Rows()
-	// print("st222")
-	// for rows.Next() {
-	// 	var data Tenantlocation
-	// 	// DB.ScanRows(rows, &data)
-	// 	err = rows.Scan(&data.LocationId, &data.LocationName, &data.TenantID, &data.Email, &data.Mobile, &data.Address, &data.Suburb, &data.State, &data.Zip, &data.Latitude, &data.Longitude, &data.Countrycode, &data.OpeningTime, &data.ClosingTime, &data.Createdby, &data.Status)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-
-	// 	loc = append(loc, data)
-	// }
-
 	return orders
 
 }
@@ -466,7 +402,7 @@ func Locationbyid(tenantid, locationid int) *Tenantlocation {
 
 	var data Tenantlocation
 
-	DB.Table("tenantlocation").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=? AND locationid=?", tenantid, locationid).Find(&data)
+	DB.Table("tenantlocations").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=? AND locationid=?", tenantid, locationid).Find(&data)
 
 	fmt.Println(data)
 
