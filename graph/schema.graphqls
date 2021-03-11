@@ -373,6 +373,8 @@ type getBusinessdata{
 }
 type info{
  tenantid:Int!
+ moduleid:Int!
+ modulename:String!
  brandname:String
  about:String
  email:String
@@ -520,7 +522,7 @@ type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
  tenantusers(tenantid:Int!):usersdata!
- getBusiness(tenantid:Int!):getBusinessdata
+ getBusiness(tenantid:Int!,categoryid:Int!):getBusinessdata
  getpromotions(tenantid:Int!):getpromotiondata
  getpromotypes:promotypesdata
  getchargetypes:chargetypedata

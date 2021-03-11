@@ -125,7 +125,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetBusiness      func(childComplexity int, tenantid int) int
+		GetBusiness      func(childComplexity int, tenantid int, categoryid int) int
 		Getchargetypes   func(childComplexity int) int
 		Getlocationbyid  func(childComplexity int, tenantid int, locationid int) int
 		Getnonsubscribed func(childComplexity int, tenantid int) int
@@ -240,6 +240,8 @@ type ComplexityRoot struct {
 		Cod         func(childComplexity int) int
 		Digital     func(childComplexity int) int
 		Email       func(childComplexity int) int
+		Moduleid    func(childComplexity int) int
+		Modulename  func(childComplexity int) int
 		Phone       func(childComplexity int) int
 		Social      func(childComplexity int) int
 		Tenantaccid func(childComplexity int) int
@@ -428,7 +430,7 @@ type QueryResolver interface {
 	Sparkle(ctx context.Context) (*model.Sparkle, error)
 	Location(ctx context.Context, tenantid int) (*model.Getalllocations, error)
 	Tenantusers(ctx context.Context, tenantid int) (*model.Usersdata, error)
-	GetBusiness(ctx context.Context, tenantid int) (*model.GetBusinessdata, error)
+	GetBusiness(ctx context.Context, tenantid int, categoryid int) (*model.GetBusinessdata, error)
 	Getpromotions(ctx context.Context, tenantid int) (*model.Getpromotiondata, error)
 	Getpromotypes(ctx context.Context) (*model.Promotypesdata, error)
 	Getchargetypes(ctx context.Context) (*model.Chargetypedata, error)
@@ -933,7 +935,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetBusiness(childComplexity, args["tenantid"].(int)), true
+		return e.complexity.Query.GetBusiness(childComplexity, args["tenantid"].(int), args["categoryid"].(int)), true
 
 	case "Query.getchargetypes":
 		if e.complexity.Query.Getchargetypes == nil {
@@ -1473,6 +1475,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Info.Email(childComplexity), true
+
+	case "info.moduleid":
+		if e.complexity.Info.Moduleid == nil {
+			break
+		}
+
+		return e.complexity.Info.Moduleid(childComplexity), true
+
+	case "info.modulename":
+		if e.complexity.Info.Modulename == nil {
+			break
+		}
+
+		return e.complexity.Info.Modulename(childComplexity), true
 
 	case "info.phone":
 		if e.complexity.Info.Phone == nil {
@@ -2739,6 +2755,8 @@ type getBusinessdata{
 }
 type info{
  tenantid:Int!
+ moduleid:Int!
+ modulename:String!
  brandname:String
  about:String
  email:String
@@ -2886,7 +2904,7 @@ type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
  tenantusers(tenantid:Int!):usersdata!
- getBusiness(tenantid:Int!):getBusinessdata
+ getBusiness(tenantid:Int!,categoryid:Int!):getBusinessdata
  getpromotions(tenantid:Int!):getpromotiondata
  getpromotypes:promotypesdata
  getchargetypes:chargetypedata
@@ -3092,6 +3110,15 @@ func (ec *executionContext) field_Query_getBusiness_args(ctx context.Context, ra
 		}
 	}
 	args["tenantid"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["categoryid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryid"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["categoryid"] = arg1
 	return args, nil
 }
 
@@ -5510,7 +5537,7 @@ func (ec *executionContext) _Query_getBusiness(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetBusiness(rctx, args["tenantid"].(int))
+		return ec.resolvers.Query().GetBusiness(rctx, args["tenantid"].(int), args["categoryid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8906,6 +8933,76 @@ func (ec *executionContext) _info_tenantid(ctx context.Context, field graphql.Co
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_moduleid(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Moduleid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_modulename(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Modulename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _info_brandname(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
@@ -15936,6 +16033,16 @@ func (ec *executionContext) _info(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = graphql.MarshalString("info")
 		case "tenantid":
 			out.Values[i] = ec._info_tenantid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "moduleid":
+			out.Values[i] = ec._info_moduleid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "modulename":
+			out.Values[i] = ec._info_modulename(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

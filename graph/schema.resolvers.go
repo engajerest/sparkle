@@ -675,7 +675,7 @@ func (r *queryResolver) Tenantusers(ctx context.Context, tenantid int) (*model.U
 	}, nil
 }
 
-func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int) (*model.GetBusinessdata, error) {
+func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryid int) (*model.GetBusinessdata, error) {
 	// id, usererr := helper.ForSparkleContext(ctx)
 	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
@@ -684,18 +684,8 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int) (*model.G
 	print("getbusin")
 	print(id.ID)
 	var Result []*model.Socialinfo
-	var business subscription.BusinessUpdate
-	businessinfo, value := business.GetBusinessInfo(tenantid)
-	if value != true {
-		print(value)
-		return &model.GetBusinessdata{
-			Status:       true,
-			Code:         http.StatusOK,
-			Message:      "Success",
-			Businessinfo: nil,
-		}, nil
-	}
-
+	var businessinfo *subscription.BusinessUpdate
+	var stat bool
 	var socialgetall []subscription.Social
 	socialgetall = subscription.GetAllSocial(tenantid)
 	for _, user := range socialgetall {
@@ -706,6 +696,17 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int) (*model.G
 			Socialicon:    &user.SocialIcon,
 		})
 	}
+	if categoryid == 0 {
+		print("cat0")
+		businessinfo, stat = businessinfo.GetBusinessInfo(tenantid)
+		print(stat)
+	
+	} else {
+		print("cat!=0")
+		businessinfo, stat = businessinfo.GetBusinessforassist(tenantid,categoryid)
+	}
+
+
 
 	return &model.GetBusinessdata{
 		Status:  true,
@@ -721,6 +722,8 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int) (*model.G
 			Email:       &businessinfo.Email,
 			Phone:       &businessinfo.Phone,
 			Address:     &businessinfo.Address,
+			Moduleid:    businessinfo.Moduleid,
+			Modulename:  businessinfo.Modulename,
 			Tenanttoken: &businessinfo.Tenanttoken,
 			Social:      Result,
 		},
@@ -852,7 +855,7 @@ func (r *queryResolver) Getpayments(ctx context.Context, tenantid int, typeid in
 				Paymenttypeid: k.Paymenttypeid, Customerid: k.Customerid, Transactiondate: k.Transactiondate, Orderid: &k.Orderid,
 				Chargeid: k.Chargeid, Amount: k.Amount, Refundamt: &k.Refundamt, Paymentstatus: &k.Paymentstatus,
 				Created: &k.Created, Packagename: k.Packagename, Firstname: k.Firstname, Lastname: k.Lastname,
-				Email: k.Email, Contact: k.Contactno,Paymentref: k.Paymentref,})
+				Email: k.Email, Contact: k.Contactno, Paymentref: k.Paymentref})
 		}
 	}
 	return &model.Getpaymentdata{Status: true, Code: http.StatusOK, Message: "Success", Payments: data}, nil

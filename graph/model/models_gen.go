@@ -256,6 +256,8 @@ type Getsubscriptionsdata struct {
 
 type Info struct {
 	Tenantid    int           `json:"tenantid"`
+	Moduleid    int           `json:"moduleid"`
+	Modulename  string        `json:"modulename"`
 	Brandname   *string       `json:"brandname"`
 	About       *string       `json:"about"`
 	Email       *string       `json:"email"`

@@ -133,6 +133,8 @@ type Location struct {
 }
 type BusinessUpdate struct {
 	TenantID    int      `json:"tenantid"`
+	Moduleid int `json:"moduleid"`
+	Modulename string `json:"modulename"`
 	Brandname   string   `json:"brandname"`
 	TenantaccId int      `json:"tenantaccid"`
 	About       string   `json:"about"`

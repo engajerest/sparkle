@@ -57,6 +57,7 @@ const (
 	getsubscription="SELECT a.packageid,a.moduleid,a.tenantid,a.totalamount,b.modulename,b.logourl,c.packagename,c.packageamount,c.packageicon, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,app_package c   WHERE a.moduleid=b.moduleid AND a.packageid=c.packageid AND  a.tenantid=?"
 	nonsubscribed = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(d.promocodeid,0) AS promocodeid,IFNULL(d.promoname ,'') AS promoname,IFNULL(d.promodescription,'') AS promodescription,IFNULL(d.promotype ,'') AS promotype,IFNULL(d.promovalue,0) AS promovalue,IFNULL(d.validity,'') AS validity,IF(d.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid INNER JOIN tenantsubscription c ON a.packageid<>c.packageid LEFT OUTER JOIN  app_promocodes d ON a.packageid=d.packageid  WHERE a.`status`='Active' AND c.tenantid=?"
 	getpayments = "SELECT a.paymentid,a.packageid,IFNULL(a.paymentref,'') AS paymentref,IFNULL(a.locationid,0) AS locationid,a.paymenttypeid,a.tenantid,IFNULL(a.customerid,0) AS customerid,a.transactiondate,IFNULL(a.orderid,0) AS orderid,a.chargeid,a.amount,a.refundamt,a.paymentstatus,a.created,b.packagename,IFNULL(c.firstname,'') AS firstname,IFNULL(c.lastname,'')AS lastname,IFNULL(c.contactno,'')AS contactno,IFNULL(c.email,'')AS email FROM payments a LEFT OUTER JOIN  app_package b ON a.packageid=b.packageid LEFT OUTER JOIN customers c ON  a.customerid=c.customerid WHERE tenantid=? AND paymenttypeid=?"
+	getbusinessforassist ="SELECT a.tenantid,IFNULL(a.brandname,'') AS brandname,IFNULL(a.tenantinfo,'') AS tenantinfo,a.bizcategoryid,IFNULL(a.paymode1,0) AS paymode1,IFNULL(a.paymode2,0) AS paymode2,IFNULL(a.tenantaccid,0) AS tenantaccid,IFNULL(a.address,'') AS address,IFNULL(a.primaryemail,'') AS primaryemail,IFNULL(a.primarycontact,'') AS  primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken,IFNULL(b.moduleid,0) AS moduleid,IFNULL(d.modulename,'') AS modulename FROM tenants a, tenantsubscription b , app_category c, app_module d WHERE a.tenantid=b.tenantid AND b.moduleid=d.moduleid AND c.categoryid=d.categoryid AND a.tenantid=? AND  c.categoryid=?"
 )
 
 func GetAllCategory() []Category {
@@ -627,6 +628,8 @@ func (info *AuthUser) UpdateAuthUser(userid int) bool {
 
 }
 func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) {
+
+
 	var data BusinessUpdate
 	stmt, err := database.Db.Prepare(getBusinessbyid)
 	if err != nil {
@@ -641,10 +644,36 @@ func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("no rows found")
-			return nil, false
+			return &data, false
+		} else {
+			// log.Fatal(err)
+			return &data, false
+		}
+	}
+	// fmt.Println(user)
+
+	fmt.Println("completed")
+	return &data, true
+}
+func (business *BusinessUpdate) GetBusinessforassist(id,catid int) (*BusinessUpdate, bool) {
+	var data BusinessUpdate
+	stmt, err := database.Db.Prepare(getbusinessforassist)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	row := stmt.QueryRow(id,catid)
+	// print(row)
+	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone, &data.Tenanttoken,&data.Moduleid,&data.Modulename)
+	print(err)
+	fmt.Println("2")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("no rows found")
+			return &data, false
 		} else {
 			log.Fatal(err)
-			return nil, false
+			return &data, false
 		}
 	}
 	// fmt.Println(user)
