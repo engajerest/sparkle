@@ -664,7 +664,9 @@ func (business *BusinessUpdate) GetBusinessforassist(id,catid int) (*BusinessUpd
 	defer stmt.Close()
 	row := stmt.QueryRow(id,catid)
 	// print(row)
-	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone, &data.Tenanttoken,&data.Moduleid,&data.Modulename)
+	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, 
+		&data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone,
+		 &data.Tenanttoken,&data.Tenantimage,&data.Moduleid,&data.Modulename)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
