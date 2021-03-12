@@ -101,6 +101,21 @@ input subscription{
  PaymentStatus:Int!
  PaymentId:Int
 }
+input subscriptionnew{
+   Tenantid:Int!
+ TransactionDate:String!
+ PackageId:[Int!]!
+ ModuleId:Int!
+ CurrencyId:Int!
+ CurrencyCode:String!
+ Price:String!
+ TaxId:Int!
+ Quantity:Int!
+ TaxAmount:String!
+ TotalAmount:String!
+ PaymentStatus:Int!
+ PaymentId:Int
+}
 
 input tenantuser{
  TenantId:Int!
@@ -341,6 +356,7 @@ input businessupdatedata{
  cod:Int
  digital:Int
  tenantaccid:Int
+ tenantimage:String!
 }
 input socialupdatedata{
 socialid:Int
@@ -384,6 +400,7 @@ type info{
  digital:Int
  tenantaccid:Int
  tenanttoken:String
+ tenantimage:String
  social:[socialinfo]
 }
 type socialinfo{
@@ -530,6 +547,7 @@ type Query {
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
  getnonsubscribed(tenantid:Int!):getnonsubscribeddata
+
 }
 
 type Mutation {
@@ -543,4 +561,5 @@ type Mutation {
  updatecharges(input:chargeupdate):promotioncreateddata
  updatelocationstatus(input:locationstatusinput):promotioncreateddata
  updatelocation(input:locationupdate):promotioncreateddata
+ subscription(input:subscriptionnew):subscribedData
 }

@@ -137,6 +137,7 @@ type Businessupdatedata struct {
 	Cod         *int    `json:"cod"`
 	Digital     *int    `json:"digital"`
 	Tenantaccid *int    `json:"tenantaccid"`
+	Tenantimage string  `json:"tenantimage"`
 }
 
 type Chargecreate struct {
@@ -267,6 +268,7 @@ type Info struct {
 	Digital     *int          `json:"digital"`
 	Tenantaccid *int          `json:"tenantaccid"`
 	Tenanttoken *string       `json:"tenanttoken"`
+	Tenantimage *string       `json:"tenantimage"`
 	Social      []*Socialinfo `json:"social"`
 }
 
@@ -442,6 +444,22 @@ type SubscribedData struct {
 }
 
 type Subscription struct {
+	TransactionDate string `json:"TransactionDate"`
+	PackageID       []int  `json:"PackageId"`
+	ModuleID        int    `json:"ModuleId"`
+	CurrencyID      int    `json:"CurrencyId"`
+	CurrencyCode    string `json:"CurrencyCode"`
+	Price           string `json:"Price"`
+	TaxID           int    `json:"TaxId"`
+	Quantity        int    `json:"Quantity"`
+	TaxAmount       string `json:"TaxAmount"`
+	TotalAmount     string `json:"TotalAmount"`
+	PaymentStatus   int    `json:"PaymentStatus"`
+	PaymentID       *int   `json:"PaymentId"`
+}
+
+type Subscriptionnew struct {
+	Tenantid        int    `json:"Tenantid"`
 	TransactionDate string `json:"TransactionDate"`
 	PackageID       []int  `json:"PackageId"`
 	ModuleID        int    `json:"ModuleId"`

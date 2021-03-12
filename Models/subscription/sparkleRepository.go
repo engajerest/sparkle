@@ -35,11 +35,11 @@ const (
 	getAllTenantUsers              = "SELECT a.firstname,a.lastname,a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocations b, app_users c WHERE  a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=?"
 	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 	getAllTenantUserByLocationId   = ""
-	updateTenantBusiness           = "UPDATE tenants SET brandname=?,tenantaccid=?,tenantinfo=?,paymode1=?,paymode2=? WHERE tenantid=?"
+	updateTenantBusiness           = "UPDATE tenants SET brandname=?,tenantaccid=?,tenantinfo=?,paymode1=?,paymode2=?,tenantimage=? WHERE tenantid=?"
 	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,sociallink,socialicon) VALUES"
 	updatesocialinfo               = "UPDATE tenantsocial SET socialprofile=?, sociallink=?,socialicon=? WHERE tenantid=? AND socialid=? "
 	updateauthuser                 = "UPDATE  app_users a,app_userprofiles b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
-	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid,IFNULL(address,'') AS address,IFNULL(primaryemail,'') AS primaryemail,IFNULL(primarycontact,'') AS  primarycontact,IFNULL(tenanttoken,'') AS tenanttoken FROM tenants WHERE tenantid=?"
+	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid,IFNULL(address,'') AS address,IFNULL(primaryemail,'') AS primaryemail,IFNULL(primarycontact,'') AS  primarycontact,IFNULL(tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage FROM tenants WHERE tenantid=?"
 	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile , IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
 	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
 	Getpromotions                  = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.promoname,a.promocode,a.promoterms,a.promovalue,a.startdate,a.enddate,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
@@ -57,7 +57,7 @@ const (
 	getsubscription="SELECT a.packageid,a.moduleid,a.tenantid,a.totalamount,b.modulename,b.logourl,c.packagename,c.packageamount,c.packageicon, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,app_package c   WHERE a.moduleid=b.moduleid AND a.packageid=c.packageid AND  a.tenantid=?"
 	nonsubscribed = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(d.promocodeid,0) AS promocodeid,IFNULL(d.promoname ,'') AS promoname,IFNULL(d.promodescription,'') AS promodescription,IFNULL(d.promotype ,'') AS promotype,IFNULL(d.promovalue,0) AS promovalue,IFNULL(d.validity,'') AS validity,IF(d.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid INNER JOIN tenantsubscription c ON a.packageid<>c.packageid LEFT OUTER JOIN  app_promocodes d ON a.packageid=d.packageid  WHERE a.`status`='Active' AND c.tenantid=?"
 	getpayments = "SELECT a.paymentid,a.packageid,IFNULL(a.paymentref,'') AS paymentref,IFNULL(a.locationid,0) AS locationid,a.paymenttypeid,a.tenantid,IFNULL(a.customerid,0) AS customerid,a.transactiondate,IFNULL(a.orderid,0) AS orderid,a.chargeid,a.amount,a.refundamt,a.paymentstatus,a.created,b.packagename,IFNULL(c.firstname,'') AS firstname,IFNULL(c.lastname,'')AS lastname,IFNULL(c.contactno,'')AS contactno,IFNULL(c.email,'')AS email FROM payments a LEFT OUTER JOIN  app_package b ON a.packageid=b.packageid LEFT OUTER JOIN customers c ON  a.customerid=c.customerid WHERE tenantid=? AND paymenttypeid=?"
-	getbusinessforassist ="SELECT a.tenantid,IFNULL(a.brandname,'') AS brandname,IFNULL(a.tenantinfo,'') AS tenantinfo,a.bizcategoryid,IFNULL(a.paymode1,0) AS paymode1,IFNULL(a.paymode2,0) AS paymode2,IFNULL(a.tenantaccid,0) AS tenantaccid,IFNULL(a.address,'') AS address,IFNULL(a.primaryemail,'') AS primaryemail,IFNULL(a.primarycontact,'') AS  primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken,IFNULL(b.moduleid,0) AS moduleid,IFNULL(d.modulename,'') AS modulename FROM tenants a, tenantsubscription b , app_category c, app_module d WHERE a.tenantid=b.tenantid AND b.moduleid=d.moduleid AND c.categoryid=d.categoryid AND a.tenantid=? AND  c.categoryid=?"
+	getbusinessforassist ="SELECT a.tenantid,IFNULL(a.brandname,'') AS brandname,IFNULL(a.tenantinfo,'') AS tenantinfo,IFNULL(a.paymode1,0) AS paymode1,IFNULL(a.paymode2,0) AS paymode2,IFNULL(a.tenantaccid,0) AS tenantaccid,IFNULL(a.address,'') AS address,IFNULL(a.primaryemail,'') AS primaryemail,IFNULL(a.primarycontact,'') AS  primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage,IFNULL(b.moduleid,0) AS moduleid,IFNULL(d.modulename,'') AS modulename FROM tenants a, tenantsubscription b , app_category c, app_module d WHERE a.tenantid=b.tenantid AND b.moduleid=d.moduleid AND c.categoryid=d.categoryid AND a.tenantid=? AND  c.categoryid=?"
 )
 
 func GetAllCategory() []Category {
@@ -546,7 +546,7 @@ func (user *BusinessUpdate) UpdateTenantBusiness() bool {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	_, err = statement.Exec(user.Brandname, user.TenantaccId, user.About, user.Paymode1, user.Paymode2, &user.TenantID)
+	_, err = statement.Exec(user.Brandname, user.TenantaccId, user.About, user.Paymode1, user.Paymode2,user.Tenantimage, user.TenantID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -638,7 +638,7 @@ func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) 
 	defer stmt.Close()
 	row := stmt.QueryRow(id)
 	// print(row)
-	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone, &data.Tenanttoken)
+	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone, &data.Tenanttoken,&data.Tenantimage)
 	print(err)
 	fmt.Println("2")
 	if err != nil {

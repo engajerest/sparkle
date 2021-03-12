@@ -82,6 +82,7 @@ type ComplexityRoot struct {
 		Createpromotion      func(childComplexity int, input *model.Promoinput) int
 		Createtenantuser     func(childComplexity int, create *model.Tenantuser) int
 		Subscribe            func(childComplexity int, input model.Data) int
+		Subscription         func(childComplexity int, input *model.Subscriptionnew) int
 		Updatecharges        func(childComplexity int, input *model.Chargeupdate) int
 		Updatelocation       func(childComplexity int, input *model.Locationupdate) int
 		Updatelocationstatus func(childComplexity int, input *model.Locationstatusinput) int
@@ -246,6 +247,7 @@ type ComplexityRoot struct {
 		Social      func(childComplexity int) int
 		Tenantaccid func(childComplexity int) int
 		Tenantid    func(childComplexity int) int
+		Tenantimage func(childComplexity int) int
 		Tenanttoken func(childComplexity int) int
 	}
 
@@ -425,6 +427,7 @@ type MutationResolver interface {
 	Updatecharges(ctx context.Context, input *model.Chargeupdate) (*model.Promotioncreateddata, error)
 	Updatelocationstatus(ctx context.Context, input *model.Locationstatusinput) (*model.Promotioncreateddata, error)
 	Updatelocation(ctx context.Context, input *model.Locationupdate) (*model.Promotioncreateddata, error)
+	Subscription(ctx context.Context, input *model.Subscriptionnew) (*model.SubscribedData, error)
 }
 type QueryResolver interface {
 	Sparkle(ctx context.Context) (*model.Sparkle, error)
@@ -661,6 +664,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Subscribe(childComplexity, args["input"].(model.Data)), true
+
+	case "Mutation.subscription":
+		if e.complexity.Mutation.Subscription == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_subscription_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Subscription(childComplexity, args["input"].(*model.Subscriptionnew)), true
 
 	case "Mutation.updatecharges":
 		if e.complexity.Mutation.Updatecharges == nil {
@@ -1517,6 +1532,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Info.Tenantid(childComplexity), true
+
+	case "info.tenantimage":
+		if e.complexity.Info.Tenantimage == nil {
+			break
+		}
+
+		return e.complexity.Info.Tenantimage(childComplexity), true
 
 	case "info.tenanttoken":
 		if e.complexity.Info.Tenanttoken == nil {
@@ -2483,6 +2505,21 @@ input subscription{
  PaymentStatus:Int!
  PaymentId:Int
 }
+input subscriptionnew{
+   Tenantid:Int!
+ TransactionDate:String!
+ PackageId:[Int!]!
+ ModuleId:Int!
+ CurrencyId:Int!
+ CurrencyCode:String!
+ Price:String!
+ TaxId:Int!
+ Quantity:Int!
+ TaxAmount:String!
+ TotalAmount:String!
+ PaymentStatus:Int!
+ PaymentId:Int
+}
 
 input tenantuser{
  TenantId:Int!
@@ -2723,6 +2760,7 @@ input businessupdatedata{
  cod:Int
  digital:Int
  tenantaccid:Int
+ tenantimage:String!
 }
 input socialupdatedata{
 socialid:Int
@@ -2766,6 +2804,7 @@ type info{
  digital:Int
  tenantaccid:Int
  tenanttoken:String
+ tenantimage:String
  social:[socialinfo]
 }
 type socialinfo{
@@ -2912,6 +2951,7 @@ type Query {
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
  getnonsubscribed(tenantid:Int!):getnonsubscribeddata
+
 }
 
 type Mutation {
@@ -2925,6 +2965,7 @@ type Mutation {
  updatecharges(input:chargeupdate):promotioncreateddata
  updatelocationstatus(input:locationstatusinput):promotioncreateddata
  updatelocation(input:locationupdate):promotioncreateddata
+ subscription(input:subscriptionnew):subscribedData
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -3000,6 +3041,21 @@ func (ec *executionContext) field_Mutation_subscribe_args(ctx context.Context, r
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNdata2githubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐData(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_subscription_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.Subscriptionnew
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOsubscriptionnew2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscriptionnew(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4409,6 +4465,45 @@ func (ec *executionContext) _Mutation_updatelocation(ctx context.Context, field 
 	res := resTmp.(*model.Promotioncreateddata)
 	fc.Result = res
 	return ec.marshalOpromotioncreateddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotioncreateddata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_subscription(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_subscription_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Subscription(rctx, args["input"].(*model.Subscriptionnew))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.SubscribedData)
+	fc.Result = res
+	return ec.marshalOsubscribedData2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscribedData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Package_ModuleId(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
@@ -9293,6 +9388,38 @@ func (ec *executionContext) _info_tenanttoken(ctx context.Context, field graphql
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _info_tenantimage(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantimage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _info_social(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -13449,6 +13576,14 @@ func (ec *executionContext) unmarshalInputbusinessupdatedata(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "tenantimage":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantimage"))
+			it.Tenantimage, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -14387,6 +14522,122 @@ func (ec *executionContext) unmarshalInputsubscription(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputsubscriptionnew(ctx context.Context, obj interface{}) (model.Subscriptionnew, error) {
+	var it model.Subscriptionnew
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "Tenantid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Tenantid"))
+			it.Tenantid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "TransactionDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TransactionDate"))
+			it.TransactionDate, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "PackageId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("PackageId"))
+			it.PackageID, err = ec.unmarshalNInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ModuleId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ModuleId"))
+			it.ModuleID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "CurrencyId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("CurrencyId"))
+			it.CurrencyID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "CurrencyCode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("CurrencyCode"))
+			it.CurrencyCode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Price":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Price"))
+			it.Price, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "TaxId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TaxId"))
+			it.TaxID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Quantity":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Quantity"))
+			it.Quantity, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "TaxAmount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TaxAmount"))
+			it.TaxAmount, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "TotalAmount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TotalAmount"))
+			it.TotalAmount, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "PaymentStatus":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("PaymentStatus"))
+			it.PaymentStatus, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "PaymentId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("PaymentId"))
+			it.PaymentID, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputtenantuser(ctx context.Context, obj interface{}) (model.Tenantuser, error) {
 	var it model.Tenantuser
 	var asMap = obj.(map[string]interface{})
@@ -14910,6 +15161,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updatelocationstatus(ctx, field)
 		case "updatelocation":
 			out.Values[i] = ec._Mutation_updatelocation(ctx, field)
+		case "subscription":
+			out.Values[i] = ec._Mutation_subscription(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16064,6 +16317,8 @@ func (ec *executionContext) _info(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._info_tenantaccid(ctx, field, obj)
 		case "tenanttoken":
 			out.Values[i] = ec._info_tenanttoken(ctx, field, obj)
+		case "tenantimage":
+			out.Values[i] = ec._info_tenantimage(ctx, field, obj)
 		case "social":
 			out.Values[i] = ec._info_social(ctx, field, obj)
 		default:
@@ -18503,6 +18758,21 @@ func (ec *executionContext) unmarshalOsocialupdatedata2ᚖgithubᚗcomᚋengajer
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputsocialupdatedata(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOsubscribedData2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscribedData(ctx context.Context, sel ast.SelectionSet, v *model.SubscribedData) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._subscribedData(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOsubscriptionnew2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscriptionnew(ctx context.Context, v interface{}) (*model.Subscriptionnew, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputsubscriptionnew(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

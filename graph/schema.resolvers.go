@@ -212,6 +212,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	data.About = *businessinfo.Businessupdate.About
 	data.Paymode1 = *businessinfo.Businessupdate.Cod
 	data.Paymode2 = *businessinfo.Businessupdate.Digital
+	data.Tenantimage=businessinfo.Businessupdate.Tenantimage
 	var check []subscription.Social
 	var updatedata []subscription.Social
 	schemasocialadd := *&businessinfo.Socialadd
@@ -525,6 +526,44 @@ func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Loca
 	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Location updated"}, nil
 }
 
+func (r *mutationResolver) Subscription(ctx context.Context, input *model.Subscriptionnew) (*model.SubscribedData, error) {
+	var data2 subscription.SubscribedData
+	var data1 subscription.TenantSubscription
+
+	data1.CurrencyId = input.CurrencyID
+	data1.Date = input.TransactionDate
+	data1.CurrencyId = input.CurrencyID
+	data1.ModuleId = input.ModuleID
+	data1.PaymentId = *input.PaymentID
+	data1.PaymentStatus = input.PaymentStatus
+	data1.Price = input.Price
+	data1.Quantity = input.Quantity
+	data1.TaxId = input.TaxID
+	data1.TaxAmount = input.TaxAmount
+	data1.TotalAmount = input.TotalAmount
+	intlist := input.PackageID
+	if len(intlist) != 0 {
+
+		for i := 0; i < len(intlist); i++ {
+			data1.PackageId = intlist[i]
+			subscribedid := data1.InsertSubscription(int64(input.Tenantid))
+			print("subs-id===")
+			print(subscribedid)
+			print(input.Tenantid)
+		}
+	}
+
+	s, Error := data2.GetSubscribedData(int64(input.Tenantid))
+	if Error != nil {
+		fmt.Println("rows were not found")
+		return nil, Error
+	}
+
+	return &model.SubscribedData{Status: true, Code: http.StatusCreated, Message: "Success",
+		Info: &model.TenantData{TenantID: s.TenantID, TenantName: s.TenantName, ModuleID: s.ModuleID,
+			ModuleName: s.ModuleName}}, nil
+}
+
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	// id, usererr := controller.ForContext(ctx)
 	id, usererr := helper.ForSparkleContext(ctx)
@@ -700,13 +739,11 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 		print("cat0")
 		businessinfo, stat = businessinfo.GetBusinessInfo(tenantid)
 		print(stat)
-	
+
 	} else {
 		print("cat!=0")
-		businessinfo, stat = businessinfo.GetBusinessforassist(tenantid,categoryid)
+		businessinfo, stat = businessinfo.GetBusinessforassist(tenantid, categoryid)
 	}
-
-
 
 	return &model.GetBusinessdata{
 		Status:  true,
@@ -725,6 +762,7 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 			Moduleid:    businessinfo.Moduleid,
 			Modulename:  businessinfo.Modulename,
 			Tenanttoken: &businessinfo.Tenanttoken,
+			Tenantimage: &businessinfo.Tenantimage,
 			Social:      Result,
 		},
 	}, nil

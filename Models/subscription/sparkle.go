@@ -69,6 +69,7 @@ type TenantLocation struct {
 }
 
 type TenantSubscription struct {
+	
 	Date          string `json:"date"`
 	PackageId     int    `json:"packageId"`
 	ModuleId      int    `json:"moduleId"`
@@ -144,6 +145,7 @@ type BusinessUpdate struct {
 	Paymode1    int      `json:"paymode1"`
 	Paymode2    int      `json:"paymode2"`
 	Tenanttoken string   `json:"tenanttoken"`
+	Tenantimage string `json:"tenantimage"`
 	SocialData  []Social `json:"social"`
 	// SociaProfile string `json:"socialprofile"`
 	// SocialLink string `json:"sociallink"`
