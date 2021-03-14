@@ -100,10 +100,11 @@ type TenantAddress struct {
 }
 
 type TenantData struct {
-	TenantID   int    `json:"TenantId"`
-	TenantName string `json:"TenantName"`
-	ModuleID   int    `json:"ModuleId"`
-	ModuleName string `json:"ModuleName"`
+	TenantID       int    `json:"TenantId"`
+	TenantName     string `json:"TenantName"`
+	ModuleID       int    `json:"ModuleId"`
+	ModuleName     string `json:"ModuleName"`
+	Subscriptionid int    `json:"Subscriptionid"`
 }
 
 type TenantDetails struct {
@@ -183,9 +184,9 @@ type Chargeupdateinput struct {
 }
 
 type Data struct {
-	Tenantinfo          *TenantDetails `json:"tenantinfo"`
-	Tenantlocation      *TenantAddress `json:"tenantlocation"`
-	Subscriptiondetails *Subscription  `json:"subscriptiondetails"`
+	Tenantinfo          *TenantDetails  `json:"tenantinfo"`
+	Tenantlocation      *TenantAddress  `json:"tenantlocation"`
+	Subscriptiondetails []*Subscription `json:"subscriptiondetails"`
 }
 
 type Deliverycharge struct {
@@ -437,21 +438,23 @@ type Socialupdatedata struct {
 }
 
 type SubscribedData struct {
-	Status  bool        `json:"status"`
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Info    *TenantData `json:"info"`
+	Status  bool          `json:"status"`
+	Code    int           `json:"code"`
+	Message string        `json:"message"`
+	Info    []*TenantData `json:"info"`
 }
 
 type Subscription struct {
 	TransactionDate string `json:"TransactionDate"`
-	PackageID       []int  `json:"PackageId"`
+	PackageID       int    `json:"PackageId"`
 	ModuleID        int    `json:"ModuleId"`
 	CurrencyID      int    `json:"CurrencyId"`
 	CurrencyCode    string `json:"CurrencyCode"`
 	Price           string `json:"Price"`
 	TaxID           int    `json:"TaxId"`
 	Quantity        int    `json:"Quantity"`
+	Promoid         int    `json:"Promoid"`
+	Promovalue      string `json:"Promovalue"`
 	TaxAmount       string `json:"TaxAmount"`
 	TotalAmount     string `json:"TotalAmount"`
 	PaymentStatus   int    `json:"PaymentStatus"`
@@ -461,7 +464,7 @@ type Subscription struct {
 type Subscriptionnew struct {
 	Tenantid        int    `json:"Tenantid"`
 	TransactionDate string `json:"TransactionDate"`
-	PackageID       []int  `json:"PackageId"`
+	PackageID       int    `json:"PackageId"`
 	ModuleID        int    `json:"ModuleId"`
 	CurrencyID      int    `json:"CurrencyId"`
 	CurrencyCode    string `json:"CurrencyCode"`
@@ -472,6 +475,8 @@ type Subscriptionnew struct {
 	TotalAmount     string `json:"TotalAmount"`
 	PaymentStatus   int    `json:"PaymentStatus"`
 	PaymentID       *int   `json:"PaymentId"`
+	Promoid         int    `json:"Promoid"`
+	Promovalue      string `json:"Promovalue"`
 }
 
 type Subscriptionsdata struct {

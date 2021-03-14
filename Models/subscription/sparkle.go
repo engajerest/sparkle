@@ -82,6 +82,8 @@ type TenantSubscription struct {
 	PaymentStatus int    `json:"paymentstatus"`
 	PaymentId     int    `json:"paymentId"`
 	Quantity      int    `json:"quantity"`
+	Promoid int `json:"promoid"`
+	Promovalue string `json:"promovalue"`
 }
 
 type SubscriptionData struct {
@@ -94,6 +96,7 @@ type SubscribedData struct {
 	TenantName string `json:"tenantname"`
 	ModuleName string `json:"modulename"`
 	ModuleID   int    `json:"moduleId"`
+	Subscriptionid int `json:"subscriptionid"`
 }
 
 type TenantUser struct {

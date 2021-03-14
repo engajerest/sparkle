@@ -6,7 +6,7 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
+
 	"net/http"
 
 	"github.com/engajerest/auth/Models/users"
@@ -28,6 +28,8 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	user.ID = id.ID
 	print("check")
 	print(user.ID)
+	var list []*model.TenantData
+	var list1 []subscription.SubscribedData
 	var data subscription.SubscriptionData
 	data.Info.CategoryId = input.Tenantinfo.CategoryID
 	data.Info.Regno = input.Tenantinfo.Regno
@@ -46,24 +48,12 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	data.Address.TimeZone = input.Tenantlocation.TimeZone
 	data.Address.OpenTime = input.Tenantlocation.Opentime
 	data.Address.CloseTime = input.Tenantlocation.Closetime
-	data.Address.CurrencyCode = input.Subscriptiondetails.CurrencyCode
 	var data1 subscription.TenantSubscription
-	data1.CurrencyId = input.Subscriptiondetails.CurrencyID
 
-	data1.Date = input.Subscriptiondetails.TransactionDate
-	data1.CurrencyId = input.Subscriptiondetails.CurrencyID
-	data1.ModuleId = input.Subscriptiondetails.ModuleID
-	data1.PaymentId = *input.Subscriptiondetails.PaymentID
-	data1.PaymentStatus = input.Subscriptiondetails.PaymentStatus
-	data1.Price = input.Subscriptiondetails.Price
-	data1.Quantity = input.Subscriptiondetails.Quantity
-	data1.TaxId = input.Subscriptiondetails.TaxID
-	data1.TaxAmount = input.Subscriptiondetails.TaxAmount
-	data1.TotalAmount = input.Subscriptiondetails.TotalAmount
 	var data2 subscription.SubscribedData
 	var auth subscription.AuthUser
-	intlist := input.Subscriptiondetails.PackageID
 
+	intlist := input.Subscriptiondetails
 	print("check456")
 	tenantId, err := data.CreateTenant(user.ID)
 	if err != nil {
@@ -80,7 +70,21 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		if len(intlist) != 0 {
 
 			for i := 0; i < len(intlist); i++ {
-				data1.PackageId = intlist[i]
+
+				data1.CurrencyId = intlist[i].CurrencyID
+				data1.Date = intlist[i].TransactionDate
+				data1.CurrencyId = intlist[i].CurrencyID
+				data1.ModuleId = intlist[i].ModuleID
+				data1.PaymentId = *intlist[i].PaymentID
+				data1.PaymentStatus = intlist[i].PaymentStatus
+				data1.Price = intlist[i].Price
+				data1.Quantity = intlist[i].Quantity
+				data1.TaxId = intlist[i].TaxID
+				data1.TaxAmount = intlist[i].TaxAmount
+				data1.TotalAmount = intlist[i].TotalAmount
+				data1.PackageId = intlist[i].PackageID
+				data1.Promoid = intlist[i].Promoid
+				data1.Promovalue = intlist[i].Promovalue
 				subscribedid := data1.InsertSubscription(tenantId)
 				print("subs-id===")
 				print(subscribedid)
@@ -105,11 +109,14 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		}
 
 	}
-	subscribed, Error := data2.GetSubscribedData(tenantId)
-	if Error != nil {
-		fmt.Println("rows were not found")
-		return nil, Error
+	list1= data2.GetSubscribedData(tenantId)
+	if len(list1)!=0{
+		for _,k:=range list1{
+			list=append(list, &model.TenantData{TenantID: k.TenantID,TenantName: k.TenantName,ModuleID: k.ModuleID,
+			ModuleName: k.ModuleName,Subscriptionid: k.Subscriptionid,})
+		}
 	}
+
 
 	status := auth.UpdateAuthUser(id.ID)
 	print(status)
@@ -120,12 +127,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		Status:  true,
 		Code:    http.StatusOK,
 		Message: "Success",
-		Info: &model.TenantData{
-			TenantID:   subscribed.TenantID,
-			TenantName: subscribed.TenantName,
-			ModuleID:   subscribed.ModuleID,
-			ModuleName: subscribed.ModuleName,
-		},
+		Info: list,
 	}, nil
 }
 
@@ -212,7 +214,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	data.About = *businessinfo.Businessupdate.About
 	data.Paymode1 = *businessinfo.Businessupdate.Cod
 	data.Paymode2 = *businessinfo.Businessupdate.Digital
-	data.Tenantimage=businessinfo.Businessupdate.Tenantimage
+	data.Tenantimage = businessinfo.Businessupdate.Tenantimage
 	var check []subscription.Social
 	var updatedata []subscription.Social
 	schemasocialadd := *&businessinfo.Socialadd
@@ -526,42 +528,48 @@ func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Loca
 	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Location updated"}, nil
 }
 
-func (r *mutationResolver) Subscription(ctx context.Context, input *model.Subscriptionnew) (*model.SubscribedData, error) {
+func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subscriptionnew) (*model.SubscribedData, error) {
 	var data2 subscription.SubscribedData
 	var data1 subscription.TenantSubscription
-
-	data1.CurrencyId = input.CurrencyID
-	data1.Date = input.TransactionDate
-	data1.CurrencyId = input.CurrencyID
-	data1.ModuleId = input.ModuleID
-	data1.PaymentId = *input.PaymentID
-	data1.PaymentStatus = input.PaymentStatus
-	data1.Price = input.Price
-	data1.Quantity = input.Quantity
-	data1.TaxId = input.TaxID
-	data1.TaxAmount = input.TaxAmount
-	data1.TotalAmount = input.TotalAmount
-	intlist := input.PackageID
+var list []*model.TenantData
+var list1 []subscription.SubscribedData
+	intlist := input
 	if len(intlist) != 0 {
-
 		for i := 0; i < len(intlist); i++ {
-			data1.PackageId = intlist[i]
-			subscribedid := data1.InsertSubscription(int64(input.Tenantid))
+
+			data1.CurrencyId = intlist[i].CurrencyID
+			data1.Date = intlist[i].TransactionDate
+			data1.CurrencyId = intlist[i].CurrencyID
+			data1.ModuleId = intlist[i].ModuleID
+			data1.PaymentId = *intlist[i].PaymentID
+			data1.PaymentStatus = intlist[i].PaymentStatus
+			data1.Price = intlist[i].Price
+			data1.Quantity = intlist[i].Quantity
+			data1.TaxId = intlist[i].TaxID
+			data1.TaxAmount = intlist[i].TaxAmount
+			data1.TotalAmount = intlist[i].TotalAmount
+			data1.PackageId = intlist[i].PackageID
+			data1.Promoid = intlist[i].Promoid
+			data1.Promovalue = intlist[i].Promovalue
+			subscribedid := data1.InsertSubscription(int64(intlist[i].Tenantid))
 			print("subs-id===")
 			print(subscribedid)
-			print(input.Tenantid)
+			print(intlist[i].Tenantid)
 		}
 	}
 
-	s, Error := data2.GetSubscribedData(int64(input.Tenantid))
-	if Error != nil {
-		fmt.Println("rows were not found")
-		return nil, Error
+	list1= data2.GetSubscribedData(int64(intlist[0].Tenantid))
+	if len(list1)!=0{
+		for _,k:=range list1{
+			list=append(list, &model.TenantData{TenantID: k.TenantID,TenantName: k.TenantName,ModuleID: k.ModuleID,
+			ModuleName: k.ModuleName,Subscriptionid: k.Subscriptionid,})
+		}
 	}
 
+
 	return &model.SubscribedData{Status: true, Code: http.StatusCreated, Message: "Success",
-		Info: &model.TenantData{TenantID: s.TenantID, TenantName: s.TenantName, ModuleID: s.ModuleID,
-			ModuleName: s.ModuleName}}, nil
+	Info: list,
+	}, nil
 }
 
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {

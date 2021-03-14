@@ -80,22 +80,25 @@ type TenantData{
  TenantName:String!
  ModuleId:Int! 
  ModuleName:String!
+ Subscriptionid:Int!
 }
 type subscribedData{
  status:Boolean!
  code:Int!
  message:String!
- info:TenantData!
+ info:[TenantData]!
 }
 input subscription{
  TransactionDate:String!
- PackageId:[Int!]!
+ PackageId:Int!
  ModuleId:Int!
  CurrencyId:Int!
  CurrencyCode:String!
  Price:String!
  TaxId:Int!
  Quantity:Int!
+ Promoid:Int!
+ Promovalue:String!
  TaxAmount:String!
  TotalAmount:String!
  PaymentStatus:Int!
@@ -104,7 +107,7 @@ input subscription{
 input subscriptionnew{
    Tenantid:Int!
  TransactionDate:String!
- PackageId:[Int!]!
+ PackageId:Int!
  ModuleId:Int!
  CurrencyId:Int!
  CurrencyCode:String!
@@ -115,6 +118,8 @@ input subscriptionnew{
  TotalAmount:String!
  PaymentStatus:Int!
  PaymentId:Int
+ Promoid:Int!
+ Promovalue:String!
 }
 
 input tenantuser{
@@ -130,7 +135,7 @@ input tenantuser{
 input data{
  tenantinfo:TenantDetails!
  tenantlocation:TenantAddress!
- subscriptiondetails:subscription!
+ subscriptiondetails:[subscription]!
 }
 input location{
  TenantId:Int!
@@ -551,7 +556,7 @@ type Query {
 }
 
 type Mutation {
- subscribe(input: data!): subscribedData!
+ subscribe(input: data!): subscribedData
  createtenantuser(create:tenantuser):tenantuserdata
  updatetenantuser(update:updatetenant):tenantupdatedata
  updatetenantbusiness(businessinfo:business):businessdata
@@ -561,5 +566,5 @@ type Mutation {
  updatecharges(input:chargeupdate):promotioncreateddata
  updatelocationstatus(input:locationstatusinput):promotioncreateddata
  updatelocation(input:locationupdate):promotioncreateddata
- subscription(input:subscriptionnew):subscribedData
+ subscription(input:[subscriptionnew]):subscribedData
 }
