@@ -41,6 +41,7 @@ type Packages struct {
 	Promovalue float64 `json:"promovalue"`
 	Promovaliditydate string `json:"promovaliditydate"`
 	Validity bool `json:"validity"`
+	Packageexpiry int `json:"packageexpiry"`
 
 
 }
@@ -84,6 +85,8 @@ type TenantSubscription struct {
 	Quantity      int    `json:"quantity"`
 	Promoid int `json:"promoid"`
 	Promovalue string `json:"promovalue"`
+	Promostatus bool `json:"promostatus"`
+	Validitydate string `json:"validitydate"`
 }
 
 type SubscriptionData struct {

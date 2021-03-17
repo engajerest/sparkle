@@ -84,6 +84,8 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 				data1.PackageId = intlist[i].PackageID
 				data1.Promoid = intlist[i].Promoid
 				data1.Promovalue = intlist[i].Promovalue
+				data1.Validitydate=intlist[i].Validitydate
+				data1.Promostatus=true
 				subscribedid := data1.InsertSubscription(tenantId)
 				print("subs-id===")
 				print(subscribedid)
@@ -549,6 +551,8 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 			data1.PackageId = intlist[i].PackageID
 			data1.Promoid = intlist[i].Promoid
 			data1.Promovalue = intlist[i].Promovalue
+			data1.Validitydate=intlist[i].Validitydate
+			data1.Promostatus=true
 			subscribedid := data1.InsertSubscription(int64(intlist[i].Tenantid))
 			print("subs-id===")
 			print(subscribedid)
@@ -597,7 +601,7 @@ func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	packageGetAll = subscription.GetAllPackages()
 	for _, packdata := range packageGetAll {
 		pack = append(pack, &model.Package{ModuleID: packdata.ModuleID, Modulename: packdata.ModuleName, Name: packdata.Name, PackageID: packdata.PackageID, Status: packdata.Status, PackageAmount: packdata.PackageAmount, PaymentMode: packdata.PaymentMode, PackageContent: packdata.PackageContent, PackageIcon: packdata.PackageIcon,
-			Promocodeid: packdata.Promocodeid, Promonname: packdata.Promoname, Promodescription: packdata.Promodescription, Promotype: packdata.Promotype, Promovalue: packdata.Promovalue, Validitydate: packdata.Promovaliditydate, Validity: packdata.Validity})
+			Promocodeid: packdata.Promocodeid, Promonname: packdata.Promoname, Promodescription: packdata.Promodescription, Promotype: packdata.Promotype, Promovalue: packdata.Promovalue, Validitydate: packdata.Promovaliditydate, Validity: packdata.Validity, Packageexpiry: packdata.Packageexpiry})
 
 	}
 
@@ -871,7 +875,7 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 	return &model.Locationbyiddata{
 		Status: true,
 		Code:   http.StatusOK, Message: "Success", Locationdata: &model.Locationgetall{
-			Locationid: loco.Locationid, LocationName: loco.Locationname, Tenantid: loco.Tenantid, Email: loco.Email, Contact:loco.Contactno,
+			Locationid: loco.Locationid, LocationName: loco.Locationname, Tenantid: loco.Tenantid, Email: loco.Email, Contact: loco.Contactno,
 			Address: loco.Address, Suburb: loco.City, State: loco.State, Postcode: loco.Postcode, Countycode: loco.Countrycode, Latitude: loco.Latitude,
 			Delivery: loco.Delivery, Deliverytype: loco.Deliverytype, Deliverymins: loco.Deliverymins,
 			Longitude: loco.Longitude, Openingtime: loco.Opentime, Closingtime: loco.Closetime, Status: loco.Status, Tenantusers: userresult, Createdby: loco.Createdby,
@@ -937,7 +941,7 @@ func (r *queryResolver) Getnonsubscribed(ctx context.Context, tenantid int) (*mo
 	packageGetAll = subscription.Getallnonsubscribedpackages(tenantid)
 	for _, packdata := range packageGetAll {
 		pack = append(pack, &model.Package{ModuleID: packdata.ModuleID, Modulename: packdata.ModuleName, Name: packdata.Name, PackageID: packdata.PackageID, Status: packdata.Status, PackageAmount: packdata.PackageAmount, PaymentMode: packdata.PaymentMode, PackageContent: packdata.PackageContent, PackageIcon: packdata.PackageIcon,
-			Promocodeid: packdata.Promocodeid, Promonname: packdata.Promoname, Promodescription: packdata.Promodescription, Promotype: packdata.Promotype, Promovalue: packdata.Promovalue, Validitydate: packdata.Promovaliditydate, Validity: packdata.Validity})
+			Packageexpiry: packdata.Packageexpiry, Promocodeid: packdata.Promocodeid, Promonname: packdata.Promoname, Promodescription: packdata.Promodescription, Promotype: packdata.Promotype, Promovalue: packdata.Promovalue, Validitydate: packdata.Promovaliditydate, Validity: packdata.Validity})
 	}
 	return &model.Getnonsubscribeddata{Status: true, Code: http.StatusCreated, Message: "Success", Nonsubscribed: pack}, nil
 }

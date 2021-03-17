@@ -50,6 +50,7 @@ type Package struct {
 	Promodescription string  `json:"Promodescription"`
 	Promotype        string  `json:"Promotype"`
 	Promovalue       float64 `json:"Promovalue"`
+	Packageexpiry    int     `json:"Packageexpiry"`
 	Validitydate     string  `json:"Validitydate"`
 	Validity         bool    `json:"Validity"`
 }
@@ -459,6 +460,7 @@ type Subscription struct {
 	TotalAmount     string `json:"TotalAmount"`
 	PaymentStatus   int    `json:"PaymentStatus"`
 	PaymentID       *int   `json:"PaymentId"`
+	Validitydate    string `json:"Validitydate"`
 }
 
 type Subscriptionnew struct {
@@ -477,6 +479,7 @@ type Subscriptionnew struct {
 	PaymentID       *int   `json:"PaymentId"`
 	Promoid         int    `json:"Promoid"`
 	Promovalue      string `json:"Promovalue"`
+	Validitydate    string `json:"Validitydate"`
 }
 
 type Subscriptionsdata struct {

@@ -48,6 +48,7 @@ type Package{
  Promodescription:String!
  Promotype:String!
  Promovalue:Float!
+ Packageexpiry:Int!
  Validitydate:String!
  Validity:Boolean!
 
@@ -103,6 +104,7 @@ input subscription{
  TotalAmount:String!
  PaymentStatus:Int!
  PaymentId:Int
+ Validitydate:String!
 }
 input subscriptionnew{
    Tenantid:Int!
@@ -120,6 +122,7 @@ input subscriptionnew{
  PaymentId:Int
  Promoid:Int!
  Promovalue:String!
+  Validitydate:String!
 }
 
 input tenantuser{

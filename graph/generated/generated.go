@@ -98,6 +98,7 @@ type ComplexityRoot struct {
 		PackageContent   func(childComplexity int) int
 		PackageID        func(childComplexity int) int
 		PackageIcon      func(childComplexity int) int
+		Packageexpiry    func(childComplexity int) int
 		PaymentMode      func(childComplexity int) int
 		Promocodeid      func(childComplexity int) int
 		Promodescription func(childComplexity int) int
@@ -786,6 +787,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Package.PackageIcon(childComplexity), true
+
+	case "Package.Packageexpiry":
+		if e.complexity.Package.Packageexpiry == nil {
+			break
+		}
+
+		return e.complexity.Package.Packageexpiry(childComplexity), true
 
 	case "Package.PaymentMode":
 		if e.complexity.Package.PaymentMode == nil {
@@ -2460,6 +2468,7 @@ type Package{
  Promodescription:String!
  Promotype:String!
  Promovalue:Float!
+ Packageexpiry:Int!
  Validitydate:String!
  Validity:Boolean!
 
@@ -2515,6 +2524,7 @@ input subscription{
  TotalAmount:String!
  PaymentStatus:Int!
  PaymentId:Int
+ Validitydate:String!
 }
 input subscriptionnew{
    Tenantid:Int!
@@ -2532,6 +2542,7 @@ input subscriptionnew{
  PaymentId:Int
  Promoid:Int!
  Promovalue:String!
+  Validitydate:String!
 }
 
 input tenantuser{
@@ -5004,6 +5015,41 @@ func (ec *executionContext) _Package_Promovalue(ctx context.Context, field graph
 	res := resTmp.(float64)
 	fc.Result = res
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Package_Packageexpiry(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Package",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Packageexpiry, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Package_Validitydate(ctx context.Context, field graphql.CollectedField, obj *model.Package) (ret graphql.Marshaler) {
@@ -14589,6 +14635,14 @@ func (ec *executionContext) unmarshalInputsubscription(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "Validitydate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Validitydate"))
+			it.Validitydate, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -14718,6 +14772,14 @@ func (ec *executionContext) unmarshalInputsubscriptionnew(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promovalue"))
 			it.Promovalue, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Validitydate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Validitydate"))
+			it.Validitydate, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15338,6 +15400,11 @@ func (ec *executionContext) _Package(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "Promovalue":
 			out.Values[i] = ec._Package_Promovalue(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Packageexpiry":
+			out.Values[i] = ec._Package_Packageexpiry(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
