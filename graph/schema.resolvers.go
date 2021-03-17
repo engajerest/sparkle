@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"errors"
-
 	"net/http"
 
 	"github.com/engajerest/auth/Models/users"
@@ -109,14 +108,13 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		}
 
 	}
-	list1= data2.GetSubscribedData(tenantId)
-	if len(list1)!=0{
-		for _,k:=range list1{
-			list=append(list, &model.TenantData{TenantID: k.TenantID,TenantName: k.TenantName,ModuleID: k.ModuleID,
-			ModuleName: k.ModuleName,Subscriptionid: k.Subscriptionid,})
+	list1 = data2.GetSubscribedData(tenantId)
+	if len(list1) != 0 {
+		for _, k := range list1 {
+			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
+				Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
-
 
 	status := auth.UpdateAuthUser(id.ID)
 	print(status)
@@ -127,7 +125,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		Status:  true,
 		Code:    http.StatusOK,
 		Message: "Success",
-		Info: list,
+		Info:    list,
 	}, nil
 }
 
@@ -531,8 +529,8 @@ func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Loca
 func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subscriptionnew) (*model.SubscribedData, error) {
 	var data2 subscription.SubscribedData
 	var data1 subscription.TenantSubscription
-var list []*model.TenantData
-var list1 []subscription.SubscribedData
+	var list []*model.TenantData
+	var list1 []subscription.SubscribedData
 	intlist := input
 	if len(intlist) != 0 {
 		for i := 0; i < len(intlist); i++ {
@@ -558,17 +556,16 @@ var list1 []subscription.SubscribedData
 		}
 	}
 
-	list1= data2.GetSubscribedData(int64(intlist[0].Tenantid))
-	if len(list1)!=0{
-		for _,k:=range list1{
-			list=append(list, &model.TenantData{TenantID: k.TenantID,TenantName: k.TenantName,ModuleID: k.ModuleID,
-			ModuleName: k.ModuleName,Subscriptionid: k.Subscriptionid,})
+	list1 = data2.GetSubscribedData(int64(intlist[0].Tenantid))
+	if len(list1) != 0 {
+		for _, k := range list1 {
+			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
+				Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 
-
 	return &model.SubscribedData{Status: true, Code: http.StatusCreated, Message: "Success",
-	Info: list,
+		Info: list,
 	}, nil
 }
 
@@ -654,8 +651,8 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 			Locationid:      loco.Locationid,
 			LocationName:    loco.Locationname,
 			Tenantid:        loco.Tenantid,
-			Email:           &loco.Email,
-			Contact:         &loco.Contactno,
+			Email:           loco.Email,
+			Contact:         loco.Contactno,
 			Address:         loco.Address,
 			Suburb:          loco.City,
 			State:           loco.State,
@@ -668,8 +665,8 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 			Status:          loco.Status,
 			Createdby:       loco.Createdby,
 			Delivery:        loco.Delivery,
-			Deliverytype:    &loco.Deliverytype,
-			Deliverymins:    &loco.Deliverymins,
+			Deliverytype:    loco.Deliverytype,
+			Deliverymins:    loco.Deliverymins,
 			Tenantusers:     userresult,
 			Othercharges:    otherchargeresult,
 			Deliverycharges: deliverychargeresult,
@@ -874,9 +871,9 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 	return &model.Locationbyiddata{
 		Status: true,
 		Code:   http.StatusOK, Message: "Success", Locationdata: &model.Locationgetall{
-			Locationid: loco.Locationid, LocationName: loco.Locationname, Tenantid: loco.Tenantid, Email: &loco.Email, Contact: &loco.Contactno,
+			Locationid: loco.Locationid, LocationName: loco.Locationname, Tenantid: loco.Tenantid, Email: loco.Email, Contact:loco.Contactno,
 			Address: loco.Address, Suburb: loco.City, State: loco.State, Postcode: loco.Postcode, Countycode: loco.Countrycode, Latitude: loco.Latitude,
-			Delivery: loco.Delivery, Deliverytype: &loco.Deliverytype, Deliverymins: &loco.Deliverymins,
+			Delivery: loco.Delivery, Deliverytype: loco.Deliverytype, Deliverymins: loco.Deliverymins,
 			Longitude: loco.Longitude, Openingtime: loco.Opentime, Closingtime: loco.Closetime, Status: loco.Status, Tenantusers: userresult, Createdby: loco.Createdby,
 			Othercharges: otherchargeresult, Deliverycharges: deliverychargeresult,
 		},

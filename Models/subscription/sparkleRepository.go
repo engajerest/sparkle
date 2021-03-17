@@ -415,8 +415,8 @@ func LocationTest(id int) []Tenantlocation {
 	DB.Table("tenantlocations").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&orders)
 
 	// fmt.Println(orders)
-	// for index, value := range orders {
-	// 	fmt.Println(index, " = ", value)
+	for index, value := range orders {
+		fmt.Println(index, " = ", value)}
 	// log.Print(pretty.Sprint(tentlocation))
 	return orders
 

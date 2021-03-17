@@ -102,8 +102,8 @@ type TenantAddress struct {
 type TenantData struct {
 	TenantID       int    `json:"TenantId"`
 	TenantName     string `json:"TenantName"`
-	ModuleID       int    `json:"ModuleId"`
-	ModuleName     string `json:"ModuleName"`
+	Moduleid       int    `json:"Moduleid"`
+	Modulename     string `json:"Modulename"`
 	Subscriptionid int    `json:"Subscriptionid"`
 }
 
@@ -310,8 +310,8 @@ type Locationgetall struct {
 	Locationid      int               `json:"locationid"`
 	LocationName    string            `json:"locationName"`
 	Tenantid        int               `json:"tenantid"`
-	Email           *string           `json:"email"`
-	Contact         *string           `json:"contact"`
+	Email           string            `json:"email"`
+	Contact         string            `json:"contact"`
 	Address         string            `json:"address"`
 	Suburb          string            `json:"suburb"`
 	State           string            `json:"state"`
@@ -322,8 +322,8 @@ type Locationgetall struct {
 	Openingtime     string            `json:"openingtime"`
 	Closingtime     string            `json:"closingtime"`
 	Delivery        bool              `json:"delivery"`
-	Deliverytype    *string           `json:"deliverytype"`
-	Deliverymins    *int              `json:"deliverymins"`
+	Deliverytype    string            `json:"deliverytype"`
+	Deliverymins    int               `json:"deliverymins"`
 	Status          string            `json:"status"`
 	Createdby       int               `json:"createdby"`
 	Tenantusers     []*Usertenant     `json:"tenantusers"`

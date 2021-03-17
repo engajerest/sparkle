@@ -156,8 +156,8 @@ type ComplexityRoot struct {
 	}
 
 	TenantData struct {
-		ModuleID       func(childComplexity int) int
-		ModuleName     func(childComplexity int) int
+		Moduleid       func(childComplexity int) int
+		Modulename     func(childComplexity int) int
 		Subscriptionid func(childComplexity int) int
 		TenantID       func(childComplexity int) int
 		TenantName     func(childComplexity int) int
@@ -1128,19 +1128,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SubCategory.Type(childComplexity), true
 
-	case "TenantData.ModuleId":
-		if e.complexity.TenantData.ModuleID == nil {
+	case "TenantData.Moduleid":
+		if e.complexity.TenantData.Moduleid == nil {
 			break
 		}
 
-		return e.complexity.TenantData.ModuleID(childComplexity), true
+		return e.complexity.TenantData.Moduleid(childComplexity), true
 
-	case "TenantData.ModuleName":
-		if e.complexity.TenantData.ModuleName == nil {
+	case "TenantData.Modulename":
+		if e.complexity.TenantData.Modulename == nil {
 			break
 		}
 
-		return e.complexity.TenantData.ModuleName(childComplexity), true
+		return e.complexity.TenantData.Modulename(childComplexity), true
 
 	case "TenantData.Subscriptionid":
 		if e.complexity.TenantData.Subscriptionid == nil {
@@ -2490,8 +2490,8 @@ input TenantAddress{
 type TenantData{
  TenantId:Int!
  TenantName:String!
- ModuleId:Int! 
- ModuleName:String!
+ Moduleid:Int! 
+ Modulename:String!
  Subscriptionid:Int!
 }
 type subscribedData{
@@ -2672,8 +2672,8 @@ type locationgetall {
  locationid:Int!
  locationName:String!
  tenantid:Int!
- email:String
- contact:String
+ email:String!
+ contact:String!
  address:String!
  suburb:String!
  state:String!
@@ -2684,8 +2684,8 @@ type locationgetall {
  openingtime:String!
  closingtime:String!
  delivery:Boolean!
- deliverytype:String
- deliverymins:Int
+ deliverytype:String!
+ deliverymins:Int!
  status:String!
  createdby:Int!
  tenantusers:[usertenant]
@@ -6406,7 +6406,7 @@ func (ec *executionContext) _TenantData_TenantName(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TenantData_ModuleId(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+func (ec *executionContext) _TenantData_Moduleid(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6424,7 +6424,7 @@ func (ec *executionContext) _TenantData_ModuleId(ctx context.Context, field grap
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ModuleID, nil
+		return obj.Moduleid, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6441,7 +6441,7 @@ func (ec *executionContext) _TenantData_ModuleId(ctx context.Context, field grap
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TenantData_ModuleName(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+func (ec *executionContext) _TenantData_Modulename(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6459,7 +6459,7 @@ func (ec *executionContext) _TenantData_ModuleName(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ModuleName, nil
+		return obj.Modulename, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9904,11 +9904,14 @@ func (ec *executionContext) _locationgetall_email(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _locationgetall_contact(ctx context.Context, field graphql.CollectedField, obj *model.Locationgetall) (ret graphql.Marshaler) {
@@ -9936,11 +9939,14 @@ func (ec *executionContext) _locationgetall_contact(ctx context.Context, field g
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _locationgetall_address(ctx context.Context, field graphql.CollectedField, obj *model.Locationgetall) (ret graphql.Marshaler) {
@@ -10318,11 +10324,14 @@ func (ec *executionContext) _locationgetall_deliverytype(ctx context.Context, fi
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _locationgetall_deliverymins(ctx context.Context, field graphql.CollectedField, obj *model.Locationgetall) (ret graphql.Marshaler) {
@@ -10350,11 +10359,14 @@ func (ec *executionContext) _locationgetall_deliverymins(ctx context.Context, fi
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _locationgetall_status(ctx context.Context, field graphql.CollectedField, obj *model.Locationgetall) (ret graphql.Marshaler) {
@@ -15679,13 +15691,13 @@ func (ec *executionContext) _TenantData(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "ModuleId":
-			out.Values[i] = ec._TenantData_ModuleId(ctx, field, obj)
+		case "Moduleid":
+			out.Values[i] = ec._TenantData_Moduleid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "ModuleName":
-			out.Values[i] = ec._TenantData_ModuleName(ctx, field, obj)
+		case "Modulename":
+			out.Values[i] = ec._TenantData_Modulename(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -16520,8 +16532,14 @@ func (ec *executionContext) _locationgetall(ctx context.Context, sel ast.Selecti
 			}
 		case "email":
 			out.Values[i] = ec._locationgetall_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "contact":
 			out.Values[i] = ec._locationgetall_contact(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "address":
 			out.Values[i] = ec._locationgetall_address(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -16574,8 +16592,14 @@ func (ec *executionContext) _locationgetall(ctx context.Context, sel ast.Selecti
 			}
 		case "deliverytype":
 			out.Values[i] = ec._locationgetall_deliverytype(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "deliverymins":
 			out.Values[i] = ec._locationgetall_deliverymins(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "status":
 			out.Values[i] = ec._locationgetall_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

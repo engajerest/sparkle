@@ -78,8 +78,8 @@ input TenantAddress{
 type TenantData{
  TenantId:Int!
  TenantName:String!
- ModuleId:Int! 
- ModuleName:String!
+ Moduleid:Int! 
+ Modulename:String!
  Subscriptionid:Int!
 }
 type subscribedData{
@@ -260,8 +260,8 @@ type locationgetall {
  locationid:Int!
  locationName:String!
  tenantid:Int!
- email:String
- contact:String
+ email:String!
+ contact:String!
  address:String!
  suburb:String!
  state:String!
@@ -272,8 +272,8 @@ type locationgetall {
  openingtime:String!
  closingtime:String!
  delivery:Boolean!
- deliverytype:String
- deliverymins:Int
+ deliverytype:String!
+ deliverymins:Int!
  status:String!
  createdby:Int!
  tenantusers:[usertenant]
