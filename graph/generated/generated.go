@@ -2826,7 +2826,7 @@ input businessupdatedata{
  about:String
  cod:Int
  digital:Int
- tenantaccid:Int
+
  tenantimage:String!
 }
 input socialupdatedata{
@@ -2869,7 +2869,7 @@ type info{
  address:String
  cod:Int
  digital:Int
- tenantaccid:Int
+ tenantaccid:String
  tenanttoken:String
  tenantimage:String
  social:[socialinfo]
@@ -9610,9 +9610,9 @@ func (ec *executionContext) _info_tenantaccid(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _info_tenanttoken(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
@@ -13836,14 +13836,6 @@ func (ec *executionContext) unmarshalInputbusinessupdatedata(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("digital"))
 			it.Digital, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "tenantaccid":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantaccid"))
-			it.Tenantaccid, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}

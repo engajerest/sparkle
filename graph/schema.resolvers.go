@@ -209,7 +209,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 
 	var data subscription.BusinessUpdate
 	data.TenantID = businessinfo.Businessupdate.Tenantid
-	data.TenantaccId = *businessinfo.Businessupdate.Tenantaccid
+	
 	data.Brandname = *businessinfo.Businessupdate.Brandname
 	data.About = *businessinfo.Businessupdate.About
 	data.Paymode1 = *businessinfo.Businessupdate.Cod
@@ -585,14 +585,14 @@ func (r *mutationResolver) Initialupdate(ctx context.Context, input *model.Updat
 	d.Locationid = input.Locationid
 	d.Brandname = input.Brandname
 	d.Tenantimage = input.Tenantimage
-	d.About=input.About
-	d.Opentime=input.Openingtime
-	d.Closetime=input.Closingtime
-	stat,err:=d.Initialupdate()
-	if err!=nil{
-		return nil,err
+	d.About = input.About
+	d.Opentime = input.Openingtime
+	d.Closetime = input.Closingtime
+	stat, err := d.Initialupdate()
+	if err != nil {
+		return nil, err
 	}
-	if stat !=true{
+	if stat != true {
 		print(stat)
 	}
 

@@ -140,7 +140,6 @@ type Businessupdatedata struct {
 	About       *string `json:"about"`
 	Cod         *int    `json:"cod"`
 	Digital     *int    `json:"digital"`
-	Tenantaccid *int    `json:"tenantaccid"`
 	Tenantimage string  `json:"tenantimage"`
 }
 
@@ -270,7 +269,7 @@ type Info struct {
 	Address     *string       `json:"address"`
 	Cod         *int          `json:"cod"`
 	Digital     *int          `json:"digital"`
-	Tenantaccid *int          `json:"tenantaccid"`
+	Tenantaccid *string       `json:"tenantaccid"`
 	Tenanttoken *string       `json:"tenanttoken"`
 	Tenantimage *string       `json:"tenantimage"`
 	Social      []*Socialinfo `json:"social"`

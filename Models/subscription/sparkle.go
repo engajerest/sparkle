@@ -145,7 +145,7 @@ type BusinessUpdate struct {
 	Moduleid int `json:"moduleid"`
 	Modulename string `json:"modulename"`
 	Brandname   string   `json:"brandname"`
-	TenantaccId int      `json:"tenantaccid"`
+	TenantaccId string      `json:"tenantaccid"`
 	About       string   `json:"about"`
 	Email       string   `json:"email"`
 	Phone       string   `json:"phone"`

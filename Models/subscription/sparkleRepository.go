@@ -35,7 +35,7 @@ const (
 	getAllTenantUsers              = "SELECT a.firstname,a.lastname,a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocations b, app_users c WHERE  a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=?"
 	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 	getAllTenantUserByLocationId   = ""
-	updateTenantBusiness           = "UPDATE tenants SET brandname=?,tenantaccid=?,tenantinfo=?,paymode1=?,paymode2=?,tenantimage=? WHERE tenantid=?"
+	updateTenantBusiness           = "UPDATE tenants SET brandname=?,tenantinfo=?,paymode1=?,paymode2=?,tenantimage=? WHERE tenantid=?"
 	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,sociallink,socialicon) VALUES"
 	updatesocialinfo               = "UPDATE tenantsocial SET socialprofile=?, sociallink=?,socialicon=? WHERE tenantid=? AND socialid=? "
 	updateauthuser                 = "UPDATE  app_users a,app_userprofiles b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
@@ -578,7 +578,7 @@ func (user *BusinessUpdate) UpdateTenantBusiness() bool {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	_, err = statement.Exec(user.Brandname, user.TenantaccId, user.About, user.Paymode1, user.Paymode2, user.Tenantimage, user.TenantID)
+	_, err = statement.Exec(user.Brandname, user.About, user.Paymode1, user.Paymode2, user.Tenantimage, user.TenantID)
 	if err != nil {
 		log.Fatal(err)
 	}

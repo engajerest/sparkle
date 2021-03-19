@@ -376,7 +376,7 @@ input businessupdatedata{
  about:String
  cod:Int
  digital:Int
- tenantaccid:Int
+
  tenantimage:String!
 }
 input socialupdatedata{
@@ -419,7 +419,7 @@ type info{
  address:String
  cod:Int
  digital:Int
- tenantaccid:Int
+ tenantaccid:String
  tenanttoken:String
  tenantimage:String
  social:[socialinfo]
