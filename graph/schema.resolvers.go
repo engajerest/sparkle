@@ -84,8 +84,8 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 				data1.PackageId = intlist[i].PackageID
 				data1.Promoid = intlist[i].Promoid
 				data1.Promovalue = intlist[i].Promovalue
-				data1.Validitydate=intlist[i].Validitydate
-				data1.Promostatus=true
+				data1.Validitydate = intlist[i].Validitydate
+				data1.Promostatus = true
 				subscribedid := data1.InsertSubscription(tenantId)
 				print("subs-id===")
 				print(subscribedid)
@@ -114,7 +114,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	if len(list1) != 0 {
 		for _, k := range list1 {
 			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
-				Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+				Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 
@@ -551,8 +551,8 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 			data1.PackageId = intlist[i].PackageID
 			data1.Promoid = intlist[i].Promoid
 			data1.Promovalue = intlist[i].Promovalue
-			data1.Validitydate=intlist[i].Validitydate
-			data1.Promostatus=true
+			data1.Validitydate = intlist[i].Validitydate
+			data1.Promostatus = true
 			subscribedid := data1.InsertSubscription(int64(intlist[i].Tenantid))
 			print("subs-id===")
 			print(subscribedid)
@@ -564,13 +564,39 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 	if len(list1) != 0 {
 		for _, k := range list1 {
 			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
-				Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+				Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 
 	return &model.SubscribedData{Status: true, Code: http.StatusCreated, Message: "Success",
 		Info: list,
 	}, nil
+}
+
+func (r *mutationResolver) Initialupdate(ctx context.Context, input *model.Updateinfo) (*model.Promotioncreateddata, error) {
+	id, usererr := helper.ForSparkleContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("raju")
+	print(id.ID)
+	var d subscription.Initial
+	d.Tenantid = input.Tenantid
+	d.Locationid = input.Locationid
+	d.Brandname = input.Brandname
+	d.Tenantimage = input.Tenantimage
+	d.About=input.About
+	d.Opentime=input.Openingtime
+	d.Closetime=input.Closingtime
+	stat,err:=d.Initialupdate()
+	if err!=nil{
+		return nil,err
+	}
+	if stat !=true{
+		print(stat)
+	}
+
+	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "BusinessInfo Updated"}, nil
 }
 
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {

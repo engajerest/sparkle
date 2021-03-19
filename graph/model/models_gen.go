@@ -106,6 +106,8 @@ type TenantData struct {
 	Moduleid       int    `json:"Moduleid"`
 	Modulename     string `json:"Modulename"`
 	Subscriptionid int    `json:"Subscriptionid"`
+	Locationid     int    `json:"Locationid"`
+	Locationname   string `json:"Locationname"`
 }
 
 type TenantDetails struct {
@@ -541,6 +543,16 @@ type Updatedeliverychargeinput struct {
 	Slab       string `json:"Slab"`
 	Slablimit  int    `json:"Slablimit"`
 	Slabcharge string `json:"Slabcharge"`
+}
+
+type Updateinfo struct {
+	Tenantid    int    `json:"Tenantid"`
+	Locationid  int    `json:"Locationid"`
+	Brandname   string `json:"Brandname"`
+	About       string `json:"About"`
+	Tenantimage string `json:"Tenantimage"`
+	Openingtime string `json:"Openingtime"`
+	Closingtime string `json:"Closingtime"`
 }
 
 type Updateother struct {

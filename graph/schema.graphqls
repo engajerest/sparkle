@@ -82,6 +82,8 @@ type TenantData{
  Moduleid:Int! 
  Modulename:String!
  Subscriptionid:Int!
+ Locationid:Int!
+ Locationname:String!
 }
 type subscribedData{
  status:Boolean!
@@ -246,6 +248,17 @@ input delstatus{
  tenantid:Int!
  locationid:Int!
  delivery:Boolean!
+}
+
+input updateinfo{
+Tenantid:Int!
+Locationid:Int!
+ Brandname:String!
+ About:String!
+ Tenantimage:String!
+ Openingtime:String!
+ Closingtime:String!
+
 }
 type LocationInfo{
  Locationid:Int!
@@ -570,4 +583,5 @@ type Mutation {
  updatelocationstatus(input:locationstatusinput):promotioncreateddata
  updatelocation(input:locationupdate):promotioncreateddata
  subscription(input:[subscriptionnew]):subscribedData
+ initialupdate(input:updateinfo):promotioncreateddata
 }

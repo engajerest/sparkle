@@ -100,6 +100,8 @@ type SubscribedData struct {
 	ModuleName string `json:"modulename"`
 	ModuleID   int    `json:"moduleId"`
 	Subscriptionid int `json:"subscriptionid"`
+	Locationid int `json:"locationid"`
+	Locationname string `json:"locationname"`
 }
 
 type TenantUser struct {
@@ -170,7 +172,15 @@ type Tenant struct {
 	Paymode2    int    `json:"paymode2"`
 	Tenanttoken string `json:"tenanttoken"`
 }
-
+type Initial struct{
+	Tenantid    int    `json:"tenantid"`
+	Locationid int `json:"locationid"`
+	Brandname   string `json:"brandname"`
+	About       string `json:"about"`
+	Tenantimage string `json:"tenantimage"`
+	Opentime     string `json:""opentime`
+	Closetime    string `json:"closetime"`
+}
 type AuthUser struct {
 	TenantID   int `json:"tenantid"`
 	LocationId int `json:"locationid"`
