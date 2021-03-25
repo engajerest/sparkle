@@ -108,7 +108,11 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 			print(err)
 			print("seqid==", seqid1)
 		}
-
+		seqid2, err := seq.Insertcustomersequence()
+		if err != nil {
+			print(err)
+			print("seqid2==", seqid2)
+		}
 	}
 	list1 = data2.GetSubscribedData(tenantId)
 	if len(list1) != 0 {

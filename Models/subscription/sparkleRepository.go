@@ -953,6 +953,33 @@ func (o *Ordersequence) Insertpaysequence() (int64, error) {
 	log.Print("Row inserted in paysequence!")
 	return id, nil
 }
+func (o *Ordersequence) Insertcustomersequence() (int64, error) {
+
+	fmt.Println("0")
+
+	statement, err := database.Db.Prepare(insertsequence)
+	print(statement)
+	fmt.Println("1")
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+	defer statement.Close()
+
+	fmt.Println("2")
+	res, err := statement.Exec(&o.Tenantid, "customer", &o.Seqno, "CUS", &o.Subprefix)
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal("Error:", err.Error())
+
+	}
+	log.Print("Row inserted in CUSTOMERsequence!")
+	return id, nil
+}
 func (info *Tenantcharge) Insertothercharges(soc []Tenantcharge) error {
 
 	var inserts []string
