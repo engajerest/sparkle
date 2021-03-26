@@ -213,7 +213,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 
 	var data subscription.BusinessUpdate
 	data.TenantID = businessinfo.Businessupdate.Tenantid
-	
+
 	data.Brandname = *businessinfo.Businessupdate.Brandname
 	data.About = *businessinfo.Businessupdate.About
 	data.Paymode1 = *businessinfo.Businessupdate.Cod
@@ -223,10 +223,11 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	var updatedata []subscription.Social
 	schemasocialadd := *&businessinfo.Socialadd
 	schemasocialupdate := *&businessinfo.Socialupdate
+    socialdelete :=*&businessinfo.Socialdelete
+	data1 := data.UpdateTenantBusiness()
 	for _, v := range schemasocialadd {
 		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon})
 	}
-	data1 := data.UpdateTenantBusiness()
 	if len(check) != 0 {
 		social := data.InsertTenantSocial(check, data.TenantID)
 		print(social)
@@ -247,6 +248,14 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 			}
 		}
 
+	}
+	if len(socialdelete)!=0{
+for i :=0;i<len(socialdelete);i++{
+	var d subscription.Social
+	d.Socialid=*socialdelete[i]
+	stat := d.Deletesocial()
+	print(stat)
+}
 	}
 	if data1 != false {
 		return &model.Businessdata{
@@ -768,10 +777,10 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 	socialgetall = subscription.GetAllSocial(tenantid)
 	for _, user := range socialgetall {
 		Result = append(Result, &model.Socialinfo{
-			Socialid:      &user.Socialid,
-			Socialprofile: &user.SociaProfile,
-			Sociallink:    &user.SocialLink,
-			Socialicon:    &user.SocialIcon,
+			Socialid:      user.Socialid,
+			Socialprofile: user.SociaProfile,
+			Sociallink:    user.SocialLink,
+			Socialicon:    user.SocialIcon,
 		})
 	}
 	if categoryid == 0 {

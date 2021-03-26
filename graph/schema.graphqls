@@ -395,6 +395,7 @@ input business{
  businessupdate:businessupdatedata
  socialadd:[socialadddata]
  socialupdate:[socialupdatedata]
+ socialdelete:[Int]
 }
 type businessdata{
  status:Boolean!
@@ -425,10 +426,10 @@ type info{
  social:[socialinfo]
 }
 type socialinfo{
-socialid:Int
- socialprofile:String
- sociallink:String
- socialicon:String
+socialid:Int!
+ socialprofile:String!
+ sociallink:String!
+ socialicon:String!
 }
 type Promotion {
  Promotionid: Int!

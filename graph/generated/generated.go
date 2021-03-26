@@ -2845,6 +2845,7 @@ input business{
  businessupdate:businessupdatedata
  socialadd:[socialadddata]
  socialupdate:[socialupdatedata]
+ socialdelete:[Int]
 }
 type businessdata{
  status:Boolean!
@@ -2875,10 +2876,10 @@ type info{
  social:[socialinfo]
 }
 type socialinfo{
-socialid:Int
- socialprofile:String
- sociallink:String
- socialicon:String
+socialid:Int!
+ socialprofile:String!
+ sociallink:String!
+ socialicon:String!
 }
 type Promotion {
  Promotionid: Int!
@@ -11879,11 +11880,14 @@ func (ec *executionContext) _socialinfo_socialid(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _socialinfo_socialprofile(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
@@ -11911,11 +11915,14 @@ func (ec *executionContext) _socialinfo_socialprofile(ctx context.Context, field
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _socialinfo_sociallink(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
@@ -11943,11 +11950,14 @@ func (ec *executionContext) _socialinfo_sociallink(ctx context.Context, field gr
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _socialinfo_socialicon(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
@@ -11975,11 +11985,14 @@ func (ec *executionContext) _socialinfo_socialicon(ctx context.Context, field gr
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _subscribedData_status(ctx context.Context, field graphql.CollectedField, obj *model.SubscribedData) (ret graphql.Marshaler) {
@@ -13784,6 +13797,14 @@ func (ec *executionContext) unmarshalInputbusiness(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialupdate"))
 			it.Socialupdate, err = ec.unmarshalOsocialupdatedata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialupdatedata(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "socialdelete":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialdelete"))
+			it.Socialdelete, err = ec.unmarshalOInt2ᚕᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17180,12 +17201,24 @@ func (ec *executionContext) _socialinfo(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = graphql.MarshalString("socialinfo")
 		case "socialid":
 			out.Values[i] = ec._socialinfo_socialid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "socialprofile":
 			out.Values[i] = ec._socialinfo_socialprofile(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "sociallink":
 			out.Values[i] = ec._socialinfo_sociallink(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "socialicon":
 			out.Values[i] = ec._socialinfo_socialicon(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

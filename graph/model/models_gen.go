@@ -125,6 +125,7 @@ type Business struct {
 	Businessupdate *Businessupdatedata `json:"businessupdate"`
 	Socialadd      []*Socialadddata    `json:"socialadd"`
 	Socialupdate   []*Socialupdatedata `json:"socialupdate"`
+	Socialdelete   []*int              `json:"socialdelete"`
 }
 
 type Businessdata struct {
@@ -426,10 +427,10 @@ type Socialadddata struct {
 }
 
 type Socialinfo struct {
-	Socialid      *int    `json:"socialid"`
-	Socialprofile *string `json:"socialprofile"`
-	Sociallink    *string `json:"sociallink"`
-	Socialicon    *string `json:"socialicon"`
+	Socialid      int    `json:"socialid"`
+	Socialprofile string `json:"socialprofile"`
+	Sociallink    string `json:"sociallink"`
+	Socialicon    string `json:"socialicon"`
 }
 
 type Socialupdatedata struct {
