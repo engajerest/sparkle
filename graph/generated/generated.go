@@ -2884,16 +2884,16 @@ socialid:Int!
 type Promotion {
  Promotionid: Int!
  Promotiontypeid:Int!
- Promotionname: String
+ Promotionname: String!
  Tenantid:Int!
- Tenantame: String
- Promocode:String
- Promoterms:String
- Promovalue:String
- Promotag: String
- Promotype:String
- Startdate:String
- Enddate: String
+ Tenantame: String!
+ Promocode:String!
+ Promoterms:String!
+ Promovalue:String!
+ Promotag: String!
+ Promotype:String!
+ Startdate:String!
+ Enddate: String!
  Status:String
 }
 type getpromotiondata{
@@ -5316,11 +5316,14 @@ func (ec *executionContext) _Promotion_Promotionname(ctx context.Context, field 
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Promotion_Tenantid(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
@@ -5383,11 +5386,14 @@ func (ec *executionContext) _Promotion_Tenantame(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Promotion_Promocode(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
@@ -5415,11 +5421,14 @@ func (ec *executionContext) _Promotion_Promocode(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Promotion_Promoterms(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
@@ -5447,11 +5456,14 @@ func (ec *executionContext) _Promotion_Promoterms(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Promotion_Promovalue(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
@@ -5479,11 +5491,14 @@ func (ec *executionContext) _Promotion_Promovalue(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Promotion_Promotag(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
@@ -5511,11 +5526,14 @@ func (ec *executionContext) _Promotion_Promotag(ctx context.Context, field graph
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Promotion_Promotype(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
@@ -5543,11 +5561,14 @@ func (ec *executionContext) _Promotion_Promotype(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Promotion_Startdate(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
@@ -5575,11 +5596,14 @@ func (ec *executionContext) _Promotion_Startdate(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Promotion_Enddate(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
@@ -5607,11 +5631,14 @@ func (ec *executionContext) _Promotion_Enddate(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Promotion_Status(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
@@ -15703,6 +15730,9 @@ func (ec *executionContext) _Promotion(ctx context.Context, sel ast.SelectionSet
 			}
 		case "Promotionname":
 			out.Values[i] = ec._Promotion_Promotionname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Tenantid":
 			out.Values[i] = ec._Promotion_Tenantid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -15710,20 +15740,44 @@ func (ec *executionContext) _Promotion(ctx context.Context, sel ast.SelectionSet
 			}
 		case "Tenantame":
 			out.Values[i] = ec._Promotion_Tenantame(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Promocode":
 			out.Values[i] = ec._Promotion_Promocode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Promoterms":
 			out.Values[i] = ec._Promotion_Promoterms(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Promovalue":
 			out.Values[i] = ec._Promotion_Promovalue(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Promotag":
 			out.Values[i] = ec._Promotion_Promotag(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Promotype":
 			out.Values[i] = ec._Promotion_Promotype(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Startdate":
 			out.Values[i] = ec._Promotion_Startdate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Enddate":
 			out.Values[i] = ec._Promotion_Enddate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Status":
 			out.Values[i] = ec._Promotion_Status(ctx, field, obj)
 		default:

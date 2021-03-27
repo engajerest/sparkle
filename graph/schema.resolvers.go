@@ -223,7 +223,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	var updatedata []subscription.Social
 	schemasocialadd := *&businessinfo.Socialadd
 	schemasocialupdate := *&businessinfo.Socialupdate
-    socialdelete :=*&businessinfo.Socialdelete
+	socialdelete := *&businessinfo.Socialdelete
 	data1 := data.UpdateTenantBusiness()
 	for _, v := range schemasocialadd {
 		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon})
@@ -249,13 +249,13 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 		}
 
 	}
-	if len(socialdelete)!=0{
-for i :=0;i<len(socialdelete);i++{
-	var d subscription.Social
-	d.Socialid=*socialdelete[i]
-	stat := d.Deletesocial()
-	print(stat)
-}
+	if len(socialdelete) != 0 {
+		for i := 0; i < len(socialdelete); i++ {
+			var d subscription.Social
+			d.Socialid = *socialdelete[i]
+			stat := d.Deletesocial()
+			print(stat)
+		}
 	}
 	if data1 != false {
 		return &model.Businessdata{
@@ -829,8 +829,8 @@ func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int) (*model
 	promotionGetAll = subscription.GetAllPromotions(tenantid)
 	for _, p := range promotionGetAll {
 		promo = append(promo, &model.Promotion{
-			Promotionid: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: &p.Promoname, Tenantid: p.Tenantid, Tenantame: &p.Tenantname, Promocode: &p.Promocode,
-			Promoterms: &p.Promoterms, Promovalue: &p.Promovalue, Promotag: &p.Promotag, Promotype: &p.Promotype, Startdate: &p.Startdate, Enddate: &p.Enddate, Status: &p.Status,
+			Promotionid: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: p.Promoname, Tenantid: p.Tenantid, Tenantame: p.Tenantname, Promocode: p.Promocode,
+			Promoterms: p.Promoterms, Promovalue: p.Promovalue, Promotag: p.Promotag, Promotype: p.Promotype, Startdate: p.Startdate, Enddate: p.Enddate, Status: &p.Status,
 		})
 	}
 	return &model.Getpromotiondata{

@@ -58,16 +58,16 @@ type Package struct {
 type Promotion struct {
 	Promotionid     int     `json:"Promotionid"`
 	Promotiontypeid int     `json:"Promotiontypeid"`
-	Promotionname   *string `json:"Promotionname"`
+	Promotionname   string  `json:"Promotionname"`
 	Tenantid        int     `json:"Tenantid"`
-	Tenantame       *string `json:"Tenantame"`
-	Promocode       *string `json:"Promocode"`
-	Promoterms      *string `json:"Promoterms"`
-	Promovalue      *string `json:"Promovalue"`
-	Promotag        *string `json:"Promotag"`
-	Promotype       *string `json:"Promotype"`
-	Startdate       *string `json:"Startdate"`
-	Enddate         *string `json:"Enddate"`
+	Tenantame       string  `json:"Tenantame"`
+	Promocode       string  `json:"Promocode"`
+	Promoterms      string  `json:"Promoterms"`
+	Promovalue      string  `json:"Promovalue"`
+	Promotag        string  `json:"Promotag"`
+	Promotype       string  `json:"Promotype"`
+	Startdate       string  `json:"Startdate"`
+	Enddate         string  `json:"Enddate"`
 	Status          *string `json:"Status"`
 }
 
