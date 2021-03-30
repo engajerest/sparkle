@@ -8,7 +8,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/engajerest/auth/Models/users"
 	"github.com/engajerest/sparkle/Models/subscription"
 	"github.com/engajerest/sparkle/graph/generated"
 	"github.com/engajerest/sparkle/graph/model"
@@ -21,79 +20,57 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
-	print("rajjj")
+	print("userid=")
 	print(id.ID)
-	var user users.User
-	user.ID = id.ID
-	print("check")
-	print(user.ID)
-	var list []*model.TenantData
-	var list1 []subscription.SubscribedData
-	var data subscription.SubscriptionData
-	data.Info.CategoryId = input.Tenantinfo.CategoryID
-	data.Info.Regno = input.Tenantinfo.Regno
-	data.Info.Name = input.Tenantinfo.Name
-	data.Info.Email = input.Tenantinfo.Email
-	data.Info.Mobile = input.Tenantinfo.Mobile
-	data.Info.SubCategoryID = input.Tenantinfo.SubCategoryID
-	data.Info.Tenanttoken = input.Tenantinfo.Tenanttoken
-	data.Address.Address = input.Tenantlocation.Address
-	data.Address.State = input.Tenantlocation.State
-	data.Address.Suburb = input.Tenantlocation.Suburb
-	data.Address.Zip = input.Tenantlocation.Zip
-	data.Address.Countrycode = input.Tenantlocation.Countrycode
-	data.Address.Latitude = input.Tenantlocation.Latitude
-	data.Address.Longitude = input.Tenantlocation.Longitude
-	data.Address.TimeZone = input.Tenantlocation.TimeZone
-	data.Address.OpenTime = input.Tenantlocation.Opentime
-	data.Address.CloseTime = input.Tenantlocation.Closetime
-	var data1 subscription.TenantSubscription
-
-	var data2 subscription.SubscribedData
 	var auth subscription.AuthUser
+	var d subscription.Initialsubscriptiondata
+	var slist []subscription.TenantSubscription
+	var s subscription.SubscribedData
+	var list []*model.TenantData
+	Subscribelist := *&input.Subscriptiondetails
+	d.Userid = id.ID
+	d.Categoryid = input.Tenantinfo.CategoryID
+	d.Regno = input.Tenantinfo.Regno
+	d.Name = input.Tenantinfo.Name
+	d.Email = input.Tenantinfo.Email
+	d.Mobile = input.Tenantinfo.Mobile
+	d.SubCategoryid = input.Tenantinfo.SubCategoryID
+	d.Tenanttoken = input.Tenantinfo.Tenanttoken
+	d.Address = input.Tenantlocation.Address
+	d.State = input.Tenantlocation.State
+	d.Suburb = input.Tenantlocation.Suburb
+	d.Zip = input.Tenantlocation.Zip
+	d.Countrycode = input.Tenantlocation.Countrycode
+	d.Latitude = input.Tenantlocation.Latitude
+	d.Longitude = input.Tenantlocation.Longitude
+	d.TimeZone = input.Tenantlocation.TimeZone
+	d.OpenTime = input.Tenantlocation.Opentime
+	d.CloseTime = input.Tenantlocation.Closetime
+	d.Subcategoryname = input.Tenantinfo.Subcategoryname
+	d.Partnerid = input.Subscriptiondetails[0].Partnerid
+	if len(Subscribelist) != 0 {
+		for _, k := range Subscribelist {
+			slist = append(slist, subscription.TenantSubscription{
+				Date: k.TransactionDate, Packageid: k.Packageid, Partnerid: k.Partnerid, Moduleid: k.Moduleid,
+				Currencyid: k.Currencyid, Categoryid: input.Tenantinfo.CategoryID, SubCategoryid: input.Tenantinfo.SubCategoryID,
+				Price: k.Price, TaxId: k.TaxID, TaxAmount: k.TaxAmount, TotalAmount: k.TotalAmount, PaymentStatus: k.PaymentStatus,
+				PaymentId: *k.Paymentid, Quantity: k.Quantity, Promoid: k.Promoid, Promovalue: k.Promovalue, Validitydate: k.Validitydate, Promostatus: true,
+			})
+		}
+	}
 
-	intlist := input.Subscriptiondetails
-	print("check456")
-	tenantId, err := data.CreateTenant(user.ID)
+	d.Tenantsubscribe = slist
+
+	status, tenantdata, err := d.Subscriptioninitial()
 	if err != nil {
 		return nil, err
 	}
-	print(tenantId)
-	if tenantId != 0 {
-		tenantlocationid := data.InsertTenantLocation(tenantId, id.ID)
-		print("loc-id")
-		print(tenantlocationid)
-		auth.TenantID = int(tenantId)
-		auth.LocationId = int(tenantlocationid)
-
-		if len(intlist) != 0 {
-
-			for i := 0; i < len(intlist); i++ {
-
-				data1.CurrencyId = intlist[i].CurrencyID
-				data1.Date = intlist[i].TransactionDate
-				data1.CurrencyId = intlist[i].CurrencyID
-				data1.ModuleId = intlist[i].ModuleID
-				data1.PaymentId = *intlist[i].PaymentID
-				data1.PaymentStatus = intlist[i].PaymentStatus
-				data1.Price = intlist[i].Price
-				data1.Quantity = intlist[i].Quantity
-				data1.TaxId = intlist[i].TaxID
-				data1.TaxAmount = intlist[i].TaxAmount
-				data1.TotalAmount = intlist[i].TotalAmount
-				data1.PackageId = intlist[i].PackageID
-				data1.Promoid = intlist[i].Promoid
-				data1.Promovalue = intlist[i].Promovalue
-				data1.Validitydate = intlist[i].Validitydate
-				data1.Promostatus = true
-				subscribedid := data1.InsertSubscription(tenantId)
-				print("subs-id===")
-				print(subscribedid)
-				print(tenantId)
-			}
-		}
+	if status == false {
+		return nil, err
+	}
+	if tenantdata.TenantID != 0 {
 		var seq subscription.Ordersequence
-		seq.Tenantid = int(tenantId)
+		seq.Tenantid = int(tenantdata.TenantID)
 		seq.Tablename = "order"
 		seq.Seqno = 0
 		seq.Prefix = "ORD"
@@ -113,19 +90,22 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 			print(err)
 			print("seqid2==", seqid2)
 		}
+		status := auth.UpdateAuthUser(id.ID)
+		print(status)
+		if status != true {
+			return nil, errors.New("tenant not subscribed")
+		}
+
+	} else {
+		return nil, errors.New("Tenant not Created")
 	}
-	list1 = data2.GetSubscribedData(tenantId)
-	if len(list1) != 0 {
-		for _, k := range list1 {
+
+	response := s.GetSubscribedData(int64(tenantdata.TenantID))
+	if len(response) != 0 {
+		for _, k := range response {
 			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
 				Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
-	}
-
-	status := auth.UpdateAuthUser(id.ID)
-	print(status)
-	if status != true {
-		return nil, errors.New("tenant not subscribed")
 	}
 	return &model.SubscribedData{
 		Status:  true,
@@ -550,18 +530,21 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 	if len(intlist) != 0 {
 		for i := 0; i < len(intlist); i++ {
 
-			data1.CurrencyId = intlist[i].CurrencyID
+			data1.Currencyid = intlist[i].Currencyid
 			data1.Date = intlist[i].TransactionDate
-			data1.CurrencyId = intlist[i].CurrencyID
-			data1.ModuleId = intlist[i].ModuleID
-			data1.PaymentId = *intlist[i].PaymentID
+			data1.Partnerid = intlist[i].Partnerid
+			data1.Categoryid = intlist[i].CategoryID
+			data1.SubCategoryid = intlist[i].SubCategoryID
+
+			data1.Moduleid = intlist[i].Moduleid
+			data1.PaymentId = *intlist[i].Paymentid
 			data1.PaymentStatus = intlist[i].PaymentStatus
 			data1.Price = intlist[i].Price
 			data1.Quantity = intlist[i].Quantity
 			data1.TaxId = intlist[i].TaxID
 			data1.TaxAmount = intlist[i].TaxAmount
 			data1.TotalAmount = intlist[i].TotalAmount
-			data1.PackageId = intlist[i].PackageID
+			data1.Packageid = intlist[i].Packageid
 			data1.Promoid = intlist[i].Promoid
 			data1.Promovalue = intlist[i].Promovalue
 			data1.Validitydate = intlist[i].Validitydate
@@ -571,6 +554,16 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 			print(subscribedid)
 			print(intlist[i].Tenantid)
 		}
+	}
+	var d subscription.TenantSubscription
+	d.Categoryid = intlist[0].CategoryID
+	d.SubCategoryid = intlist[0].SubCategoryID
+	d.Moduleid = intlist[0].Moduleid
+	d.Tenantid = intlist[0].Tenantid
+	d.Subcategoryname = intlist[0].Subcategoryname
+	_, er := d.Insertsubcategory()
+	if er != nil {
+		print(er)
 	}
 
 	list1 = data2.GetSubscribedData(int64(intlist[0].Tenantid))
@@ -610,6 +603,35 @@ func (r *mutationResolver) Initialupdate(ctx context.Context, input *model.Updat
 	}
 
 	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "BusinessInfo Updated"}, nil
+}
+
+func (r *mutationResolver) Insertsubcategory(ctx context.Context, input []*model.Subcatinsertdata) (*model.Promotioncreateddata, error) {
+	id, usererr := helper.ForSparkleContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("raju")
+	print(id.ID)
+	var d subscription.TenantSubscription
+	sublist := input
+	if len(sublist) != 0 {
+		for i := 0; i < len(sublist); i++ {
+			d.Categoryid = sublist[i].Categoryid
+			d.SubCategoryid = sublist[i].Subcategoryid
+			d.Moduleid = sublist[i].Moduleid
+			d.Tenantid = sublist[i].Tenantid
+			d.Subcategoryname = sublist[i].Subcategoryname
+			_, err := d.Insertsubcategory()
+			if err != nil {
+				print(err)
+			}
+
+		}
+	}
+
+	return &model.Promotioncreateddata{
+		Status: true, Code: http.StatusCreated, Message: "Subcategories Added to Tenants",
+	}, nil
 }
 
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
@@ -983,6 +1005,31 @@ func (r *queryResolver) Getnonsubscribed(ctx context.Context, tenantid int) (*mo
 			Packageexpiry: packdata.Packageexpiry, Promocodeid: packdata.Promocodeid, Promonname: packdata.Promoname, Promodescription: packdata.Promodescription, Promotype: packdata.Promotype, Promovalue: packdata.Promovalue, Validitydate: packdata.Promovaliditydate, Validity: packdata.Validity})
 	}
 	return &model.Getnonsubscribeddata{Status: true, Code: http.StatusCreated, Message: "Success", Nonsubscribed: pack}, nil
+}
+
+func (r *queryResolver) Getallmodule(ctx context.Context, categoryid int) (*model.Getallmoduledata, error) {
+	id, usererr := helper.ForSparkleContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)
+	var mods []*model.Mod
+
+	mods = subscription.Getmodules(categoryid)
+	return &model.Getallmoduledata{Status: true, Code: http.StatusOK, Message: "Success", Modules: mods}, nil
+}
+
+func (r *queryResolver) Getallpromos(ctx context.Context, moduleid int) (*model.Getallpromodata, error) {
+	id, usererr := helper.ForSparkleContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)
+	var data []*model.Promo
+	data = subscription.Getpromos(moduleid)
+	return &model.Getallpromodata{Status: true, Code: http.StatusOK, Message: "Success", Promos: data}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

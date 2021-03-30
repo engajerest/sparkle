@@ -61,6 +61,7 @@ input TenantDetails{
  Mobile:String!
  CategoryId: Int!
  SubCategoryId: Int!
+ Subcategoryname:String!
  Type: Int!
  Tenanttoken:String!
 }
@@ -91,6 +92,12 @@ type subscribedData{
  message:String!
  info:[TenantData]!
 }
+type subscribedDataResponse{
+ status:Boolean!
+ code:Int!
+ message:String!
+ info:TenantData
+}
 input subscription{
  TransactionDate:String!
  PackageId:Int!
@@ -108,23 +115,46 @@ input subscription{
  PaymentId:Int
  Validitydate:String!
 }
-input subscriptionnew{
-   Tenantid:Int!
- TransactionDate:String!
- PackageId:Int!
- ModuleId:Int!
- CurrencyId:Int!
+
+input initialsubscribe{
+TransactionDate:String!
+ Packageid:Int!
+ Partnerid:Int!
+ Moduleid:Int!
+ Currencyid:Int!
  CurrencyCode:String!
  Price:String!
  TaxId:Int!
  Quantity:Int!
+ Promoid:Int!
+ Promovalue:String!
  TaxAmount:String!
  TotalAmount:String!
  PaymentStatus:Int!
- PaymentId:Int
+ Paymentid:Int
+ Validitydate:String!
+}
+input subscriptionnew{
+   Tenantid:Int!
+TransactionDate:String!
+ Packageid:Int!
+ Partnerid:Int!
+ Moduleid:Int!
+  CategoryId: Int!
+ SubCategoryId: Int!
+ Subcategoryname:String!
+ Currencyid:Int!
+ CurrencyCode:String!
+ Price:String!
+ TaxId:Int!
+ Quantity:Int!
  Promoid:Int!
  Promovalue:String!
-  Validitydate:String!
+ TaxAmount:String!
+ TotalAmount:String!
+ PaymentStatus:Int!
+ Paymentid:Int
+ Validitydate:String!
 }
 
 input tenantuser{
@@ -138,9 +168,9 @@ input tenantuser{
  roleid:Int!
 }
 input data{
- tenantinfo:TenantDetails!
- tenantlocation:TenantAddress!
- subscriptiondetails:[subscription]!
+ tenantinfo:TenantDetails
+ tenantlocation:TenantAddress
+ subscriptiondetails:[initialsubscribe]
 }
 input location{
  TenantId:Int!
@@ -249,7 +279,13 @@ input delstatus{
  locationid:Int!
  delivery:Boolean!
 }
-
+input subcatinsertdata{
+Tenantid:Int! 
+Moduleid:Int!
+Categoryid:Int!
+Subcategoryid:Int! 
+Subcategoryname:String! 
+}
 input updateinfo{
 Tenantid:Int!
 Locationid:Int!
@@ -441,11 +477,12 @@ type Promotion {
  Promoterms:String!
  Promovalue:String!
  Promotag: String!
- Promotype:String!
+Promotype:String!
  Startdate:String!
  Enddate: String!
  Status:String
 }
+
 type getpromotiondata{
  status:Boolean!
  code:Int!
@@ -557,6 +594,39 @@ code:Int!
 message:String!  
  nonsubscribed:[Package]
 }
+type getallmoduledata{
+ status:Boolean!
+code:Int!
+message:String! 
+modules:[mod]  
+}
+type mod{
+ Moduleid:Int!
+	Categoryid:Int!
+	Modulename:String!
+	Content:String!
+	Logourl:String!
+	Iconurl:String!
+}
+type getallpromodata{
+  status:Boolean!
+code:Int!
+message:String! 
+promos:[promo]  
+}
+type promo{
+Promocodeid:Int!
+Moduleid:Int!
+Partnerid:Int!
+Packageid:Int!
+Promoname:String!
+Promodescription:String!
+Packageexpiry:String!
+Promotype:String!
+Promovalue:String!
+Validity:String!
+Validitystatus:Boolean!
+}
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
@@ -569,6 +639,8 @@ type Query {
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
  getnonsubscribed(tenantid:Int!):getnonsubscribeddata
+ getallmodule(categoryid:Int!):getallmoduledata
+ getallpromos(moduleid:Int!):getallpromodata
 
 }
 
@@ -585,4 +657,5 @@ type Mutation {
  updatelocation(input:locationupdate):promotioncreateddata
  subscription(input:[subscriptionnew]):subscribedData
  initialupdate(input:updateinfo):promotioncreateddata
+ insertsubcategory(input:[subcatinsertdata]):promotioncreateddata
 }

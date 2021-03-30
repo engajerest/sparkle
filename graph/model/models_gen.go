@@ -111,14 +111,15 @@ type TenantData struct {
 }
 
 type TenantDetails struct {
-	Name          string `json:"Name"`
-	Regno         string `json:"Regno"`
-	Email         string `json:"Email"`
-	Mobile        string `json:"Mobile"`
-	CategoryID    int    `json:"CategoryId"`
-	SubCategoryID int    `json:"SubCategoryId"`
-	Type          int    `json:"Type"`
-	Tenanttoken   string `json:"Tenanttoken"`
+	Name            string `json:"Name"`
+	Regno           string `json:"Regno"`
+	Email           string `json:"Email"`
+	Mobile          string `json:"Mobile"`
+	CategoryID      int    `json:"CategoryId"`
+	SubCategoryID   int    `json:"SubCategoryId"`
+	Subcategoryname string `json:"Subcategoryname"`
+	Type            int    `json:"Type"`
+	Tenanttoken     string `json:"Tenanttoken"`
 }
 
 type Business struct {
@@ -187,9 +188,9 @@ type Chargeupdateinput struct {
 }
 
 type Data struct {
-	Tenantinfo          *TenantDetails  `json:"tenantinfo"`
-	Tenantlocation      *TenantAddress  `json:"tenantlocation"`
-	Subscriptiondetails []*Subscription `json:"subscriptiondetails"`
+	Tenantinfo          *TenantDetails      `json:"tenantinfo"`
+	Tenantlocation      *TenantAddress      `json:"tenantlocation"`
+	Subscriptiondetails []*Initialsubscribe `json:"subscriptiondetails"`
 }
 
 type Deliverycharge struct {
@@ -229,6 +230,20 @@ type Getalllocations struct {
 	Code      int               `json:"code"`
 	Message   string            `json:"message"`
 	Locations []*Locationgetall `json:"locations"`
+}
+
+type Getallmoduledata struct {
+	Status  bool   `json:"status"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Modules []*Mod `json:"modules"`
+}
+
+type Getallpromodata struct {
+	Status  bool     `json:"status"`
+	Code    int      `json:"code"`
+	Message string   `json:"message"`
+	Promos  []*Promo `json:"promos"`
 }
 
 type Getnonsubscribeddata struct {
@@ -274,6 +289,25 @@ type Info struct {
 	Tenanttoken *string       `json:"tenanttoken"`
 	Tenantimage *string       `json:"tenantimage"`
 	Social      []*Socialinfo `json:"social"`
+}
+
+type Initialsubscribe struct {
+	TransactionDate string `json:"TransactionDate"`
+	Packageid       int    `json:"Packageid"`
+	Partnerid       int    `json:"Partnerid"`
+	Moduleid        int    `json:"Moduleid"`
+	Currencyid      int    `json:"Currencyid"`
+	CurrencyCode    string `json:"CurrencyCode"`
+	Price           string `json:"Price"`
+	TaxID           int    `json:"TaxId"`
+	Quantity        int    `json:"Quantity"`
+	Promoid         int    `json:"Promoid"`
+	Promovalue      string `json:"Promovalue"`
+	TaxAmount       string `json:"TaxAmount"`
+	TotalAmount     string `json:"TotalAmount"`
+	PaymentStatus   int    `json:"PaymentStatus"`
+	Paymentid       *int   `json:"Paymentid"`
+	Validitydate    string `json:"Validitydate"`
 }
 
 type Location struct {
@@ -365,6 +399,15 @@ type Locstatus struct {
 	Status     string `json:"status"`
 }
 
+type Mod struct {
+	Moduleid   int    `json:"Moduleid"`
+	Categoryid int    `json:"Categoryid"`
+	Modulename string `json:"Modulename"`
+	Content    string `json:"Content"`
+	Logourl    string `json:"Logourl"`
+	Iconurl    string `json:"Iconurl"`
+}
+
 type Othercharge struct {
 	Tenantchargeid int    `json:"Tenantchargeid"`
 	Tenantid       int    `json:"Tenantid"`
@@ -394,6 +437,20 @@ type Paymentdata struct {
 	Email           string   `json:"Email"`
 	Contact         string   `json:"Contact"`
 	Paymentref      string   `json:"Paymentref"`
+}
+
+type Promo struct {
+	Promocodeid      int    `json:"Promocodeid"`
+	Moduleid         int    `json:"Moduleid"`
+	Partnerid        int    `json:"Partnerid"`
+	Packageid        int    `json:"Packageid"`
+	Promoname        string `json:"Promoname"`
+	Promodescription string `json:"Promodescription"`
+	Packageexpiry    string `json:"Packageexpiry"`
+	Promotype        string `json:"Promotype"`
+	Promovalue       string `json:"Promovalue"`
+	Validity         string `json:"Validity"`
+	Validitystatus   bool   `json:"Validitystatus"`
 }
 
 type Promoinput struct {
@@ -440,11 +497,26 @@ type Socialupdatedata struct {
 	Socialicon    *string `json:"socialicon"`
 }
 
+type Subcatinsertdata struct {
+	Tenantid        int    `json:"Tenantid"`
+	Moduleid        int    `json:"Moduleid"`
+	Categoryid      int    `json:"Categoryid"`
+	Subcategoryid   int    `json:"Subcategoryid"`
+	Subcategoryname string `json:"Subcategoryname"`
+}
+
 type SubscribedData struct {
 	Status  bool          `json:"status"`
 	Code    int           `json:"code"`
 	Message string        `json:"message"`
 	Info    []*TenantData `json:"info"`
+}
+
+type SubscribedDataResponse struct {
+	Status  bool        `json:"status"`
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Info    *TenantData `json:"info"`
 }
 
 type Subscription struct {
@@ -468,19 +540,23 @@ type Subscription struct {
 type Subscriptionnew struct {
 	Tenantid        int    `json:"Tenantid"`
 	TransactionDate string `json:"TransactionDate"`
-	PackageID       int    `json:"PackageId"`
-	ModuleID        int    `json:"ModuleId"`
-	CurrencyID      int    `json:"CurrencyId"`
+	Packageid       int    `json:"Packageid"`
+	Partnerid       int    `json:"Partnerid"`
+	Moduleid        int    `json:"Moduleid"`
+	CategoryID      int    `json:"CategoryId"`
+	SubCategoryID   int    `json:"SubCategoryId"`
+	Subcategoryname string `json:"Subcategoryname"`
+	Currencyid      int    `json:"Currencyid"`
 	CurrencyCode    string `json:"CurrencyCode"`
 	Price           string `json:"Price"`
 	TaxID           int    `json:"TaxId"`
 	Quantity        int    `json:"Quantity"`
+	Promoid         int    `json:"Promoid"`
+	Promovalue      string `json:"Promovalue"`
 	TaxAmount       string `json:"TaxAmount"`
 	TotalAmount     string `json:"TotalAmount"`
 	PaymentStatus   int    `json:"PaymentStatus"`
-	PaymentID       *int   `json:"PaymentId"`
-	Promoid         int    `json:"Promoid"`
-	Promovalue      string `json:"Promovalue"`
+	Paymentid       *int   `json:"Paymentid"`
 	Validitydate    string `json:"Validitydate"`
 }
 

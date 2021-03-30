@@ -82,6 +82,7 @@ type ComplexityRoot struct {
 		Createpromotion      func(childComplexity int, input *model.Promoinput) int
 		Createtenantuser     func(childComplexity int, create *model.Tenantuser) int
 		Initialupdate        func(childComplexity int, input *model.Updateinfo) int
+		Insertsubcategory    func(childComplexity int, input []*model.Subcatinsertdata) int
 		Subscribe            func(childComplexity int, input model.Data) int
 		Subscription         func(childComplexity int, input []*model.Subscriptionnew) int
 		Updatecharges        func(childComplexity int, input *model.Chargeupdate) int
@@ -129,6 +130,8 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetBusiness      func(childComplexity int, tenantid int, categoryid int) int
+		Getallmodule     func(childComplexity int, categoryid int) int
+		Getallpromos     func(childComplexity int, moduleid int) int
 		Getchargetypes   func(childComplexity int) int
 		Getlocationbyid  func(childComplexity int, tenantid int, locationid int) int
 		Getnonsubscribed func(childComplexity int, tenantid int) int
@@ -209,6 +212,20 @@ type ComplexityRoot struct {
 		Locations func(childComplexity int) int
 		Message   func(childComplexity int) int
 		Status    func(childComplexity int) int
+	}
+
+	Getallmoduledata struct {
+		Code    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Modules func(childComplexity int) int
+		Status  func(childComplexity int) int
+	}
+
+	Getallpromodata struct {
+		Code    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Promos  func(childComplexity int) int
+		Status  func(childComplexity int) int
 	}
 
 	Getnonsubscribeddata struct {
@@ -295,6 +312,15 @@ type ComplexityRoot struct {
 		Tenantusers     func(childComplexity int) int
 	}
 
+	Mod struct {
+		Categoryid func(childComplexity int) int
+		Content    func(childComplexity int) int
+		Iconurl    func(childComplexity int) int
+		Logourl    func(childComplexity int) int
+		Moduleid   func(childComplexity int) int
+		Modulename func(childComplexity int) int
+	}
+
 	Othercharge struct {
 		Chargeid       func(childComplexity int) int
 		Chargename     func(childComplexity int) int
@@ -326,6 +352,20 @@ type ComplexityRoot struct {
 		Transactiondate func(childComplexity int) int
 	}
 
+	Promo struct {
+		Moduleid         func(childComplexity int) int
+		Packageexpiry    func(childComplexity int) int
+		Packageid        func(childComplexity int) int
+		Partnerid        func(childComplexity int) int
+		Promocodeid      func(childComplexity int) int
+		Promodescription func(childComplexity int) int
+		Promoname        func(childComplexity int) int
+		Promotype        func(childComplexity int) int
+		Promovalue       func(childComplexity int) int
+		Validity         func(childComplexity int) int
+		Validitystatus   func(childComplexity int) int
+	}
+
 	Promotioncreateddata struct {
 		Code    func(childComplexity int) int
 		Message func(childComplexity int) int
@@ -347,6 +387,13 @@ type ComplexityRoot struct {
 	}
 
 	SubscribedData struct {
+		Code    func(childComplexity int) int
+		Info    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Status  func(childComplexity int) int
+	}
+
+	SubscribedDataResponse struct {
 		Code    func(childComplexity int) int
 		Info    func(childComplexity int) int
 		Message func(childComplexity int) int
@@ -434,6 +481,7 @@ type MutationResolver interface {
 	Updatelocation(ctx context.Context, input *model.Locationupdate) (*model.Promotioncreateddata, error)
 	Subscription(ctx context.Context, input []*model.Subscriptionnew) (*model.SubscribedData, error)
 	Initialupdate(ctx context.Context, input *model.Updateinfo) (*model.Promotioncreateddata, error)
+	Insertsubcategory(ctx context.Context, input []*model.Subcatinsertdata) (*model.Promotioncreateddata, error)
 }
 type QueryResolver interface {
 	Sparkle(ctx context.Context) (*model.Sparkle, error)
@@ -447,6 +495,8 @@ type QueryResolver interface {
 	Getpayments(ctx context.Context, tenantid int, typeid int) (*model.Getpaymentdata, error)
 	Getsubscriptions(ctx context.Context, tenantid int) (*model.Getsubscriptionsdata, error)
 	Getnonsubscribed(ctx context.Context, tenantid int) (*model.Getnonsubscribeddata, error)
+	Getallmodule(ctx context.Context, categoryid int) (*model.Getallmoduledata, error)
+	Getallpromos(ctx context.Context, moduleid int) (*model.Getallpromodata, error)
 }
 
 type executableSchema struct {
@@ -670,6 +720,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Initialupdate(childComplexity, args["input"].(*model.Updateinfo)), true
+
+	case "Mutation.insertsubcategory":
+		if e.complexity.Mutation.Insertsubcategory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_insertsubcategory_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Insertsubcategory(childComplexity, args["input"].([]*model.Subcatinsertdata)), true
 
 	case "Mutation.subscribe":
 		if e.complexity.Mutation.Subscribe == nil {
@@ -976,6 +1038,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetBusiness(childComplexity, args["tenantid"].(int), args["categoryid"].(int)), true
+
+	case "Query.getallmodule":
+		if e.complexity.Query.Getallmodule == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getallmodule_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Getallmodule(childComplexity, args["categoryid"].(int)), true
+
+	case "Query.getallpromos":
+		if e.complexity.Query.Getallpromos == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getallpromos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Getallpromos(childComplexity, args["moduleid"].(int)), true
 
 	case "Query.getchargetypes":
 		if e.complexity.Query.Getchargetypes == nil {
@@ -1382,6 +1468,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Getalllocations.Status(childComplexity), true
+
+	case "getallmoduledata.code":
+		if e.complexity.Getallmoduledata.Code == nil {
+			break
+		}
+
+		return e.complexity.Getallmoduledata.Code(childComplexity), true
+
+	case "getallmoduledata.message":
+		if e.complexity.Getallmoduledata.Message == nil {
+			break
+		}
+
+		return e.complexity.Getallmoduledata.Message(childComplexity), true
+
+	case "getallmoduledata.modules":
+		if e.complexity.Getallmoduledata.Modules == nil {
+			break
+		}
+
+		return e.complexity.Getallmoduledata.Modules(childComplexity), true
+
+	case "getallmoduledata.status":
+		if e.complexity.Getallmoduledata.Status == nil {
+			break
+		}
+
+		return e.complexity.Getallmoduledata.Status(childComplexity), true
+
+	case "getallpromodata.code":
+		if e.complexity.Getallpromodata.Code == nil {
+			break
+		}
+
+		return e.complexity.Getallpromodata.Code(childComplexity), true
+
+	case "getallpromodata.message":
+		if e.complexity.Getallpromodata.Message == nil {
+			break
+		}
+
+		return e.complexity.Getallpromodata.Message(childComplexity), true
+
+	case "getallpromodata.promos":
+		if e.complexity.Getallpromodata.Promos == nil {
+			break
+		}
+
+		return e.complexity.Getallpromodata.Promos(childComplexity), true
+
+	case "getallpromodata.status":
+		if e.complexity.Getallpromodata.Status == nil {
+			break
+		}
+
+		return e.complexity.Getallpromodata.Status(childComplexity), true
 
 	case "getnonsubscribeddata.code":
 		if e.complexity.Getnonsubscribeddata.Code == nil {
@@ -1803,6 +1945,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Locationgetall.Tenantusers(childComplexity), true
 
+	case "mod.Categoryid":
+		if e.complexity.Mod.Categoryid == nil {
+			break
+		}
+
+		return e.complexity.Mod.Categoryid(childComplexity), true
+
+	case "mod.Content":
+		if e.complexity.Mod.Content == nil {
+			break
+		}
+
+		return e.complexity.Mod.Content(childComplexity), true
+
+	case "mod.Iconurl":
+		if e.complexity.Mod.Iconurl == nil {
+			break
+		}
+
+		return e.complexity.Mod.Iconurl(childComplexity), true
+
+	case "mod.Logourl":
+		if e.complexity.Mod.Logourl == nil {
+			break
+		}
+
+		return e.complexity.Mod.Logourl(childComplexity), true
+
+	case "mod.Moduleid":
+		if e.complexity.Mod.Moduleid == nil {
+			break
+		}
+
+		return e.complexity.Mod.Moduleid(childComplexity), true
+
+	case "mod.Modulename":
+		if e.complexity.Mod.Modulename == nil {
+			break
+		}
+
+		return e.complexity.Mod.Modulename(childComplexity), true
+
 	case "othercharge.Chargeid":
 		if e.complexity.Othercharge.Chargeid == nil {
 			break
@@ -1978,6 +2162,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Paymentdata.Transactiondate(childComplexity), true
 
+	case "promo.Moduleid":
+		if e.complexity.Promo.Moduleid == nil {
+			break
+		}
+
+		return e.complexity.Promo.Moduleid(childComplexity), true
+
+	case "promo.Packageexpiry":
+		if e.complexity.Promo.Packageexpiry == nil {
+			break
+		}
+
+		return e.complexity.Promo.Packageexpiry(childComplexity), true
+
+	case "promo.Packageid":
+		if e.complexity.Promo.Packageid == nil {
+			break
+		}
+
+		return e.complexity.Promo.Packageid(childComplexity), true
+
+	case "promo.Partnerid":
+		if e.complexity.Promo.Partnerid == nil {
+			break
+		}
+
+		return e.complexity.Promo.Partnerid(childComplexity), true
+
+	case "promo.Promocodeid":
+		if e.complexity.Promo.Promocodeid == nil {
+			break
+		}
+
+		return e.complexity.Promo.Promocodeid(childComplexity), true
+
+	case "promo.Promodescription":
+		if e.complexity.Promo.Promodescription == nil {
+			break
+		}
+
+		return e.complexity.Promo.Promodescription(childComplexity), true
+
+	case "promo.Promoname":
+		if e.complexity.Promo.Promoname == nil {
+			break
+		}
+
+		return e.complexity.Promo.Promoname(childComplexity), true
+
+	case "promo.Promotype":
+		if e.complexity.Promo.Promotype == nil {
+			break
+		}
+
+		return e.complexity.Promo.Promotype(childComplexity), true
+
+	case "promo.Promovalue":
+		if e.complexity.Promo.Promovalue == nil {
+			break
+		}
+
+		return e.complexity.Promo.Promovalue(childComplexity), true
+
+	case "promo.Validity":
+		if e.complexity.Promo.Validity == nil {
+			break
+		}
+
+		return e.complexity.Promo.Validity(childComplexity), true
+
+	case "promo.Validitystatus":
+		if e.complexity.Promo.Validitystatus == nil {
+			break
+		}
+
+		return e.complexity.Promo.Validitystatus(childComplexity), true
+
 	case "promotioncreateddata.code":
 		if e.complexity.Promotioncreateddata.Code == nil {
 			break
@@ -2082,6 +2343,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.SubscribedData.Status(childComplexity), true
+
+	case "subscribedDataResponse.code":
+		if e.complexity.SubscribedDataResponse.Code == nil {
+			break
+		}
+
+		return e.complexity.SubscribedDataResponse.Code(childComplexity), true
+
+	case "subscribedDataResponse.info":
+		if e.complexity.SubscribedDataResponse.Info == nil {
+			break
+		}
+
+		return e.complexity.SubscribedDataResponse.Info(childComplexity), true
+
+	case "subscribedDataResponse.message":
+		if e.complexity.SubscribedDataResponse.Message == nil {
+			break
+		}
+
+		return e.complexity.SubscribedDataResponse.Message(childComplexity), true
+
+	case "subscribedDataResponse.status":
+		if e.complexity.SubscribedDataResponse.Status == nil {
+			break
+		}
+
+		return e.complexity.SubscribedDataResponse.Status(childComplexity), true
 
 	case "subscriptionsdata.Customercount":
 		if e.complexity.Subscriptionsdata.Customercount == nil {
@@ -2511,6 +2800,7 @@ input TenantDetails{
  Mobile:String!
  CategoryId: Int!
  SubCategoryId: Int!
+ Subcategoryname:String!
  Type: Int!
  Tenanttoken:String!
 }
@@ -2541,6 +2831,12 @@ type subscribedData{
  message:String!
  info:[TenantData]!
 }
+type subscribedDataResponse{
+ status:Boolean!
+ code:Int!
+ message:String!
+ info:TenantData
+}
 input subscription{
  TransactionDate:String!
  PackageId:Int!
@@ -2558,23 +2854,46 @@ input subscription{
  PaymentId:Int
  Validitydate:String!
 }
-input subscriptionnew{
-   Tenantid:Int!
- TransactionDate:String!
- PackageId:Int!
- ModuleId:Int!
- CurrencyId:Int!
+
+input initialsubscribe{
+TransactionDate:String!
+ Packageid:Int!
+ Partnerid:Int!
+ Moduleid:Int!
+ Currencyid:Int!
  CurrencyCode:String!
  Price:String!
  TaxId:Int!
  Quantity:Int!
+ Promoid:Int!
+ Promovalue:String!
  TaxAmount:String!
  TotalAmount:String!
  PaymentStatus:Int!
- PaymentId:Int
+ Paymentid:Int
+ Validitydate:String!
+}
+input subscriptionnew{
+   Tenantid:Int!
+TransactionDate:String!
+ Packageid:Int!
+ Partnerid:Int!
+ Moduleid:Int!
+  CategoryId: Int!
+ SubCategoryId: Int!
+ Subcategoryname:String!
+ Currencyid:Int!
+ CurrencyCode:String!
+ Price:String!
+ TaxId:Int!
+ Quantity:Int!
  Promoid:Int!
  Promovalue:String!
-  Validitydate:String!
+ TaxAmount:String!
+ TotalAmount:String!
+ PaymentStatus:Int!
+ Paymentid:Int
+ Validitydate:String!
 }
 
 input tenantuser{
@@ -2588,9 +2907,9 @@ input tenantuser{
  roleid:Int!
 }
 input data{
- tenantinfo:TenantDetails!
- tenantlocation:TenantAddress!
- subscriptiondetails:[subscription]!
+ tenantinfo:TenantDetails
+ tenantlocation:TenantAddress
+ subscriptiondetails:[initialsubscribe]
 }
 input location{
  TenantId:Int!
@@ -2699,7 +3018,13 @@ input delstatus{
  locationid:Int!
  delivery:Boolean!
 }
-
+input subcatinsertdata{
+Tenantid:Int! 
+Moduleid:Int!
+Categoryid:Int!
+Subcategoryid:Int! 
+Subcategoryname:String! 
+}
 input updateinfo{
 Tenantid:Int!
 Locationid:Int!
@@ -2891,11 +3216,12 @@ type Promotion {
  Promoterms:String!
  Promovalue:String!
  Promotag: String!
- Promotype:String!
+Promotype:String!
  Startdate:String!
  Enddate: String!
  Status:String
 }
+
 type getpromotiondata{
  status:Boolean!
  code:Int!
@@ -3007,6 +3333,39 @@ code:Int!
 message:String!  
  nonsubscribed:[Package]
 }
+type getallmoduledata{
+ status:Boolean!
+code:Int!
+message:String! 
+modules:[mod]  
+}
+type mod{
+ Moduleid:Int!
+	Categoryid:Int!
+	Modulename:String!
+	Content:String!
+	Logourl:String!
+	Iconurl:String!
+}
+type getallpromodata{
+  status:Boolean!
+code:Int!
+message:String! 
+promos:[promo]  
+}
+type promo{
+Promocodeid:Int!
+Moduleid:Int!
+Partnerid:Int!
+Packageid:Int!
+Promoname:String!
+Promodescription:String!
+Packageexpiry:String!
+Promotype:String!
+Promovalue:String!
+Validity:String!
+Validitystatus:Boolean!
+}
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
@@ -3019,6 +3378,8 @@ type Query {
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
  getnonsubscribed(tenantid:Int!):getnonsubscribeddata
+ getallmodule(categoryid:Int!):getallmoduledata
+ getallpromos(moduleid:Int!):getallpromodata
 
 }
 
@@ -3035,6 +3396,7 @@ type Mutation {
  updatelocation(input:locationupdate):promotioncreateddata
  subscription(input:[subscriptionnew]):subscribedData
  initialupdate(input:updateinfo):promotioncreateddata
+ insertsubcategory(input:[subcatinsertdata]):promotioncreateddata
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -3110,6 +3472,21 @@ func (ec *executionContext) field_Mutation_initialupdate_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalOupdateinfo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUpdateinfo(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_insertsubcategory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.Subcatinsertdata
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOsubcatinsertdata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcatinsertdata(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3259,6 +3636,36 @@ func (ec *executionContext) field_Query_getBusiness_args(ctx context.Context, ra
 		}
 	}
 	args["categoryid"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getallmodule_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["categoryid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["categoryid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getallpromos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["moduleid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("moduleid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["moduleid"] = arg0
 	return args, nil
 }
 
@@ -4613,6 +5020,45 @@ func (ec *executionContext) _Mutation_initialupdate(ctx context.Context, field g
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().Initialupdate(rctx, args["input"].(*model.Updateinfo))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Promotioncreateddata)
+	fc.Result = res
+	return ec.marshalOpromotioncreateddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotioncreateddata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_insertsubcategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_insertsubcategory_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Insertsubcategory(rctx, args["input"].([]*model.Subcatinsertdata))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6085,6 +6531,84 @@ func (ec *executionContext) _Query_getnonsubscribed(ctx context.Context, field g
 	res := resTmp.(*model.Getnonsubscribeddata)
 	fc.Result = res
 	return ec.marshalOgetnonsubscribeddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetnonsubscribeddata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getallmodule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getallmodule_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Getallmodule(rctx, args["categoryid"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Getallmoduledata)
+	fc.Result = res
+	return ec.marshalOgetallmoduledata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetallmoduledata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getallpromos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getallpromos_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Getallpromos(rctx, args["moduleid"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Getallpromodata)
+	fc.Result = res
+	return ec.marshalOgetallpromodata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetallpromodata(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -8734,6 +9258,280 @@ func (ec *executionContext) _getalllocations_locations(ctx context.Context, fiel
 	return ec.marshalOlocationgetall2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocationgetall(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _getallmoduledata_status(ctx context.Context, field graphql.CollectedField, obj *model.Getallmoduledata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getallmoduledata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getallmoduledata_code(ctx context.Context, field graphql.CollectedField, obj *model.Getallmoduledata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getallmoduledata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getallmoduledata_message(ctx context.Context, field graphql.CollectedField, obj *model.Getallmoduledata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getallmoduledata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getallmoduledata_modules(ctx context.Context, field graphql.CollectedField, obj *model.Getallmoduledata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getallmoduledata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Modules, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Mod)
+	fc.Result = res
+	return ec.marshalOmod2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐMod(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getallpromodata_status(ctx context.Context, field graphql.CollectedField, obj *model.Getallpromodata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getallpromodata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getallpromodata_code(ctx context.Context, field graphql.CollectedField, obj *model.Getallpromodata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getallpromodata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getallpromodata_message(ctx context.Context, field graphql.CollectedField, obj *model.Getallpromodata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getallpromodata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getallpromodata_promos(ctx context.Context, field graphql.CollectedField, obj *model.Getallpromodata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getallpromodata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promos, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Promo)
+	fc.Result = res
+	return ec.marshalOpromo2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromo(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _getnonsubscribeddata_status(ctx context.Context, field graphql.CollectedField, obj *model.Getnonsubscribeddata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10777,6 +11575,216 @@ func (ec *executionContext) _locationgetall_deliverycharges(ctx context.Context,
 	return ec.marshalOdeliverycharge2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐDeliverycharge(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _mod_Moduleid(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Moduleid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _mod_Categoryid(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Categoryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _mod_Modulename(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Modulename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _mod_Content(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _mod_Logourl(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Logourl, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _mod_Iconurl(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Iconurl, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _othercharge_Tenantchargeid(ctx context.Context, field graphql.CollectedField, obj *model.Othercharge) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -11640,6 +12648,391 @@ func (ec *executionContext) _paymentdata_Paymentref(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _promo_Promocodeid(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promocodeid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Moduleid(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Moduleid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Partnerid(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Partnerid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Packageid(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Packageid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Promoname(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promoname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Promodescription(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promodescription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Packageexpiry(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Packageexpiry, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Promotype(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promotype, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Promovalue(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Promovalue, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Validity(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Validity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Validitystatus(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Validitystatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _promotioncreateddata_status(ctx context.Context, field graphql.CollectedField, obj *model.Promotioncreateddata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12160,6 +13553,143 @@ func (ec *executionContext) _subscribedData_info(ctx context.Context, field grap
 	res := resTmp.([]*model.TenantData)
 	fc.Result = res
 	return ec.marshalNTenantData2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantData(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subscribedDataResponse_status(ctx context.Context, field graphql.CollectedField, obj *model.SubscribedDataResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscribedDataResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subscribedDataResponse_code(ctx context.Context, field graphql.CollectedField, obj *model.SubscribedDataResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscribedDataResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subscribedDataResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.SubscribedDataResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscribedDataResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subscribedDataResponse_info(ctx context.Context, field graphql.CollectedField, obj *model.SubscribedDataResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscribedDataResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Info, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TenantData)
+	fc.Result = res
+	return ec.marshalOTenantData2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _subscriptionsdata_Packageid(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
@@ -13775,6 +15305,14 @@ func (ec *executionContext) unmarshalInputTenantDetails(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
+		case "Subcategoryname":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Subcategoryname"))
+			it.Subcategoryname, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "Type":
 			var err error
 
@@ -14095,7 +15633,7 @@ func (ec *executionContext) unmarshalInputdata(ctx context.Context, obj interfac
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantinfo"))
-			it.Tenantinfo, err = ec.unmarshalNTenantDetails2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantDetails(ctx, v)
+			it.Tenantinfo, err = ec.unmarshalOTenantDetails2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantDetails(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14103,7 +15641,7 @@ func (ec *executionContext) unmarshalInputdata(ctx context.Context, obj interfac
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantlocation"))
-			it.Tenantlocation, err = ec.unmarshalNTenantAddress2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantAddress(ctx, v)
+			it.Tenantlocation, err = ec.unmarshalOTenantAddress2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantAddress(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14111,7 +15649,7 @@ func (ec *executionContext) unmarshalInputdata(ctx context.Context, obj interfac
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptiondetails"))
-			it.Subscriptiondetails, err = ec.unmarshalNsubscription2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscription(ctx, v)
+			it.Subscriptiondetails, err = ec.unmarshalOinitialsubscribe2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐInitialsubscribe(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14208,6 +15746,146 @@ func (ec *executionContext) unmarshalInputdelstatus(ctx context.Context, obj int
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delivery"))
 			it.Delivery, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputinitialsubscribe(ctx context.Context, obj interface{}) (model.Initialsubscribe, error) {
+	var it model.Initialsubscribe
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "TransactionDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TransactionDate"))
+			it.TransactionDate, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Packageid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Packageid"))
+			it.Packageid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Partnerid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Partnerid"))
+			it.Partnerid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Moduleid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Moduleid"))
+			it.Moduleid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Currencyid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Currencyid"))
+			it.Currencyid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "CurrencyCode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("CurrencyCode"))
+			it.CurrencyCode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Price":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Price"))
+			it.Price, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "TaxId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TaxId"))
+			it.TaxID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Quantity":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Quantity"))
+			it.Quantity, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Promoid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promoid"))
+			it.Promoid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Promovalue":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promovalue"))
+			it.Promovalue, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "TaxAmount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TaxAmount"))
+			it.TaxAmount, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "TotalAmount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TotalAmount"))
+			it.TotalAmount, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "PaymentStatus":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("PaymentStatus"))
+			it.PaymentStatus, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Paymentid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Paymentid"))
+			it.Paymentid, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Validitydate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Validitydate"))
+			it.Validitydate, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14725,6 +16403,58 @@ func (ec *executionContext) unmarshalInputsocialupdatedata(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputsubcatinsertdata(ctx context.Context, obj interface{}) (model.Subcatinsertdata, error) {
+	var it model.Subcatinsertdata
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "Tenantid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Tenantid"))
+			it.Tenantid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Moduleid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Moduleid"))
+			it.Moduleid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Categoryid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Categoryid"))
+			it.Categoryid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Subcategoryid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Subcategoryid"))
+			it.Subcategoryid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Subcategoryname":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Subcategoryname"))
+			it.Subcategoryname, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputsubscription(ctx context.Context, obj interface{}) (model.Subscription, error) {
 	var it model.Subscription
 	var asMap = obj.(map[string]interface{})
@@ -14879,27 +16609,59 @@ func (ec *executionContext) unmarshalInputsubscriptionnew(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "PackageId":
+		case "Packageid":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("PackageId"))
-			it.PackageID, err = ec.unmarshalNInt2int(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Packageid"))
+			it.Packageid, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "ModuleId":
+		case "Partnerid":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ModuleId"))
-			it.ModuleID, err = ec.unmarshalNInt2int(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Partnerid"))
+			it.Partnerid, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "CurrencyId":
+		case "Moduleid":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("CurrencyId"))
-			it.CurrencyID, err = ec.unmarshalNInt2int(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Moduleid"))
+			it.Moduleid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "CategoryId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("CategoryId"))
+			it.CategoryID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "SubCategoryId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("SubCategoryId"))
+			it.SubCategoryID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Subcategoryname":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Subcategoryname"))
+			it.Subcategoryname, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Currencyid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Currencyid"))
+			it.Currencyid, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14935,6 +16697,22 @@ func (ec *executionContext) unmarshalInputsubscriptionnew(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "Promoid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promoid"))
+			it.Promoid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Promovalue":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promovalue"))
+			it.Promovalue, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "TaxAmount":
 			var err error
 
@@ -14959,27 +16737,11 @@ func (ec *executionContext) unmarshalInputsubscriptionnew(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "PaymentId":
+		case "Paymentid":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("PaymentId"))
-			it.PaymentID, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "Promoid":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promoid"))
-			it.Promoid, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "Promovalue":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Promovalue"))
-			it.Promovalue, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Paymentid"))
+			it.Paymentid, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15589,6 +17351,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_subscription(ctx, field)
 		case "initialupdate":
 			out.Values[i] = ec._Mutation_initialupdate(ctx, field)
+		case "insertsubcategory":
+			out.Values[i] = ec._Mutation_insertsubcategory(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15931,6 +17695,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getnonsubscribed(ctx, field)
+				return res
+			})
+		case "getallmodule":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getallmodule(ctx, field)
+				return res
+			})
+		case "getallpromos":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getallpromos(ctx, field)
 				return res
 			})
 		case "__type":
@@ -16590,6 +18376,84 @@ func (ec *executionContext) _getalllocations(ctx context.Context, sel ast.Select
 	return out
 }
 
+var getallmoduledataImplementors = []string{"getallmoduledata"}
+
+func (ec *executionContext) _getallmoduledata(ctx context.Context, sel ast.SelectionSet, obj *model.Getallmoduledata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getallmoduledataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("getallmoduledata")
+		case "status":
+			out.Values[i] = ec._getallmoduledata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._getallmoduledata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._getallmoduledata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "modules":
+			out.Values[i] = ec._getallmoduledata_modules(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var getallpromodataImplementors = []string{"getallpromodata"}
+
+func (ec *executionContext) _getallpromodata(ctx context.Context, sel ast.SelectionSet, obj *model.Getallpromodata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getallpromodataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("getallpromodata")
+		case "status":
+			out.Values[i] = ec._getallpromodata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._getallpromodata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._getallpromodata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "promos":
+			out.Values[i] = ec._getallpromodata_promos(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var getnonsubscribeddataImplementors = []string{"getnonsubscribeddata"}
 
 func (ec *executionContext) _getnonsubscribeddata(ctx context.Context, sel ast.SelectionSet, obj *model.Getnonsubscribeddata) graphql.Marshaler {
@@ -17009,6 +18873,58 @@ func (ec *executionContext) _locationgetall(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var modImplementors = []string{"mod"}
+
+func (ec *executionContext) _mod(ctx context.Context, sel ast.SelectionSet, obj *model.Mod) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, modImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("mod")
+		case "Moduleid":
+			out.Values[i] = ec._mod_Moduleid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Categoryid":
+			out.Values[i] = ec._mod_Categoryid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Modulename":
+			out.Values[i] = ec._mod_Modulename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Content":
+			out.Values[i] = ec._mod_Content(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Logourl":
+			out.Values[i] = ec._mod_Logourl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Iconurl":
+			out.Values[i] = ec._mod_Iconurl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var otherchargeImplementors = []string{"othercharge"}
 
 func (ec *executionContext) _othercharge(ctx context.Context, sel ast.SelectionSet, obj *model.Othercharge) graphql.Marshaler {
@@ -17152,6 +19068,83 @@ func (ec *executionContext) _paymentdata(ctx context.Context, sel ast.SelectionS
 			}
 		case "Paymentref":
 			out.Values[i] = ec._paymentdata_Paymentref(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var promoImplementors = []string{"promo"}
+
+func (ec *executionContext) _promo(ctx context.Context, sel ast.SelectionSet, obj *model.Promo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, promoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("promo")
+		case "Promocodeid":
+			out.Values[i] = ec._promo_Promocodeid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Moduleid":
+			out.Values[i] = ec._promo_Moduleid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Partnerid":
+			out.Values[i] = ec._promo_Partnerid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Packageid":
+			out.Values[i] = ec._promo_Packageid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Promoname":
+			out.Values[i] = ec._promo_Promoname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Promodescription":
+			out.Values[i] = ec._promo_Promodescription(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Packageexpiry":
+			out.Values[i] = ec._promo_Packageexpiry(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Promotype":
+			out.Values[i] = ec._promo_Promotype(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Promovalue":
+			out.Values[i] = ec._promo_Promovalue(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Validity":
+			out.Values[i] = ec._promo_Validity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Validitystatus":
+			out.Values[i] = ec._promo_Validitystatus(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -17315,6 +19308,45 @@ func (ec *executionContext) _subscribedData(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var subscribedDataResponseImplementors = []string{"subscribedDataResponse"}
+
+func (ec *executionContext) _subscribedDataResponse(ctx context.Context, sel ast.SelectionSet, obj *model.SubscribedDataResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, subscribedDataResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("subscribedDataResponse")
+		case "status":
+			out.Values[i] = ec._subscribedDataResponse_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._subscribedDataResponse_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._subscribedDataResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "info":
+			out.Values[i] = ec._subscribedDataResponse_info(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -17874,11 +19906,6 @@ func (ec *executionContext) marshalNSubCategory2ᚕᚖgithubᚗcomᚋengajerest�
 	return ret
 }
 
-func (ec *executionContext) unmarshalNTenantAddress2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantAddress(ctx context.Context, v interface{}) (*model.TenantAddress, error) {
-	res, err := ec.unmarshalInputTenantAddress(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) marshalNTenantData2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantData(ctx context.Context, sel ast.SelectionSet, v []*model.TenantData) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -17914,11 +19941,6 @@ func (ec *executionContext) marshalNTenantData2ᚕᚖgithubᚗcomᚋengajerest�
 	}
 	wg.Wait()
 	return ret
-}
-
-func (ec *executionContext) unmarshalNTenantDetails2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantDetails(ctx context.Context, v interface{}) (*model.TenantDetails, error) {
-	res, err := ec.unmarshalInputTenantDetails(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -18153,27 +20175,6 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 func (ec *executionContext) unmarshalNdata2githubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐData(ctx context.Context, v interface{}) (model.Data, error) {
 	res, err := ec.unmarshalInputdata(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNsubscription2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscription(ctx context.Context, v interface{}) ([]*model.Subscription, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.Subscription, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOsubscription2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscription(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
 }
 
 func (ec *executionContext) marshalNuser2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
@@ -18422,11 +20423,27 @@ func (ec *executionContext) marshalOSubCategory2ᚖgithubᚗcomᚋengajerestᚋs
 	return ec._SubCategory(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOTenantAddress2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantAddress(ctx context.Context, v interface{}) (*model.TenantAddress, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputTenantAddress(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalOTenantData2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantData(ctx context.Context, sel ast.SelectionSet, v *model.TenantData) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._TenantData(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOTenantDetails2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantDetails(ctx context.Context, v interface{}) (*model.TenantDetails, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputTenantDetails(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
@@ -18885,6 +20902,20 @@ func (ec *executionContext) marshalOgetalllocations2ᚖgithubᚗcomᚋengajerest
 	return ec._getalllocations(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOgetallmoduledata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetallmoduledata(ctx context.Context, sel ast.SelectionSet, v *model.Getallmoduledata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._getallmoduledata(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOgetallpromodata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetallpromodata(ctx context.Context, sel ast.SelectionSet, v *model.Getallpromodata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._getallpromodata(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOgetnonsubscribeddata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetnonsubscribeddata(ctx context.Context, sel ast.SelectionSet, v *model.Getnonsubscribeddata) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -18918,6 +20949,38 @@ func (ec *executionContext) marshalOinfo2ᚖgithubᚗcomᚋengajerestᚋsparkle�
 		return graphql.Null
 	}
 	return ec._info(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOinitialsubscribe2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐInitialsubscribe(ctx context.Context, v interface{}) ([]*model.Initialsubscribe, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Initialsubscribe, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOinitialsubscribe2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐInitialsubscribe(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOinitialsubscribe2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐInitialsubscribe(ctx context.Context, v interface{}) (*model.Initialsubscribe, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputinitialsubscribe(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOlocation2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐLocation(ctx context.Context, v interface{}) (*model.Location, error) {
@@ -19037,6 +21100,53 @@ func (ec *executionContext) unmarshalOlocstatus2ᚖgithubᚗcomᚋengajerestᚋs
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOmod2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐMod(ctx context.Context, sel ast.SelectionSet, v []*model.Mod) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOmod2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐMod(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOmod2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐMod(ctx context.Context, sel ast.SelectionSet, v *model.Mod) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._mod(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOothercharge2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐOthercharge(ctx context.Context, sel ast.SelectionSet, v []*model.Othercharge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -19129,6 +21239,53 @@ func (ec *executionContext) marshalOpaymentdata2ᚖgithubᚗcomᚋengajerestᚋs
 		return graphql.Null
 	}
 	return ec._paymentdata(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOpromo2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromo(ctx context.Context, sel ast.SelectionSet, v []*model.Promo) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOpromo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromo(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOpromo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromo(ctx context.Context, sel ast.SelectionSet, v *model.Promo) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._promo(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOpromoinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromoinput(ctx context.Context, v interface{}) (*model.Promoinput, error) {
@@ -19264,19 +21421,43 @@ func (ec *executionContext) unmarshalOsocialupdatedata2ᚖgithubᚗcomᚋengajer
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalOsubcatinsertdata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcatinsertdata(ctx context.Context, v interface{}) ([]*model.Subcatinsertdata, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Subcatinsertdata, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOsubcatinsertdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcatinsertdata(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOsubcatinsertdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcatinsertdata(ctx context.Context, v interface{}) (*model.Subcatinsertdata, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputsubcatinsertdata(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalOsubscribedData2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscribedData(ctx context.Context, sel ast.SelectionSet, v *model.SubscribedData) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._subscribedData(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOsubscription2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscription(ctx context.Context, v interface{}) (*model.Subscription, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputsubscription(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOsubscriptionnew2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscriptionnew(ctx context.Context, v interface{}) ([]*model.Subscriptionnew, error) {

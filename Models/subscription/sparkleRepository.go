@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -22,9 +23,9 @@ const (
 	getAllCategoryQuery            = "SELECT categoryid,categoryname,categorytype,sortorder,status FROM app_category WHERE STATUS='Active'"
 	getAllSubCategoryQuery         = "SELECT  subcategoryid,categorytypeid,categoryid,subcategoryname,status,icon FROM app_subcategory WHERE statuscode=1"
 	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(c.promocodeid,0) AS promocodeid,IFNULL(c.promoname ,'') AS promoname,IFNULL(c.promodescription,'') AS promodescription,IFNULL(c.packageexpiry,0) AS packageexpiry,IFNULL(c.promotype ,'') AS promotype,IFNULL(c.promovalue,0) AS promovalue,IFNULL(c.validity,'') AS validity,IF(c.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid LEFT OUTER JOIN  app_promocodes c ON a.packageid=c.packageid WHERE a.`status`='Active' "
-	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,registrationno,tenantname,primaryemail,primarycontact,bizcategoryid,bizsubcategoryid,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,moduleid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid,promoid,promoprice,promostatus,validitydate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,partnerid,moduleid,categoryid,subcategoryid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid,promoid,promoprice,promostatus,validitydate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid,b.subscriptionid, c.name ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND  a.tenantid=?"
 	createLocationQuery            = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	updatelocation                 = "UPDATE tenantlocations SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
@@ -60,8 +61,128 @@ const (
 	getbusinessforassist           = "SELECT a.tenantid,IFNULL(a.brandname,'') AS brandname,IFNULL(a.tenantinfo,'') AS tenantinfo,IFNULL(a.paymode1,0) AS paymode1,IFNULL(a.paymode2,0) AS paymode2,IFNULL(a.tenantaccid,0) AS tenantaccid,IFNULL(a.address,'') AS address,IFNULL(a.primaryemail,'') AS primaryemail,IFNULL(a.primarycontact,'') AS  primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage,IFNULL(b.moduleid,0) AS moduleid,IFNULL(d.modulename,'') AS modulename FROM tenants a, tenantsubscription b , app_category c, app_module d WHERE a.tenantid=b.tenantid AND b.moduleid=d.moduleid AND c.categoryid=d.categoryid AND a.tenantid=? AND  c.categoryid=?"
 	updateinitial1                 = "UPDATE tenants SET brandname=?,tenantinfo=?,tenantimage=? WHERE tenantid=?"
 	updateinitial2                 = "UPDATE tenantlocations SET opentime=?,closetime=? WHERE tenantid=? AND locationid=?"
-	deletesocial = "DELETE FROM tenantsocial WHERE socialid=?"
+	deletesocial                   = "DELETE FROM tenantsocial WHERE socialid=?"
+	getmodules                     = "SELECT moduleid,categoryid,modulename,content,IFNULL(logourl,'') AS logourl,IFNULL(iconurl,'') AS iconurl FROM app_module WHERE STATUS='Active' AND categoryid=?"
+	getpromo                       = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active' AND moduleid=?"
+	insertsubcategory = "INSERT INTO tenantsubcategories (tenantid,moduleid,categoryid,subcategoryid,subcategoryname) VALUES(?,?,?,?,?)"
 )
+
+func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, error) {
+	var tenantid int64
+	var locationid int64
+	var subcatid int64
+	var err error
+	var data SubscribedData
+	tx, err := database.Db.Begin()
+	if err != nil {
+		return false, nil, err
+	}
+
+	{
+		print("entry in tenants")
+		stmt, err := tx.Prepare(insertTenantInfoQuery)
+		if err != nil {
+			tx.Rollback()
+			return false, nil, err
+		}
+		defer stmt.Close()
+
+		res, err := stmt.Exec(&s.Userid, &s.Partnerid, &s.Regno, &s.Name, &s.Email, &s.Mobile,
+			&s.Address, &s.State, &s.Suburb, &s.Latitude, &s.Longitude, &s.Zip, &s.Countrycode,
+			&s.TimeZone, &s.CurrencyCode, &s.Tenanttoken)
+		if err != nil {
+			tx.Rollback() // return an error too, we may want to wrap them
+			return false, nil, err
+		}
+		tenantid, err = res.LastInsertId()
+		print("tenantid=", tenantid)
+	}
+
+	{
+		print("entry in location")
+		stmt, err := tx.Prepare(insertTenantLocationQuery)
+		if err != nil {
+			tx.Rollback()
+			return false, nil, err
+		}
+		defer stmt.Close()
+
+		res, err := stmt.Exec(tenantid, &s.Name, &s.Email,
+			&s.Mobile, &s.Address, &s.State,
+			&s.Suburb, &s.Latitude, &s.Longitude,
+			&s.Zip, &s.Countrycode, &s.OpenTime,
+			&s.CloseTime, &s.Userid)
+		if err != nil {
+			tx.Rollback() // return an error too, we may want to wrap them
+			return false, nil, err
+		}
+		locationid, err = res.LastInsertId()
+		print("locationid=", locationid)
+	}
+	datalist := s.Tenantsubscribe
+	if len(datalist) != 0 {
+		var a TenantSubscription
+		for i := 0; i < len(datalist); i++ {
+			a.Currencyid = datalist[i].Currencyid
+			a.Partnerid = datalist[i].Partnerid
+			a.Date = datalist[i].Date
+			a.Moduleid = datalist[i].Moduleid
+			a.PaymentId = datalist[i].PaymentId
+			a.PaymentStatus = datalist[i].PaymentStatus
+			a.Price = datalist[i].Price
+			a.Quantity = datalist[i].Quantity
+			a.TaxId = datalist[i].TaxId
+			a.TaxAmount = datalist[i].TaxAmount
+			a.TotalAmount = datalist[i].TotalAmount
+			a.Packageid = datalist[i].Packageid
+			a.Promoid = datalist[i].Promoid
+			a.Promovalue = datalist[i].Promovalue
+			a.Validitydate = datalist[i].Validitydate
+			a.Promostatus = true
+			{
+				print("entry in subscription")
+				stmt, err := tx.Prepare(insertTenantSubscription)
+				if err != nil {
+					tx.Rollback()
+					return false, nil, err
+				}
+				defer stmt.Close()
+				if _, err := stmt.Exec(tenantid, &a.Date, &a.Packageid, &a.Partnerid, &a.Moduleid,
+					&s.Categoryid, &s.SubCategoryid,
+					&a.Currencyid, &a.Price, &a.Quantity, &a.TaxId, &a.TaxAmount,
+					&a.TotalAmount, &a.PaymentStatus, &a.PaymentId, &a.Promoid,
+					&a.Promovalue, &a.Promostatus, &a.Validitydate); err != nil {
+					tx.Rollback() // return an error too, we may want to wrap them
+					return false, nil, err
+				}
+			}
+		}
+	
+	}
+	{
+		print("entry in subcat")
+		stmt, err := tx.Prepare(insertsubcategory)
+		if err != nil {
+			tx.Rollback()
+			return false, nil, err
+		}
+		defer stmt.Close()
+
+		res, err := stmt.Exec(tenantid,&s.Tenantsubscribe[0].Moduleid,&s.Categoryid,&s.SubCategoryid,&s.Subcategoryname)
+		if err != nil {
+			tx.Rollback() // return an error too, we may want to wrap them
+			return false, nil, err
+		}
+		subcatid, err = res.LastInsertId()
+		print("subcat=", subcatid)
+	}
+
+	data.TenantID = int(tenantid)
+	data.Locationid = int(locationid)
+
+	tx.Commit()
+	return true, &data, nil
+}
 
 func GetAllCategory() []Category {
 	print("st1c")
@@ -233,7 +354,7 @@ func (info *TenantSubscription) InsertSubscription(tenantid int64) int64 {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(tenantid, &info.Date, &info.PackageId, &info.ModuleId, &info.CurrencyId, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
+	res, err := statement.Exec(tenantid, &info.Date, &info.Packageid,&info.Partnerid,&info.Moduleid,&info.Categoryid,&info.SubCategoryid, &info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
 		&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate)
 	if err != nil {
 		log.Fatal(err)
@@ -272,6 +393,32 @@ func (info *SubscribedData) GetSubscribedData(tenantid int64) []SubscribedData {
 	}
 
 	return paylist
+}
+func (info *SubscribedData) GetInitialSubscribedData(tenantid int64) *SubscribedData {
+	print("st1c")
+	stmt, err := database.Db.Prepare(getSubscribedDataQuery)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	row := stmt.QueryRow(tenantid)
+	// print(row)
+	var p SubscribedData
+	err = row.Scan(&p.TenantID, &p.TenantName, &p.ModuleID, &p.Subscriptionid, &p.ModuleName, &p.Locationid, &p.Locationname)
+	print(err)
+	fmt.Println("2")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("no rows found")
+		} else {
+			log.Fatal(err)
+		}
+	}
+	// fmt.Println(user)
+
+	fmt.Println("completed")
+
+	return &p
 }
 
 func Payments(tenantid, typeid int) []Payment {
@@ -900,6 +1047,59 @@ func Getchargetypes() []*model.Chargetype {
 	return data
 
 }
+
+func Getmodules(catid int) []*model.Mod {
+
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+
+	var data []*model.Mod
+if catid!=0{
+	DB.Table("app_module").Where("status='Active' and categoryid=?", catid).Find(&data)
+}else{
+	DB.Table("app_module").Where("status='Active'").Find(&data)
+}
+
+
+	fmt.Println(data)
+
+	return data
+
+}
+
+func Getpromos(moduleid int) []*model.Promo {
+
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+	var q1 string
+	n1 := int64(moduleid)
+	mod := strconv.FormatInt(n1, 10)
+	if moduleid!=0{
+		q1 = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active' AND moduleid=" + mod
+	}else{
+		q1 = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active'"
+	}
+
+	var data []*model.Promo
+
+	DB.Raw(q1).Find(&data)
+
+	fmt.Println(data)
+
+	return data
+
+}
+
 func (o *Ordersequence) Insertsequence() (int64, error) {
 
 	fmt.Println("0")
@@ -1244,4 +1444,32 @@ func (c *Social) Deletesocial() bool {
 	log.Print("Row deleted in social!")
 	return true
 
+}
+
+func (d *TenantSubscription) Insertsubcategory() (int64, error) {
+
+	fmt.Println("0")
+
+	statement, err := database.Db.Prepare(insertsubcategory)
+	print(statement)
+	fmt.Println("1")
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+	defer statement.Close()
+
+	fmt.Println("2")
+	res, err := statement.Exec(&d.Tenantid,&d.Moduleid,&d.Categoryid,&d.SubCategoryid,&d.Subcategoryname)
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal("Error:", err.Error())
+
+	}
+	log.Print("Row inserted in subcat!")
+	return id, nil
 }
