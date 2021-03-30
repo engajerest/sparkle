@@ -130,7 +130,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetBusiness      func(childComplexity int, tenantid int, categoryid int) int
-		Getallmodule     func(childComplexity int, categoryid int) int
+		Getallmodule     func(childComplexity int, categoryid int, tenantid int) int
 		Getallpromos     func(childComplexity int, moduleid int) int
 		Getchargetypes   func(childComplexity int) int
 		Getlocationbyid  func(childComplexity int, tenantid int, locationid int) int
@@ -313,12 +313,16 @@ type ComplexityRoot struct {
 	}
 
 	Mod struct {
+		Amount     func(childComplexity int) int
+		Baseprice  func(childComplexity int) int
 		Categoryid func(childComplexity int) int
 		Content    func(childComplexity int) int
 		Iconurl    func(childComplexity int) int
 		Logourl    func(childComplexity int) int
 		Moduleid   func(childComplexity int) int
 		Modulename func(childComplexity int) int
+		Taxamount  func(childComplexity int) int
+		Taxpercent func(childComplexity int) int
 	}
 
 	Othercharge struct {
@@ -353,10 +357,14 @@ type ComplexityRoot struct {
 	}
 
 	Promo struct {
+		Address          func(childComplexity int) int
+		City             func(childComplexity int) int
+		Companyname      func(childComplexity int) int
 		Moduleid         func(childComplexity int) int
 		Packageexpiry    func(childComplexity int) int
 		Packageid        func(childComplexity int) int
 		Partnerid        func(childComplexity int) int
+		Postcode         func(childComplexity int) int
 		Promocodeid      func(childComplexity int) int
 		Promodescription func(childComplexity int) int
 		Promoname        func(childComplexity int) int
@@ -495,7 +503,7 @@ type QueryResolver interface {
 	Getpayments(ctx context.Context, tenantid int, typeid int) (*model.Getpaymentdata, error)
 	Getsubscriptions(ctx context.Context, tenantid int) (*model.Getsubscriptionsdata, error)
 	Getnonsubscribed(ctx context.Context, tenantid int) (*model.Getnonsubscribeddata, error)
-	Getallmodule(ctx context.Context, categoryid int) (*model.Getallmoduledata, error)
+	Getallmodule(ctx context.Context, categoryid int, tenantid int) (*model.Getallmoduledata, error)
 	Getallpromos(ctx context.Context, moduleid int) (*model.Getallpromodata, error)
 }
 
@@ -1049,7 +1057,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Getallmodule(childComplexity, args["categoryid"].(int)), true
+		return e.complexity.Query.Getallmodule(childComplexity, args["categoryid"].(int), args["tenantid"].(int)), true
 
 	case "Query.getallpromos":
 		if e.complexity.Query.Getallpromos == nil {
@@ -1945,6 +1953,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Locationgetall.Tenantusers(childComplexity), true
 
+	case "mod.Amount":
+		if e.complexity.Mod.Amount == nil {
+			break
+		}
+
+		return e.complexity.Mod.Amount(childComplexity), true
+
+	case "mod.Baseprice":
+		if e.complexity.Mod.Baseprice == nil {
+			break
+		}
+
+		return e.complexity.Mod.Baseprice(childComplexity), true
+
 	case "mod.Categoryid":
 		if e.complexity.Mod.Categoryid == nil {
 			break
@@ -1986,6 +2008,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mod.Modulename(childComplexity), true
+
+	case "mod.Taxamount":
+		if e.complexity.Mod.Taxamount == nil {
+			break
+		}
+
+		return e.complexity.Mod.Taxamount(childComplexity), true
+
+	case "mod.Taxpercent":
+		if e.complexity.Mod.Taxpercent == nil {
+			break
+		}
+
+		return e.complexity.Mod.Taxpercent(childComplexity), true
 
 	case "othercharge.Chargeid":
 		if e.complexity.Othercharge.Chargeid == nil {
@@ -2162,6 +2198,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Paymentdata.Transactiondate(childComplexity), true
 
+	case "promo.Address":
+		if e.complexity.Promo.Address == nil {
+			break
+		}
+
+		return e.complexity.Promo.Address(childComplexity), true
+
+	case "promo.City":
+		if e.complexity.Promo.City == nil {
+			break
+		}
+
+		return e.complexity.Promo.City(childComplexity), true
+
+	case "promo.Companyname":
+		if e.complexity.Promo.Companyname == nil {
+			break
+		}
+
+		return e.complexity.Promo.Companyname(childComplexity), true
+
 	case "promo.Moduleid":
 		if e.complexity.Promo.Moduleid == nil {
 			break
@@ -2189,6 +2246,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Promo.Partnerid(childComplexity), true
+
+	case "promo.Postcode":
+		if e.complexity.Promo.Postcode == nil {
+			break
+		}
+
+		return e.complexity.Promo.Postcode(childComplexity), true
 
 	case "promo.Promocodeid":
 		if e.complexity.Promo.Promocodeid == nil {
@@ -3343,6 +3407,10 @@ type mod{
  Moduleid:Int!
 	Categoryid:Int!
 	Modulename:String!
+   Baseprice:String!
+   Taxpercent:Int!
+   Taxamount:String!
+   Amount:String!
 	Content:String!
 	Logourl:String!
 	Iconurl:String!
@@ -3365,6 +3433,10 @@ Promotype:String!
 Promovalue:String!
 Validity:String!
 Validitystatus:Boolean!
+Companyname:String!
+Address:String!
+City:String!
+Postcode:String!
 }
 type Query {
  sparkle: Sparkle!
@@ -3378,7 +3450,7 @@ type Query {
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
  getnonsubscribed(tenantid:Int!):getnonsubscribeddata
- getallmodule(categoryid:Int!):getallmoduledata
+ getallmodule(categoryid:Int!,tenantid:Int!):getallmoduledata
  getallpromos(moduleid:Int!):getallpromodata
 
 }
@@ -3651,6 +3723,15 @@ func (ec *executionContext) field_Query_getallmodule_args(ctx context.Context, r
 		}
 	}
 	args["categoryid"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["tenantid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantid"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tenantid"] = arg1
 	return args, nil
 }
 
@@ -6558,7 +6639,7 @@ func (ec *executionContext) _Query_getallmodule(ctx context.Context, field graph
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Getallmodule(rctx, args["categoryid"].(int))
+		return ec.resolvers.Query().Getallmodule(rctx, args["categoryid"].(int), args["tenantid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11680,6 +11761,146 @@ func (ec *executionContext) _mod_Modulename(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _mod_Baseprice(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Baseprice, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _mod_Taxpercent(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Taxpercent, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _mod_Taxamount(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Taxamount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _mod_Amount(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _mod_Content(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -13031,6 +13252,146 @@ func (ec *executionContext) _promo_Validitystatus(ctx context.Context, field gra
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Companyname(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Companyname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Address(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Address, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_City(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.City, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _promo_Postcode(ctx context.Context, field graphql.CollectedField, obj *model.Promo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "promo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Postcode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _promotioncreateddata_status(ctx context.Context, field graphql.CollectedField, obj *model.Promotioncreateddata) (ret graphql.Marshaler) {
@@ -18899,6 +19260,26 @@ func (ec *executionContext) _mod(ctx context.Context, sel ast.SelectionSet, obj 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "Baseprice":
+			out.Values[i] = ec._mod_Baseprice(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Taxpercent":
+			out.Values[i] = ec._mod_Taxpercent(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Taxamount":
+			out.Values[i] = ec._mod_Taxamount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Amount":
+			out.Values[i] = ec._mod_Amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Content":
 			out.Values[i] = ec._mod_Content(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -19145,6 +19526,26 @@ func (ec *executionContext) _promo(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "Validitystatus":
 			out.Values[i] = ec._promo_Validitystatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Companyname":
+			out.Values[i] = ec._promo_Companyname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Address":
+			out.Values[i] = ec._promo_Address(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "City":
+			out.Values[i] = ec._promo_City(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Postcode":
+			out.Values[i] = ec._promo_Postcode(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

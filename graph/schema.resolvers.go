@@ -1007,7 +1007,7 @@ func (r *queryResolver) Getnonsubscribed(ctx context.Context, tenantid int) (*mo
 	return &model.Getnonsubscribeddata{Status: true, Code: http.StatusCreated, Message: "Success", Nonsubscribed: pack}, nil
 }
 
-func (r *queryResolver) Getallmodule(ctx context.Context, categoryid int) (*model.Getallmoduledata, error) {
+func (r *queryResolver) Getallmodule(ctx context.Context, categoryid int, tenantid int) (*model.Getallmoduledata, error) {
 	id, usererr := helper.ForSparkleContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
@@ -1016,7 +1016,7 @@ func (r *queryResolver) Getallmodule(ctx context.Context, categoryid int) (*mode
 	print(id.ID)
 	var mods []*model.Mod
 
-	mods = subscription.Getmodules(categoryid)
+	mods = subscription.Getmodules(categoryid, tenantid)
 	return &model.Getallmoduledata{Status: true, Code: http.StatusOK, Message: "Success", Modules: mods}, nil
 }
 
@@ -1029,6 +1029,7 @@ func (r *queryResolver) Getallpromos(ctx context.Context, moduleid int) (*model.
 	print(id.ID)
 	var data []*model.Promo
 	data = subscription.Getpromos(moduleid)
+
 	return &model.Getallpromodata{Status: true, Code: http.StatusOK, Message: "Success", Promos: data}, nil
 }
 

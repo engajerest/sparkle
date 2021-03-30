@@ -403,6 +403,10 @@ type Mod struct {
 	Moduleid   int    `json:"Moduleid"`
 	Categoryid int    `json:"Categoryid"`
 	Modulename string `json:"Modulename"`
+	Baseprice  string `json:"Baseprice"`
+	Taxpercent int    `json:"Taxpercent"`
+	Taxamount  string `json:"Taxamount"`
+	Amount     string `json:"Amount"`
 	Content    string `json:"Content"`
 	Logourl    string `json:"Logourl"`
 	Iconurl    string `json:"Iconurl"`
@@ -451,6 +455,10 @@ type Promo struct {
 	Promovalue       string `json:"Promovalue"`
 	Validity         string `json:"Validity"`
 	Validitystatus   bool   `json:"Validitystatus"`
+	Companyname      string `json:"Companyname"`
+	Address          string `json:"Address"`
+	City             string `json:"City"`
+	Postcode         string `json:"Postcode"`
 }
 
 type Promoinput struct {

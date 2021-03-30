@@ -64,7 +64,7 @@ const (
 	deletesocial                   = "DELETE FROM tenantsocial WHERE socialid=?"
 	getmodules                     = "SELECT moduleid,categoryid,modulename,content,IFNULL(logourl,'') AS logourl,IFNULL(iconurl,'') AS iconurl FROM app_module WHERE STATUS='Active' AND categoryid=?"
 	getpromo                       = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active' AND moduleid=?"
-	insertsubcategory = "INSERT INTO tenantsubcategories (tenantid,moduleid,categoryid,subcategoryid,subcategoryname) VALUES(?,?,?,?,?)"
+	insertsubcategory              = "INSERT INTO tenantsubcategories (tenantid,moduleid,categoryid,subcategoryid,subcategoryname) VALUES(?,?,?,?,?)"
 )
 
 func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, error) {
@@ -157,7 +157,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 				}
 			}
 		}
-	
+
 	}
 	{
 		print("entry in subcat")
@@ -168,7 +168,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 		}
 		defer stmt.Close()
 
-		res, err := stmt.Exec(tenantid,&s.Tenantsubscribe[0].Moduleid,&s.Categoryid,&s.SubCategoryid,&s.Subcategoryname)
+		res, err := stmt.Exec(tenantid, &s.Tenantsubscribe[0].Moduleid, &s.Categoryid, &s.SubCategoryid, &s.Subcategoryname)
 		if err != nil {
 			tx.Rollback() // return an error too, we may want to wrap them
 			return false, nil, err
@@ -354,7 +354,7 @@ func (info *TenantSubscription) InsertSubscription(tenantid int64) int64 {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(tenantid, &info.Date, &info.Packageid,&info.Partnerid,&info.Moduleid,&info.Categoryid,&info.SubCategoryid, &info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
+	res, err := statement.Exec(tenantid, &info.Date, &info.Packageid, &info.Partnerid, &info.Moduleid, &info.Categoryid, &info.SubCategoryid, &info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
 		&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate)
 	if err != nil {
 		log.Fatal(err)
@@ -1048,7 +1048,7 @@ func Getchargetypes() []*model.Chargetype {
 
 }
 
-func Getmodules(catid int) []*model.Mod {
+func Getmodules(catid, tenantid int) []*model.Mod {
 
 	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
 	if err != nil {
@@ -1059,12 +1059,21 @@ func Getmodules(catid int) []*model.Mod {
 	}
 
 	var data []*model.Mod
-if catid!=0{
-	DB.Table("app_module").Where("status='Active' and categoryid=?", catid).Find(&data)
-}else{
-	DB.Table("app_module").Where("status='Active'").Find(&data)
-}
+	if catid != 0 && tenantid == 0 {
+		print("con1")
+		DB.Table("app_module").Where("status='Active' and categoryid=?", catid).Find(&data)
+	} else if catid == 0 && tenantid != 0 {
+		print("con2")
+		var q1 string
+		n1 := int64(tenantid)
+	tenant := strconv.FormatInt(n1, 10)
+		q1 = " SELECT moduleid,categoryid,modulename,baseprice,taxpercent,taxamount,amount,IFNULL(content,'') AS content,IFNULL(logourl,'') AS logourl,IFNULL(iconurl,'') AS iconurl FROM app_module WHERE STATUS ='Active' and categoryid NOT IN (SELECT categoryid FROM tenantsubcategories WHERE tenantid= "+ tenant +" )"
+		DB.Raw(q1).Find(&data)
+	} else {
+		print("con3")
 
+		DB.Table("app_module").Where("status='Active'").Find(&data)
+	}
 
 	fmt.Println(data)
 
@@ -1084,10 +1093,10 @@ func Getpromos(moduleid int) []*model.Promo {
 	var q1 string
 	n1 := int64(moduleid)
 	mod := strconv.FormatInt(n1, 10)
-	if moduleid!=0{
-		q1 = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active' AND moduleid=" + mod
-	}else{
-		q1 = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active'"
+	if moduleid != 0 {
+		q1 = "SELECT IFNULL(a.promocodeid,0) AS promocodeid,a.moduleid,a.partnerid,a.packageid, IFNULL(a.promoname,'') AS promoname, IFNULL(a.promodescription,'') AS promodescription, IFNULL(a.packageexpiry,0) AS packageexpiry, IFNULL(a.promotype,'') AS promotype, IFNULL(a.promovalue,0) AS promovalue, IFNULL(a.validity,'') AS validity,IF(a.validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus, b.companyname,b.address,b.city,b.postcode FROM app_promocodes a, partnerinfo b WHERE a.STATUS='Active' AND a.moduleid="+ mod +" GROUP BY a.partnerid"
+	} else {
+		q1 = "SELECT IFNULL(a.promocodeid,0) AS promocodeid,a.moduleid,a.partnerid,a.packageid, IFNULL(a.promoname,'') AS promoname, IFNULL(a.promodescription,'') AS promodescription, IFNULL(a.packageexpiry,0) AS packageexpiry, IFNULL(a.promotype,'') AS promotype, IFNULL(a.promovalue,0) AS promovalue, IFNULL(a.validity,'') AS validity,IF(a.validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus, b.companyname,b.address,b.city,b.postcode FROM app_promocodes a, partnerinfo b WHERE a.STATUS='Active'  GROUP BY a.partnerid"
 	}
 
 	var data []*model.Promo
@@ -1460,7 +1469,7 @@ func (d *TenantSubscription) Insertsubcategory() (int64, error) {
 	defer statement.Close()
 
 	fmt.Println("2")
-	res, err := statement.Exec(&d.Tenantid,&d.Moduleid,&d.Categoryid,&d.SubCategoryid,&d.Subcategoryname)
+	res, err := statement.Exec(&d.Tenantid, &d.Moduleid, &d.Categoryid, &d.SubCategoryid, &d.Subcategoryname)
 	if err != nil {
 		log.Fatal(err)
 

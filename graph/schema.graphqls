@@ -604,6 +604,10 @@ type mod{
  Moduleid:Int!
 	Categoryid:Int!
 	Modulename:String!
+   Baseprice:String!
+   Taxpercent:Int!
+   Taxamount:String!
+   Amount:String!
 	Content:String!
 	Logourl:String!
 	Iconurl:String!
@@ -626,6 +630,10 @@ Promotype:String!
 Promovalue:String!
 Validity:String!
 Validitystatus:Boolean!
+Companyname:String!
+Address:String!
+City:String!
+Postcode:String!
 }
 type Query {
  sparkle: Sparkle!
@@ -639,7 +647,7 @@ type Query {
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
  getnonsubscribed(tenantid:Int!):getnonsubscribeddata
- getallmodule(categoryid:Int!):getallmoduledata
+ getallmodule(categoryid:Int!,tenantid:Int!):getallmoduledata
  getallpromos(moduleid:Int!):getallpromodata
 
 }
