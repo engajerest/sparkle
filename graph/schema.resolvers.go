@@ -90,8 +90,8 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 			print(err)
 			print("seqid2==", seqid2)
 		}
-		auth.LocationId=tenantdata.Locationid
-		auth.TenantID=tenantdata.TenantID
+		auth.LocationId = tenantdata.Locationid
+		auth.TenantID = tenantdata.TenantID
 		status := auth.UpdateAuthUser(id.ID)
 		print(status)
 		if status != true {
@@ -106,7 +106,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	if len(response) != 0 {
 		for _, k := range response {
 			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
-				Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+			Categoryid: k.Categoryid,Subcategoryid: k.Subcategoryid,	Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 	return &model.SubscribedData{
@@ -572,7 +572,7 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 	if len(list1) != 0 {
 		for _, k := range list1 {
 			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
-				Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+				Categoryid: k.Categoryid,Subcategoryid: k.Subcategoryid,	Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 

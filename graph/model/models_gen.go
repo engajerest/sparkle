@@ -108,6 +108,8 @@ type TenantData struct {
 	Subscriptionid int    `json:"Subscriptionid"`
 	Locationid     int    `json:"Locationid"`
 	Locationname   string `json:"Locationname"`
+	Categoryid     int    `json:"Categoryid"`
+	Subcategoryid  int    `json:"Subcategoryid"`
 }
 
 type TenantDetails struct {

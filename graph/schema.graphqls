@@ -85,6 +85,8 @@ type TenantData{
  Subscriptionid:Int!
  Locationid:Int!
  Locationname:String!
+ Categoryid:Int!
+ Subcategoryid:Int!
 }
 type subscribedData{
  status:Boolean!

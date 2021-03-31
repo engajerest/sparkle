@@ -26,7 +26,7 @@ const (
 	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,partnerid,moduleid,categoryid,subcategoryid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid,promoid,promoprice,promostatus,validitydate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid,b.subscriptionid, c.name ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND  a.tenantid=?"
+	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid,b.subscriptionid,b.categoryid,b.subcategoryid, c.name ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND  a.tenantid=?"
 	createLocationQuery            = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	updatelocation                 = "UPDATE tenantlocations SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
 	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocations WHERE status='Active' AND locationid=? "
@@ -382,7 +382,7 @@ func (info *SubscribedData) GetSubscribedData(tenantid int64) []SubscribedData {
 
 	for rows.Next() {
 		var p SubscribedData
-		err := rows.Scan(&p.TenantID, &p.TenantName, &p.ModuleID, &p.Subscriptionid, &p.ModuleName, &p.Locationid, &p.Locationname)
+		err := rows.Scan(&p.TenantID, &p.TenantName, &p.ModuleID, &p.Subscriptionid,&p.Categoryid,&p.Subcategoryid, &p.ModuleName, &p.Locationid, &p.Locationname)
 		if err != nil {
 			log.Fatal(err)
 		}

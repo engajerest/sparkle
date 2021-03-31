@@ -129,6 +129,8 @@ type SubscribedData struct {
 	Subscriptionid int    `json:"subscriptionid"`
 	Locationid     int    `json:"locationid"`
 	Locationname   string `json:"locationname"`
+	Subcategoryid int `json:"subcategoryid"`
+	Categoryid int `json:"categoryid"`
 }
 
 type TenantUser struct {

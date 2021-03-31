@@ -161,10 +161,12 @@ type ComplexityRoot struct {
 	}
 
 	TenantData struct {
+		Categoryid     func(childComplexity int) int
 		Locationid     func(childComplexity int) int
 		Locationname   func(childComplexity int) int
 		Moduleid       func(childComplexity int) int
 		Modulename     func(childComplexity int) int
+		Subcategoryid  func(childComplexity int) int
 		Subscriptionid func(childComplexity int) int
 		TenantID       func(childComplexity int) int
 		TenantName     func(childComplexity int) int
@@ -1246,6 +1248,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SubCategory.Type(childComplexity), true
 
+	case "TenantData.Categoryid":
+		if e.complexity.TenantData.Categoryid == nil {
+			break
+		}
+
+		return e.complexity.TenantData.Categoryid(childComplexity), true
+
 	case "TenantData.Locationid":
 		if e.complexity.TenantData.Locationid == nil {
 			break
@@ -1273,6 +1282,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TenantData.Modulename(childComplexity), true
+
+	case "TenantData.Subcategoryid":
+		if e.complexity.TenantData.Subcategoryid == nil {
+			break
+		}
+
+		return e.complexity.TenantData.Subcategoryid(childComplexity), true
 
 	case "TenantData.Subscriptionid":
 		if e.complexity.TenantData.Subscriptionid == nil {
@@ -2888,6 +2904,8 @@ type TenantData{
  Subscriptionid:Int!
  Locationid:Int!
  Locationname:String!
+ Categoryid:Int!
+ Subcategoryid:Int!
 }
 type subscribedData{
  status:Boolean!
@@ -7356,6 +7374,76 @@ func (ec *executionContext) _TenantData_Locationname(ctx context.Context, field 
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TenantData_Categoryid(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TenantData",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Categoryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TenantData_Subcategoryid(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TenantData",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subcategoryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -18232,6 +18320,16 @@ func (ec *executionContext) _TenantData(ctx context.Context, sel ast.SelectionSe
 			}
 		case "Locationname":
 			out.Values[i] = ec._TenantData_Locationname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Categoryid":
+			out.Values[i] = ec._TenantData_Categoryid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Subcategoryid":
+			out.Values[i] = ec._TenantData_Subcategoryid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
