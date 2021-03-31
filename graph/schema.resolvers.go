@@ -90,6 +90,8 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 			print(err)
 			print("seqid2==", seqid2)
 		}
+		auth.LocationId=tenantdata.Locationid
+		auth.TenantID=tenantdata.TenantID
 		status := auth.UpdateAuthUser(id.ID)
 		print(status)
 		if status != true {
