@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/engajerest/auth/controller"
 	"github.com/engajerest/auth/logger"
 	"github.com/engajerest/auth/utils/dbconfig"
 	"github.com/engajerest/sparkle/controllers"
@@ -36,7 +37,7 @@ func main() {
 
 	router := gin.Default()
 	// router.GET("/locations", controllers.Location)
-	router.Use(controllers.TokenAuthMiddleware(UserContextKey))
+	router.Use(controller.TokenNoAuthMiddleware(UserContextKey))
 
 	dbconfig.InitDB(dbName, userName, password, host)
 	logger.Info("sparkle application started")
