@@ -215,6 +215,7 @@ func GetAllCategory() []Category {
 }
 func GetAllSubCategory() []SubCategory {
 	print("st1s")
+
 	stmt, err := database.Db.Prepare(getAllSubCategoryQuery)
 	if err != nil {
 		log.Fatal(err)
@@ -382,7 +383,7 @@ func (info *SubscribedData) GetSubscribedData(tenantid int64) []SubscribedData {
 
 	for rows.Next() {
 		var p SubscribedData
-		err := rows.Scan(&p.TenantID, &p.TenantName, &p.ModuleID, &p.Subscriptionid,&p.Categoryid,&p.Subcategoryid, &p.ModuleName, &p.Locationid, &p.Locationname)
+		err := rows.Scan(&p.TenantID, &p.TenantName, &p.ModuleID, &p.Subscriptionid, &p.Categoryid, &p.Subcategoryid, &p.ModuleName, &p.Locationid, &p.Locationname)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -1066,8 +1067,8 @@ func Getmodules(catid, tenantid int) []*model.Mod {
 		print("con2")
 		var q1 string
 		n1 := int64(tenantid)
-	tenant := strconv.FormatInt(n1, 10)
-		q1 = " SELECT moduleid,categoryid,modulename,baseprice,taxpercent,taxamount,amount,IFNULL(content,'') AS content,IFNULL(logourl,'') AS logourl,IFNULL(iconurl,'') AS iconurl FROM app_module WHERE STATUS ='Active' and categoryid NOT IN (SELECT categoryid FROM tenantsubcategories WHERE tenantid= "+ tenant +" )"
+		tenant := strconv.FormatInt(n1, 10)
+		q1 = " SELECT moduleid,categoryid,subcategoryid,subcategoryname,modulename,baseprice,taxpercent,taxamount,amount,IFNULL(content,'') AS content,IFNULL(logourl,'') AS logourl,IFNULL(iconurl,'') AS iconurl FROM app_module WHERE STATUS ='Active' and categoryid NOT IN (SELECT categoryid FROM tenantsubcategories WHERE tenantid= " + tenant + " )"
 		DB.Raw(q1).Find(&data)
 	} else {
 		print("con3")
@@ -1094,7 +1095,7 @@ func Getpromos(moduleid int) []*model.Promo {
 	n1 := int64(moduleid)
 	mod := strconv.FormatInt(n1, 10)
 	if moduleid != 0 {
-		q1 = "SELECT IFNULL(a.promocodeid,0) AS promocodeid,a.moduleid,a.partnerid,a.packageid, IFNULL(a.promoname,'') AS promoname, IFNULL(a.promodescription,'') AS promodescription, IFNULL(a.packageexpiry,0) AS packageexpiry, IFNULL(a.promotype,'') AS promotype, IFNULL(a.promovalue,0) AS promovalue, IFNULL(a.validity,'') AS validity,IF(a.validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus, b.companyname,b.address,b.city,b.postcode FROM app_promocodes a, partnerinfo b WHERE a.STATUS='Active' AND a.moduleid="+ mod +" GROUP BY a.partnerid"
+		q1 = "SELECT IFNULL(a.promocodeid,0) AS promocodeid,a.moduleid,a.partnerid,a.packageid, IFNULL(a.promoname,'') AS promoname, IFNULL(a.promodescription,'') AS promodescription, IFNULL(a.packageexpiry,0) AS packageexpiry, IFNULL(a.promotype,'') AS promotype, IFNULL(a.promovalue,0) AS promovalue, IFNULL(a.validity,'') AS validity,IF(a.validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus, b.companyname,b.address,b.city,b.postcode FROM app_promocodes a, partnerinfo b WHERE a.STATUS='Active' AND a.moduleid=" + mod + " GROUP BY a.partnerid"
 	} else {
 		q1 = "SELECT IFNULL(a.promocodeid,0) AS promocodeid,a.moduleid,a.partnerid,a.packageid, IFNULL(a.promoname,'') AS promoname, IFNULL(a.promodescription,'') AS promodescription, IFNULL(a.packageexpiry,0) AS packageexpiry, IFNULL(a.promotype,'') AS promotype, IFNULL(a.promovalue,0) AS promovalue, IFNULL(a.validity,'') AS validity,IF(a.validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus, b.companyname,b.address,b.city,b.postcode FROM app_promocodes a, partnerinfo b WHERE a.STATUS='Active'  GROUP BY a.partnerid"
 	}
@@ -1108,7 +1109,57 @@ func Getpromos(moduleid int) []*model.Promo {
 	return data
 
 }
+func Getsubcatbyid(categoryid int) []*model.Subcat {
 
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+
+	var data []*model.Subcat
+
+	DB.Table("app_subcategory").Where("status='Active' AND categoryid=?", categoryid).Find(&data)
+
+	fmt.Println(data)
+
+	return data
+
+}
+func Gettenantsubcat(moduleid, tenantid, categoryid int) []*model.Tenantsubcat {
+
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+	var q1 string
+	var q2 string
+	var q3 string
+	n1 := int64(moduleid)
+	n2 := int64(tenantid)
+	n3 := int64(categoryid)
+
+	mod := strconv.FormatInt(n1, 10)
+	tent := strconv.FormatInt(n2, 10)
+	cat := strconv.FormatInt(n3, 10)
+
+	q1 = "SELECT subcategoryid,subcategoryname,0 AS selected FROM app_subcategory WHERE categoryid=" + cat + "  AND STATUS='active' AND subcategoryid NOT IN"
+	q2 = "(SELECT subcategoryid FROM tenantsubcategories WHERE tenantid=" + tent + "  AND moduleid=12) UNION"
+	q3 = "  SELECT subcategoryid,subcategoryname,1 AS selected FROM tenantsubcategories WHERE tenantid=" + tent + "  AND moduleid=" + mod + "  AND STATUS='Active'"
+	var data []*model.Tenantsubcat
+
+	DB.Raw(q1 + q2 + q3).Find(&data)
+
+	fmt.Println(data)
+
+	return data
+
+}
 func (o *Ordersequence) Insertsequence() (int64, error) {
 
 	fmt.Println("0")

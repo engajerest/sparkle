@@ -129,19 +129,21 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetBusiness      func(childComplexity int, tenantid int, categoryid int) int
-		Getallmodule     func(childComplexity int, categoryid int, tenantid int) int
-		Getallpromos     func(childComplexity int, moduleid int) int
-		Getchargetypes   func(childComplexity int) int
-		Getlocationbyid  func(childComplexity int, tenantid int, locationid int) int
-		Getnonsubscribed func(childComplexity int, tenantid int) int
-		Getpayments      func(childComplexity int, tenantid int, typeid int) int
-		Getpromotions    func(childComplexity int, tenantid int) int
-		Getpromotypes    func(childComplexity int) int
-		Getsubscriptions func(childComplexity int, tenantid int) int
-		Location         func(childComplexity int, tenantid int) int
-		Sparkle          func(childComplexity int) int
-		Tenantusers      func(childComplexity int, tenantid int) int
+		GetBusiness          func(childComplexity int, tenantid int, categoryid int) int
+		Getallmodule         func(childComplexity int, categoryid int, tenantid int) int
+		Getallpromos         func(childComplexity int, moduleid int) int
+		Getchargetypes       func(childComplexity int) int
+		Getlocationbyid      func(childComplexity int, tenantid int, locationid int) int
+		Getnonsubscribed     func(childComplexity int, tenantid int) int
+		Getpayments          func(childComplexity int, tenantid int, typeid int) int
+		Getpromotions        func(childComplexity int, tenantid int) int
+		Getpromotypes        func(childComplexity int) int
+		Getsubcategorybyid   func(childComplexity int, categoryid int) int
+		Getsubscriptions     func(childComplexity int, tenantid int) int
+		Gettenantsubcategory func(childComplexity int, tenantid int, categoryid int, moduleid int) int
+		Location             func(childComplexity int, tenantid int) int
+		Sparkle              func(childComplexity int) int
+		Tenantusers          func(childComplexity int, tenantid int) int
 	}
 
 	Sparkle struct {
@@ -251,11 +253,25 @@ type ComplexityRoot struct {
 		Status     func(childComplexity int) int
 	}
 
+	Getsubcategorydata struct {
+		Code          func(childComplexity int) int
+		Message       func(childComplexity int) int
+		Status        func(childComplexity int) int
+		Subcategories func(childComplexity int) int
+	}
+
 	Getsubscriptionsdata struct {
 		Code       func(childComplexity int) int
 		Message    func(childComplexity int) int
 		Status     func(childComplexity int) int
 		Subscribed func(childComplexity int) int
+	}
+
+	Gettenantsubcategorydata struct {
+		Code                func(childComplexity int) int
+		Message             func(childComplexity int) int
+		Status              func(childComplexity int) int
+		Tenantsubcategories func(childComplexity int) int
 	}
 
 	Info struct {
@@ -315,16 +331,18 @@ type ComplexityRoot struct {
 	}
 
 	Mod struct {
-		Amount     func(childComplexity int) int
-		Baseprice  func(childComplexity int) int
-		Categoryid func(childComplexity int) int
-		Content    func(childComplexity int) int
-		Iconurl    func(childComplexity int) int
-		Logourl    func(childComplexity int) int
-		Moduleid   func(childComplexity int) int
-		Modulename func(childComplexity int) int
-		Taxamount  func(childComplexity int) int
-		Taxpercent func(childComplexity int) int
+		Amount          func(childComplexity int) int
+		Baseprice       func(childComplexity int) int
+		Categoryid      func(childComplexity int) int
+		Content         func(childComplexity int) int
+		Iconurl         func(childComplexity int) int
+		Logourl         func(childComplexity int) int
+		Moduleid        func(childComplexity int) int
+		Modulename      func(childComplexity int) int
+		Subcategoryid   func(childComplexity int) int
+		Subcategoryname func(childComplexity int) int
+		Taxamount       func(childComplexity int) int
+		Taxpercent      func(childComplexity int) int
 	}
 
 	Othercharge struct {
@@ -396,6 +414,14 @@ type ComplexityRoot struct {
 		Socialprofile func(childComplexity int) int
 	}
 
+	Subcat struct {
+		Categoryid      func(childComplexity int) int
+		Icon            func(childComplexity int) int
+		Status          func(childComplexity int) int
+		Subcategoryid   func(childComplexity int) int
+		Subcategoryname func(childComplexity int) int
+	}
+
 	SubscribedData struct {
 		Code    func(childComplexity int) int
 		Info    func(childComplexity int) int
@@ -422,6 +448,12 @@ type ComplexityRoot struct {
 		Packagename   func(childComplexity int) int
 		Tenantid      func(childComplexity int) int
 		TotalAmount   func(childComplexity int) int
+	}
+
+	Tenantsubcat struct {
+		Selected        func(childComplexity int) int
+		Subcategoryid   func(childComplexity int) int
+		Subcategoryname func(childComplexity int) int
 	}
 
 	Tenantupdatedata struct {
@@ -507,6 +539,8 @@ type QueryResolver interface {
 	Getnonsubscribed(ctx context.Context, tenantid int) (*model.Getnonsubscribeddata, error)
 	Getallmodule(ctx context.Context, categoryid int, tenantid int) (*model.Getallmoduledata, error)
 	Getallpromos(ctx context.Context, moduleid int) (*model.Getallpromodata, error)
+	Getsubcategorybyid(ctx context.Context, categoryid int) (*model.Getsubcategorydata, error)
+	Gettenantsubcategory(ctx context.Context, tenantid int, categoryid int, moduleid int) (*model.Gettenantsubcategorydata, error)
 }
 
 type executableSchema struct {
@@ -1135,6 +1169,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Getpromotypes(childComplexity), true
 
+	case "Query.getsubcategorybyid":
+		if e.complexity.Query.Getsubcategorybyid == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getsubcategorybyid_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Getsubcategorybyid(childComplexity, args["categoryid"].(int)), true
+
 	case "Query.getsubscriptions":
 		if e.complexity.Query.Getsubscriptions == nil {
 			break
@@ -1146,6 +1192,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Getsubscriptions(childComplexity, args["tenantid"].(int)), true
+
+	case "Query.gettenantsubcategory":
+		if e.complexity.Query.Gettenantsubcategory == nil {
+			break
+		}
+
+		args, err := ec.field_Query_gettenantsubcategory_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Gettenantsubcategory(childComplexity, args["tenantid"].(int), args["categoryid"].(int), args["moduleid"].(int)), true
 
 	case "Query.location":
 		if e.complexity.Query.Location == nil {
@@ -1633,6 +1691,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Getpromotiondata.Status(childComplexity), true
 
+	case "getsubcategorydata.code":
+		if e.complexity.Getsubcategorydata.Code == nil {
+			break
+		}
+
+		return e.complexity.Getsubcategorydata.Code(childComplexity), true
+
+	case "getsubcategorydata.message":
+		if e.complexity.Getsubcategorydata.Message == nil {
+			break
+		}
+
+		return e.complexity.Getsubcategorydata.Message(childComplexity), true
+
+	case "getsubcategorydata.status":
+		if e.complexity.Getsubcategorydata.Status == nil {
+			break
+		}
+
+		return e.complexity.Getsubcategorydata.Status(childComplexity), true
+
+	case "getsubcategorydata.subcategories":
+		if e.complexity.Getsubcategorydata.Subcategories == nil {
+			break
+		}
+
+		return e.complexity.Getsubcategorydata.Subcategories(childComplexity), true
+
 	case "getsubscriptionsdata.code":
 		if e.complexity.Getsubscriptionsdata.Code == nil {
 			break
@@ -1660,6 +1746,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Getsubscriptionsdata.Subscribed(childComplexity), true
+
+	case "gettenantsubcategorydata.code":
+		if e.complexity.Gettenantsubcategorydata.Code == nil {
+			break
+		}
+
+		return e.complexity.Gettenantsubcategorydata.Code(childComplexity), true
+
+	case "gettenantsubcategorydata.message":
+		if e.complexity.Gettenantsubcategorydata.Message == nil {
+			break
+		}
+
+		return e.complexity.Gettenantsubcategorydata.Message(childComplexity), true
+
+	case "gettenantsubcategorydata.status":
+		if e.complexity.Gettenantsubcategorydata.Status == nil {
+			break
+		}
+
+		return e.complexity.Gettenantsubcategorydata.Status(childComplexity), true
+
+	case "gettenantsubcategorydata.tenantsubcategories":
+		if e.complexity.Gettenantsubcategorydata.Tenantsubcategories == nil {
+			break
+		}
+
+		return e.complexity.Gettenantsubcategorydata.Tenantsubcategories(childComplexity), true
 
 	case "info.about":
 		if e.complexity.Info.About == nil {
@@ -2024,6 +2138,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mod.Modulename(childComplexity), true
+
+	case "mod.Subcategoryid":
+		if e.complexity.Mod.Subcategoryid == nil {
+			break
+		}
+
+		return e.complexity.Mod.Subcategoryid(childComplexity), true
+
+	case "mod.Subcategoryname":
+		if e.complexity.Mod.Subcategoryname == nil {
+			break
+		}
+
+		return e.complexity.Mod.Subcategoryname(childComplexity), true
 
 	case "mod.Taxamount":
 		if e.complexity.Mod.Taxamount == nil {
@@ -2396,6 +2524,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Socialinfo.Socialprofile(childComplexity), true
 
+	case "subcat.Categoryid":
+		if e.complexity.Subcat.Categoryid == nil {
+			break
+		}
+
+		return e.complexity.Subcat.Categoryid(childComplexity), true
+
+	case "subcat.Icon":
+		if e.complexity.Subcat.Icon == nil {
+			break
+		}
+
+		return e.complexity.Subcat.Icon(childComplexity), true
+
+	case "subcat.Status":
+		if e.complexity.Subcat.Status == nil {
+			break
+		}
+
+		return e.complexity.Subcat.Status(childComplexity), true
+
+	case "subcat.Subcategoryid":
+		if e.complexity.Subcat.Subcategoryid == nil {
+			break
+		}
+
+		return e.complexity.Subcat.Subcategoryid(childComplexity), true
+
+	case "subcat.Subcategoryname":
+		if e.complexity.Subcat.Subcategoryname == nil {
+			break
+		}
+
+		return e.complexity.Subcat.Subcategoryname(childComplexity), true
+
 	case "subscribedData.code":
 		if e.complexity.SubscribedData.Code == nil {
 			break
@@ -2528,6 +2691,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Subscriptionsdata.TotalAmount(childComplexity), true
+
+	case "tenantsubcat.Selected":
+		if e.complexity.Tenantsubcat.Selected == nil {
+			break
+		}
+
+		return e.complexity.Tenantsubcat.Selected(childComplexity), true
+
+	case "tenantsubcat.Subcategoryid":
+		if e.complexity.Tenantsubcat.Subcategoryid == nil {
+			break
+		}
+
+		return e.complexity.Tenantsubcat.Subcategoryid(childComplexity), true
+
+	case "tenantsubcat.Subcategoryname":
+		if e.complexity.Tenantsubcat.Subcategoryname == nil {
+			break
+		}
+
+		return e.complexity.Tenantsubcat.Subcategoryname(childComplexity), true
 
 	case "tenantupdatedata.code":
 		if e.complexity.Tenantupdatedata.Code == nil {
@@ -3424,6 +3608,8 @@ modules:[mod]
 type mod{
  Moduleid:Int!
 	Categoryid:Int!
+   Subcategoryid:Int!
+   Subcategoryname:String!
 	Modulename:String!
    Baseprice:String!
    Taxpercent:Int!
@@ -3456,6 +3642,30 @@ Address:String!
 City:String!
 Postcode:String!
 }
+type getsubcategorydata{
+  status:Boolean!
+code:Int!
+message:String! 
+subcategories:[subcat]   
+}
+type subcat{
+   Subcategoryname:String!
+   Subcategoryid:Int!
+   Categoryid:Int!
+   Status:String!
+   Icon:String!
+}
+type gettenantsubcategorydata{
+status:Boolean!
+code:Int!
+message:String!   
+tenantsubcategories:[tenantsubcat]
+}
+type tenantsubcat{
+   Subcategoryid:Int!
+  Subcategoryname:String!
+  Selected:Int!
+}
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
@@ -3470,6 +3680,9 @@ type Query {
  getnonsubscribed(tenantid:Int!):getnonsubscribeddata
  getallmodule(categoryid:Int!,tenantid:Int!):getallmoduledata
  getallpromos(moduleid:Int!):getallpromodata
+ getsubcategorybyid(categoryid:Int!): getsubcategorydata
+ gettenantsubcategory(tenantid:Int!,categoryid:Int!,moduleid:Int!):gettenantsubcategorydata
+
 
 }
 
@@ -3846,6 +4059,21 @@ func (ec *executionContext) field_Query_getpromotions_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_getsubcategorybyid_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["categoryid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["categoryid"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_getsubscriptions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3858,6 +4086,39 @@ func (ec *executionContext) field_Query_getsubscriptions_args(ctx context.Contex
 		}
 	}
 	args["tenantid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_gettenantsubcategory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["tenantid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tenantid"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["categoryid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryid"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["categoryid"] = arg1
+	var arg2 int
+	if tmp, ok := rawArgs["moduleid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("moduleid"))
+		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["moduleid"] = arg2
 	return args, nil
 }
 
@@ -6708,6 +6969,84 @@ func (ec *executionContext) _Query_getallpromos(ctx context.Context, field graph
 	res := resTmp.(*model.Getallpromodata)
 	fc.Result = res
 	return ec.marshalOgetallpromodata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetallpromodata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getsubcategorybyid(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getsubcategorybyid_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Getsubcategorybyid(rctx, args["categoryid"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Getsubcategorydata)
+	fc.Result = res
+	return ec.marshalOgetsubcategorydata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetsubcategorydata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_gettenantsubcategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_gettenantsubcategory_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Gettenantsubcategory(rctx, args["tenantid"].(int), args["categoryid"].(int), args["moduleid"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Gettenantsubcategorydata)
+	fc.Result = res
+	return ec.marshalOgettenantsubcategorydata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGettenantsubcategorydata(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -10112,6 +10451,143 @@ func (ec *executionContext) _getpromotiondata_promotions(ctx context.Context, fi
 	return ec.marshalOPromotion2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromotion(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _getsubcategorydata_status(ctx context.Context, field graphql.CollectedField, obj *model.Getsubcategorydata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getsubcategorydata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getsubcategorydata_code(ctx context.Context, field graphql.CollectedField, obj *model.Getsubcategorydata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getsubcategorydata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getsubcategorydata_message(ctx context.Context, field graphql.CollectedField, obj *model.Getsubcategorydata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getsubcategorydata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getsubcategorydata_subcategories(ctx context.Context, field graphql.CollectedField, obj *model.Getsubcategorydata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getsubcategorydata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subcategories, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Subcat)
+	fc.Result = res
+	return ec.marshalOsubcat2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcat(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _getsubscriptionsdata_status(ctx context.Context, field graphql.CollectedField, obj *model.Getsubscriptionsdata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10247,6 +10723,143 @@ func (ec *executionContext) _getsubscriptionsdata_subscribed(ctx context.Context
 	res := resTmp.([]*model.Subscriptionsdata)
 	fc.Result = res
 	return ec.marshalOsubscriptionsdata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubscriptionsdata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _gettenantsubcategorydata_status(ctx context.Context, field graphql.CollectedField, obj *model.Gettenantsubcategorydata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "gettenantsubcategorydata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _gettenantsubcategorydata_code(ctx context.Context, field graphql.CollectedField, obj *model.Gettenantsubcategorydata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "gettenantsubcategorydata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _gettenantsubcategorydata_message(ctx context.Context, field graphql.CollectedField, obj *model.Gettenantsubcategorydata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "gettenantsubcategorydata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _gettenantsubcategorydata_tenantsubcategories(ctx context.Context, field graphql.CollectedField, obj *model.Gettenantsubcategorydata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "gettenantsubcategorydata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantsubcategories, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tenantsubcat)
+	fc.Result = res
+	return ec.marshalOtenantsubcat2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantsubcat(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _info_tenantid(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
@@ -11812,6 +12425,76 @@ func (ec *executionContext) _mod_Categoryid(ctx context.Context, field graphql.C
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _mod_Subcategoryid(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subcategoryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _mod_Subcategoryname(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "mod",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subcategoryname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _mod_Modulename(ctx context.Context, field graphql.CollectedField, obj *model.Mod) (ret graphql.Marshaler) {
@@ -13864,6 +14547,181 @@ func (ec *executionContext) _socialinfo_socialicon(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _subcat_Subcategoryname(ctx context.Context, field graphql.CollectedField, obj *model.Subcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subcategoryname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subcat_Subcategoryid(ctx context.Context, field graphql.CollectedField, obj *model.Subcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subcategoryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subcat_Categoryid(ctx context.Context, field graphql.CollectedField, obj *model.Subcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Categoryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subcat_Status(ctx context.Context, field graphql.CollectedField, obj *model.Subcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subcat_Icon(ctx context.Context, field graphql.CollectedField, obj *model.Subcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Icon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _subscribedData_status(ctx context.Context, field graphql.CollectedField, obj *model.SubscribedData) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -14491,6 +15349,111 @@ func (ec *executionContext) _subscriptionsdata_Locationcount(ctx context.Context
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _tenantsubcat_Subcategoryid(ctx context.Context, field graphql.CollectedField, obj *model.Tenantsubcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "tenantsubcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subcategoryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _tenantsubcat_Subcategoryname(ctx context.Context, field graphql.CollectedField, obj *model.Tenantsubcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "tenantsubcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subcategoryname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _tenantsubcat_Selected(ctx context.Context, field graphql.CollectedField, obj *model.Tenantsubcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "tenantsubcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Selected, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _tenantupdatedata_status(ctx context.Context, field graphql.CollectedField, obj *model.Tenantupdatedata) (ret graphql.Marshaler) {
@@ -18168,6 +19131,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_getallpromos(ctx, field)
 				return res
 			})
+		case "getsubcategorybyid":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getsubcategorybyid(ctx, field)
+				return res
+			})
+		case "gettenantsubcategory":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_gettenantsubcategory(ctx, field)
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -19030,6 +20015,45 @@ func (ec *executionContext) _getpromotiondata(ctx context.Context, sel ast.Selec
 	return out
 }
 
+var getsubcategorydataImplementors = []string{"getsubcategorydata"}
+
+func (ec *executionContext) _getsubcategorydata(ctx context.Context, sel ast.SelectionSet, obj *model.Getsubcategorydata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getsubcategorydataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("getsubcategorydata")
+		case "status":
+			out.Values[i] = ec._getsubcategorydata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._getsubcategorydata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._getsubcategorydata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "subcategories":
+			out.Values[i] = ec._getsubcategorydata_subcategories(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var getsubscriptionsdataImplementors = []string{"getsubscriptionsdata"}
 
 func (ec *executionContext) _getsubscriptionsdata(ctx context.Context, sel ast.SelectionSet, obj *model.Getsubscriptionsdata) graphql.Marshaler {
@@ -19058,6 +20082,45 @@ func (ec *executionContext) _getsubscriptionsdata(ctx context.Context, sel ast.S
 			}
 		case "subscribed":
 			out.Values[i] = ec._getsubscriptionsdata_subscribed(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var gettenantsubcategorydataImplementors = []string{"gettenantsubcategorydata"}
+
+func (ec *executionContext) _gettenantsubcategorydata(ctx context.Context, sel ast.SelectionSet, obj *model.Gettenantsubcategorydata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, gettenantsubcategorydataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("gettenantsubcategorydata")
+		case "status":
+			out.Values[i] = ec._gettenantsubcategorydata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._gettenantsubcategorydata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._gettenantsubcategorydata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tenantsubcategories":
+			out.Values[i] = ec._gettenantsubcategorydata_tenantsubcategories(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19350,6 +20413,16 @@ func (ec *executionContext) _mod(ctx context.Context, sel ast.SelectionSet, obj 
 			}
 		case "Categoryid":
 			out.Values[i] = ec._mod_Categoryid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Subcategoryid":
+			out.Values[i] = ec._mod_Subcategoryid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Subcategoryname":
+			out.Values[i] = ec._mod_Subcategoryname(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -19776,6 +20849,53 @@ func (ec *executionContext) _socialinfo(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var subcatImplementors = []string{"subcat"}
+
+func (ec *executionContext) _subcat(ctx context.Context, sel ast.SelectionSet, obj *model.Subcat) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, subcatImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("subcat")
+		case "Subcategoryname":
+			out.Values[i] = ec._subcat_Subcategoryname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Subcategoryid":
+			out.Values[i] = ec._subcat_Subcategoryid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Categoryid":
+			out.Values[i] = ec._subcat_Categoryid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Status":
+			out.Values[i] = ec._subcat_Status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Icon":
+			out.Values[i] = ec._subcat_Icon(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var subscribedDataImplementors = []string{"subscribedData"}
 
 func (ec *executionContext) _subscribedData(ctx context.Context, sel ast.SelectionSet, obj *model.SubscribedData) graphql.Marshaler {
@@ -19890,6 +21010,43 @@ func (ec *executionContext) _subscriptionsdata(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._subscriptionsdata_Customercount(ctx, field, obj)
 		case "Locationcount":
 			out.Values[i] = ec._subscriptionsdata_Locationcount(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var tenantsubcatImplementors = []string{"tenantsubcat"}
+
+func (ec *executionContext) _tenantsubcat(ctx context.Context, sel ast.SelectionSet, obj *model.Tenantsubcat) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tenantsubcatImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("tenantsubcat")
+		case "Subcategoryid":
+			out.Values[i] = ec._tenantsubcat_Subcategoryid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Subcategoryname":
+			out.Values[i] = ec._tenantsubcat_Subcategoryname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Selected":
+			out.Values[i] = ec._tenantsubcat_Selected(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -21436,11 +22593,25 @@ func (ec *executionContext) marshalOgetpromotiondata2ᚖgithubᚗcomᚋengajeres
 	return ec._getpromotiondata(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOgetsubcategorydata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetsubcategorydata(ctx context.Context, sel ast.SelectionSet, v *model.Getsubcategorydata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._getsubcategorydata(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOgetsubscriptionsdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetsubscriptionsdata(ctx context.Context, sel ast.SelectionSet, v *model.Getsubscriptionsdata) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._getsubscriptionsdata(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOgettenantsubcategorydata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGettenantsubcategorydata(ctx context.Context, sel ast.SelectionSet, v *model.Gettenantsubcategorydata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._gettenantsubcategorydata(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOinfo2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐInfo(ctx context.Context, sel ast.SelectionSet, v *model.Info) graphql.Marshaler {
@@ -21920,6 +23091,53 @@ func (ec *executionContext) unmarshalOsocialupdatedata2ᚖgithubᚗcomᚋengajer
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOsubcat2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcat(ctx context.Context, sel ast.SelectionSet, v []*model.Subcat) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOsubcat2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcat(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOsubcat2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcat(ctx context.Context, sel ast.SelectionSet, v *model.Subcat) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._subcat(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOsubcatinsertdata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcatinsertdata(ctx context.Context, v interface{}) ([]*model.Subcatinsertdata, error) {
 	if v == nil {
 		return nil, nil
@@ -22036,6 +23254,53 @@ func (ec *executionContext) marshalOsubscriptionsdata2ᚖgithubᚗcomᚋengajere
 		return graphql.Null
 	}
 	return ec._subscriptionsdata(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOtenantsubcat2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantsubcat(ctx context.Context, sel ast.SelectionSet, v []*model.Tenantsubcat) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOtenantsubcat2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantsubcat(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOtenantsubcat2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantsubcat(ctx context.Context, sel ast.SelectionSet, v *model.Tenantsubcat) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._tenantsubcat(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOtenantupdatedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantupdatedata(ctx context.Context, sel ast.SelectionSet, v *model.Tenantupdatedata) graphql.Marshaler {

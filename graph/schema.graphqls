@@ -605,6 +605,8 @@ modules:[mod]
 type mod{
  Moduleid:Int!
 	Categoryid:Int!
+   Subcategoryid:Int!
+   Subcategoryname:String!
 	Modulename:String!
    Baseprice:String!
    Taxpercent:Int!
@@ -637,6 +639,30 @@ Address:String!
 City:String!
 Postcode:String!
 }
+type getsubcategorydata{
+  status:Boolean!
+code:Int!
+message:String! 
+subcategories:[subcat]   
+}
+type subcat{
+   Subcategoryname:String!
+   Subcategoryid:Int!
+   Categoryid:Int!
+   Status:String!
+   Icon:String!
+}
+type gettenantsubcategorydata{
+status:Boolean!
+code:Int!
+message:String!   
+tenantsubcategories:[tenantsubcat]
+}
+type tenantsubcat{
+   Subcategoryid:Int!
+  Subcategoryname:String!
+  Selected:Int!
+}
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
@@ -651,6 +677,9 @@ type Query {
  getnonsubscribed(tenantid:Int!):getnonsubscribeddata
  getallmodule(categoryid:Int!,tenantid:Int!):getallmoduledata
  getallpromos(moduleid:Int!):getallpromodata
+ getsubcategorybyid(categoryid:Int!): getsubcategorydata
+ gettenantsubcategory(tenantid:Int!,categoryid:Int!,moduleid:Int!):gettenantsubcategorydata
+
 
 }
 

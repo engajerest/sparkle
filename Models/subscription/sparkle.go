@@ -16,6 +16,13 @@ type SubCategory struct {
 	Status        string `json:"status"`
 	Icon          string `json:"icon"`
 }
+// type Appsubcategory struct{
+// 	Categoryid   int    `json:"categoryid"`
+// 	SubCategoryid int    `json:"subcategoryid"`	
+// 	Subcategoryname string `json:"subcategoryname"`
+// 	Status string 
+
+// } 
 type Modules struct {
 	CategoryID int    `json:"categoryId"`
 	ModuleID   int    `json:"moduleId"`

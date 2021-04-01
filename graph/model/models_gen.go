@@ -269,11 +269,25 @@ type Getpromotiondata struct {
 	Promotions []*Promotion `json:"promotions"`
 }
 
+type Getsubcategorydata struct {
+	Status        bool      `json:"status"`
+	Code          int       `json:"code"`
+	Message       string    `json:"message"`
+	Subcategories []*Subcat `json:"subcategories"`
+}
+
 type Getsubscriptionsdata struct {
 	Status     bool                 `json:"status"`
 	Code       int                  `json:"code"`
 	Message    string               `json:"message"`
 	Subscribed []*Subscriptionsdata `json:"subscribed"`
+}
+
+type Gettenantsubcategorydata struct {
+	Status              bool            `json:"status"`
+	Code                int             `json:"code"`
+	Message             string          `json:"message"`
+	Tenantsubcategories []*Tenantsubcat `json:"tenantsubcategories"`
 }
 
 type Info struct {
@@ -402,16 +416,18 @@ type Locstatus struct {
 }
 
 type Mod struct {
-	Moduleid   int    `json:"Moduleid"`
-	Categoryid int    `json:"Categoryid"`
-	Modulename string `json:"Modulename"`
-	Baseprice  string `json:"Baseprice"`
-	Taxpercent int    `json:"Taxpercent"`
-	Taxamount  string `json:"Taxamount"`
-	Amount     string `json:"Amount"`
-	Content    string `json:"Content"`
-	Logourl    string `json:"Logourl"`
-	Iconurl    string `json:"Iconurl"`
+	Moduleid        int    `json:"Moduleid"`
+	Categoryid      int    `json:"Categoryid"`
+	Subcategoryid   int    `json:"Subcategoryid"`
+	Subcategoryname string `json:"Subcategoryname"`
+	Modulename      string `json:"Modulename"`
+	Baseprice       string `json:"Baseprice"`
+	Taxpercent      int    `json:"Taxpercent"`
+	Taxamount       string `json:"Taxamount"`
+	Amount          string `json:"Amount"`
+	Content         string `json:"Content"`
+	Logourl         string `json:"Logourl"`
+	Iconurl         string `json:"Iconurl"`
 }
 
 type Othercharge struct {
@@ -507,6 +523,14 @@ type Socialupdatedata struct {
 	Socialicon    *string `json:"socialicon"`
 }
 
+type Subcat struct {
+	Subcategoryname string `json:"Subcategoryname"`
+	Subcategoryid   int    `json:"Subcategoryid"`
+	Categoryid      int    `json:"Categoryid"`
+	Status          string `json:"Status"`
+	Icon            string `json:"Icon"`
+}
+
 type Subcatinsertdata struct {
 	Tenantid        int    `json:"Tenantid"`
 	Moduleid        int    `json:"Moduleid"`
@@ -582,6 +606,12 @@ type Subscriptionsdata struct {
 	TotalAmount   *float64 `json:"TotalAmount"`
 	Customercount *int     `json:"Customercount"`
 	Locationcount *int     `json:"Locationcount"`
+}
+
+type Tenantsubcat struct {
+	Subcategoryid   int    `json:"Subcategoryid"`
+	Subcategoryname string `json:"Subcategoryname"`
+	Selected        int    `json:"Selected"`
 }
 
 type Tenantupdatedata struct {

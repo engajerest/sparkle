@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"errors"
+
 	"net/http"
 
 	"github.com/engajerest/sparkle/Models/subscription"
@@ -106,7 +107,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	if len(response) != 0 {
 		for _, k := range response {
 			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
-			Categoryid: k.Categoryid,Subcategoryid: k.Subcategoryid,	Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+				Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 	return &model.SubscribedData{
@@ -572,7 +573,7 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 	if len(list1) != 0 {
 		for _, k := range list1 {
 			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
-				Categoryid: k.Categoryid,Subcategoryid: k.Subcategoryid,	Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+				Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 
@@ -1033,6 +1034,30 @@ func (r *queryResolver) Getallpromos(ctx context.Context, moduleid int) (*model.
 	data = subscription.Getpromos(moduleid)
 
 	return &model.Getallpromodata{Status: true, Code: http.StatusOK, Message: "Success", Promos: data}, nil
+}
+
+func (r *queryResolver) Getsubcategorybyid(ctx context.Context, categoryid int) (*model.Getsubcategorydata, error) {
+	id, usererr := helper.ForSparkleContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)
+	var subcat []*model.Subcat
+	subcat = subscription.Getsubcatbyid(categoryid)
+	return &model.Getsubcategorydata{Status: true,Code: http.StatusOK,Message: "Success",Subcategories: subcat},nil
+}
+
+func (r *queryResolver) Gettenantsubcategory(ctx context.Context, tenantid int, categoryid int, moduleid int) (*model.Gettenantsubcategorydata, error) {
+	id, usererr := helper.ForSparkleContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)
+	var tenantsubcat []*model.Tenantsubcat
+	tenantsubcat = subscription.Gettenantsubcat(moduleid,tenantid,categoryid)
+	return &model.Gettenantsubcategorydata{Status: true,Code: http.StatusOK,Message: "Success",Tenantsubcategories: tenantsubcat},nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
