@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"errors"
-
 	"net/http"
 
 	"github.com/engajerest/auth/datacontext"
@@ -1067,16 +1066,15 @@ func (r *queryResolver) Gettenantsubcategory(ctx context.Context, tenantid int, 
 }
 
 func (r *queryResolver) Getnonsubscribedcategory(ctx context.Context, tenantid int) (*model.Getnonsubscribedcategorydata, error) {
-
 	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
 	print("userid==")
-	print(id.ID)	
+	print(id.ID)
 	var data []*model.Cat
-	data=subscription.Getunsubscribecategory(tenantid)
-return &model.Getnonsubscribedcategorydata{Status: true,Code: http.StatusOK,Message: "Success",Category: data},nil
+	data = subscription.Getunsubscribecategory(tenantid)
+	return &model.Getnonsubscribedcategorydata{Status: true, Code: http.StatusOK, Message: "Success", Category: data}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

@@ -4,7 +4,7 @@ package model
 
 type Cat struct {
 	Categoryid   int    `json:"Categoryid"`
-	Categoryame  string `json:"Categoryame"`
+	Categoryname string `json:"Categoryname"`
 	Categorytype int    `json:"Categorytype"`
 	Sortorder    int    `json:"Sortorder"`
 	Status       string `json:"Status"`

@@ -11,7 +11,7 @@ type Category {
 }
 type Cat {
  Categoryid: Int!
- Categoryame: String!
+ Categoryname: String!
  Categorytype: Int!
  Sortorder: Int!
  Status:String!

@@ -44,8 +44,8 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Cat struct {
-		Categoryame  func(childComplexity int) int
 		Categoryid   func(childComplexity int) int
+		Categoryname func(childComplexity int) int
 		Categorytype func(childComplexity int) int
 		Sortorder    func(childComplexity int) int
 		Status       func(childComplexity int) int
@@ -575,19 +575,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Cat.Categoryame":
-		if e.complexity.Cat.Categoryame == nil {
-			break
-		}
-
-		return e.complexity.Cat.Categoryame(childComplexity), true
-
 	case "Cat.Categoryid":
 		if e.complexity.Cat.Categoryid == nil {
 			break
 		}
 
 		return e.complexity.Cat.Categoryid(childComplexity), true
+
+	case "Cat.Categoryname":
+		if e.complexity.Cat.Categoryname == nil {
+			break
+		}
+
+		return e.complexity.Cat.Categoryname(childComplexity), true
 
 	case "Cat.Categorytype":
 		if e.complexity.Cat.Categorytype == nil {
@@ -3106,7 +3106,7 @@ type Category {
 }
 type Cat {
  Categoryid: Int!
- Categoryame: String!
+ Categoryname: String!
  Categorytype: Int!
  Sortorder: Int!
  Status:String!
@@ -4346,7 +4346,7 @@ func (ec *executionContext) _Cat_Categoryid(ctx context.Context, field graphql.C
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Cat_Categoryame(ctx context.Context, field graphql.CollectedField, obj *model.Cat) (ret graphql.Marshaler) {
+func (ec *executionContext) _Cat_Categoryname(ctx context.Context, field graphql.CollectedField, obj *model.Cat) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4364,7 +4364,7 @@ func (ec *executionContext) _Cat_Categoryame(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Categoryame, nil
+		return obj.Categoryname, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -19019,8 +19019,8 @@ func (ec *executionContext) _Cat(ctx context.Context, sel ast.SelectionSet, obj 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Categoryame":
-			out.Values[i] = ec._Cat_Categoryame(ctx, field, obj)
+		case "Categoryname":
+			out.Values[i] = ec._Cat_Categoryname(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
