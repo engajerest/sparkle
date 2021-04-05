@@ -8,11 +8,11 @@ import (
 	"errors"
 
 	"net/http"
+
 	"github.com/engajerest/auth/datacontext"
 	"github.com/engajerest/sparkle/Models/subscription"
 	"github.com/engajerest/sparkle/graph/generated"
 	"github.com/engajerest/sparkle/graph/model"
-
 )
 
 func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*model.SubscribedData, error) {
@@ -259,7 +259,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 
 func (r *mutationResolver) Createlocation(ctx context.Context, input *model.Location) (*model.Locationdata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=datacontext.ForAuthContext(ctx)
+	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -331,7 +331,7 @@ func (r *mutationResolver) Createpromotion(ctx context.Context, input *model.Pro
 
 func (r *mutationResolver) Createcharges(ctx context.Context, input *model.Chargecreate) (*model.Promotioncreateddata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=datacontext.ForAuthContext(ctx)
+	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -795,7 +795,7 @@ func (r *queryResolver) Tenantusers(ctx context.Context, tenantid int) (*model.U
 
 func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryid int) (*model.GetBusinessdata, error) {
 	// id, usererr := helper.ForSparkleContext(ctx)
-	id, usererr :=datacontext.ForAuthContext(ctx)
+	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -849,7 +849,7 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 
 func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int) (*model.Getpromotiondata, error) {
 	// id, usererr := controller.ForContext(ctx)
-	id, usererr :=datacontext.ForAuthContext(ctx)
+	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
@@ -1051,19 +1051,32 @@ func (r *queryResolver) Getsubcategorybyid(ctx context.Context, categoryid int) 
 	print(id.ID)
 	var subcat []*model.Subcat
 	subcat = subscription.Getsubcatbyid(categoryid)
-	return &model.Getsubcategorydata{Status: true,Code: http.StatusOK,Message: "Success",Subcategories: subcat},nil
+	return &model.Getsubcategorydata{Status: true, Code: http.StatusOK, Message: "Success", Subcategories: subcat}, nil
 }
 
 func (r *queryResolver) Gettenantsubcategory(ctx context.Context, tenantid int, categoryid int, moduleid int) (*model.Gettenantsubcategorydata, error) {
-	id, usererr :=datacontext.ForAuthContext(ctx)
+	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
 	print("userid==")
 	print(id.ID)
 	var tenantsubcat []*model.Tenantsubcat
-	tenantsubcat = subscription.Gettenantsubcat(moduleid,tenantid,categoryid)
-	return &model.Gettenantsubcategorydata{Status: true,Code: http.StatusOK,Message: "Success",Tenantsubcategories: tenantsubcat},nil
+	tenantsubcat = subscription.Gettenantsubcat(moduleid, tenantid, categoryid)
+	return &model.Gettenantsubcategorydata{Status: true, Code: http.StatusOK, Message: "Success", Tenantsubcategories: tenantsubcat}, nil
+}
+
+func (r *queryResolver) Getnonsubscribedcategory(ctx context.Context, tenantid int) (*model.Getnonsubscribedcategorydata, error) {
+
+	id, usererr := datacontext.ForAuthContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)	
+	var data []*model.Cat
+	data=subscription.Getunsubscribecategory(tenantid)
+return &model.Getnonsubscribedcategorydata{Status: true,Code: http.StatusOK,Message: "Success",Category: data},nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

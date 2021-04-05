@@ -1095,12 +1095,34 @@ func Getpromos(moduleid int) []*model.Promo {
 	n1 := int64(moduleid)
 	mod := strconv.FormatInt(n1, 10)
 	if moduleid != 0 {
-		q1 = "SELECT IFNULL(a.promocodeid,0) AS promocodeid,a.moduleid,a.partnerid,a.packageid, IFNULL(a.promoname,'') AS promoname, IFNULL(a.promodescription,'') AS promodescription, IFNULL(a.packageexpiry,0) AS packageexpiry, IFNULL(a.promotype,'') AS promotype, IFNULL(a.promovalue,0) AS promovalue, IFNULL(a.validity,'') AS validity,IF(a.validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus, b.companyname,b.address,b.city,b.postcode FROM app_promocodes a, partnerinfo b WHERE a.STATUS='Active' AND a.moduleid=" + mod + " GROUP BY a.partnerid"
+		q1 = "SELECT IFNULL(a.promocodeid,0) AS promocodeid,a.moduleid,a.partnerid,a.packageid, IFNULL(a.promoname,'') AS promoname, IFNULL(a.promodescription,'') AS promodescription, IFNULL(a.packageexpiry,0) AS packageexpiry, IFNULL(a.promotype,'') AS promotype, IFNULL(a.promovalue,0) AS promovalue, IFNULL(a.validity,'') AS validity,IF(a.validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus, b.companyname,b.address,b.city,b.postcode FROM app_promocodes a, partnerinfo b WHERE a.STATUS='Active' AND a.partnerid=b.partnerid AND a.moduleid=" + mod
 	} else {
-		q1 = "SELECT IFNULL(a.promocodeid,0) AS promocodeid,a.moduleid,a.partnerid,a.packageid, IFNULL(a.promoname,'') AS promoname, IFNULL(a.promodescription,'') AS promodescription, IFNULL(a.packageexpiry,0) AS packageexpiry, IFNULL(a.promotype,'') AS promotype, IFNULL(a.promovalue,0) AS promovalue, IFNULL(a.validity,'') AS validity,IF(a.validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus, b.companyname,b.address,b.city,b.postcode FROM app_promocodes a, partnerinfo b WHERE a.STATUS='Active'  GROUP BY a.partnerid"
+		q1 = "SELECT IFNULL(a.promocodeid,0) AS promocodeid,a.moduleid,a.partnerid,a.packageid, IFNULL(a.promoname,'') AS promoname, IFNULL(a.promodescription,'') AS promodescription, IFNULL(a.packageexpiry,0) AS packageexpiry, IFNULL(a.promotype,'') AS promotype, IFNULL(a.promovalue,0) AS promovalue, IFNULL(a.validity,'') AS validity,IF(a.validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus, b.companyname,b.address,b.city,b.postcode FROM app_promocodes a, partnerinfo b WHERE a.STATUS='Active' AND a.partnerid=b.partnerid"
 	}
 
 	var data []*model.Promo
+
+	DB.Raw(q1).Find(&data)
+
+	fmt.Println(data)
+
+	return data
+
+}
+
+func Getunsubscribecategory(tenantid int) []*model.Cat {
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+	var q1 string
+	n1 := int64(tenantid)
+	tent := strconv.FormatInt(n1, 10)
+q1="SELECT categoryid,categoryname,categorytype,sortorder,`status` FROM app_category WHERE categoryid NOT IN(SELECT categoryid FROM tenantsubscription WHERE tenantid= "+tent+  " )"
+	var data []*model.Cat
 
 	DB.Raw(q1).Find(&data)
 

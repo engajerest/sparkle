@@ -2,6 +2,14 @@
 
 package model
 
+type Cat struct {
+	Categoryid   int    `json:"Categoryid"`
+	Categoryame  string `json:"Categoryame"`
+	Categorytype int    `json:"Categorytype"`
+	Sortorder    int    `json:"Sortorder"`
+	Status       string `json:"Status"`
+}
+
 type Category struct {
 	Categoryid int    `json:"Categoryid"`
 	Name       string `json:"Name"`
@@ -246,6 +254,13 @@ type Getallpromodata struct {
 	Code    int      `json:"code"`
 	Message string   `json:"message"`
 	Promos  []*Promo `json:"promos"`
+}
+
+type Getnonsubscribedcategorydata struct {
+	Status   bool   `json:"status"`
+	Code     int    `json:"code"`
+	Message  string `json:"message"`
+	Category []*Cat `json:"category"`
 }
 
 type Getnonsubscribeddata struct {

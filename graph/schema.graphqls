@@ -9,6 +9,13 @@ type Category {
  SortOrder: Int!
  Status:String!
 }
+type Cat {
+ Categoryid: Int!
+ Categoryame: String!
+ Categorytype: Int!
+ Sortorder: Int!
+ Status:String!
+}
 type SubCategory{
  CategoryId: Int!
  SubCategoryId: Int!
@@ -663,6 +670,12 @@ type tenantsubcat{
   Subcategoryname:String!
   Selected:Int!
 }
+type getnonsubscribedcategorydata {
+status:Boolean!
+code:Int!
+message:String! 
+category:[Cat]
+}
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
@@ -679,6 +692,7 @@ type Query {
  getallpromos(moduleid:Int!):getallpromodata
  getsubcategorybyid(categoryid:Int!): getsubcategorydata
  gettenantsubcategory(tenantid:Int!,categoryid:Int!,moduleid:Int!):gettenantsubcategorydata
+ getnonsubscribedcategory(tenantid:Int!):getnonsubscribedcategorydata
 
 
 }
