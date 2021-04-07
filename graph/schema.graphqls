@@ -666,8 +666,10 @@ message:String!
 tenantsubcategories:[tenantsubcat]
 }
 type tenantsubcat{
+   Categoryid:Int!
    Subcategoryid:Int!
   Subcategoryname:String!
+  Icon:String!
   Selected:Int!
 }
 type getnonsubscribedcategorydata {

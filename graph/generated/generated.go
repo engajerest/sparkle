@@ -467,6 +467,8 @@ type ComplexityRoot struct {
 	}
 
 	Tenantsubcat struct {
+		Categoryid      func(childComplexity int) int
+		Icon            func(childComplexity int) int
 		Selected        func(childComplexity int) int
 		Subcategoryid   func(childComplexity int) int
 		Subcategoryname func(childComplexity int) int
@@ -2784,6 +2786,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscriptionsdata.TotalAmount(childComplexity), true
 
+	case "tenantsubcat.Categoryid":
+		if e.complexity.Tenantsubcat.Categoryid == nil {
+			break
+		}
+
+		return e.complexity.Tenantsubcat.Categoryid(childComplexity), true
+
+	case "tenantsubcat.Icon":
+		if e.complexity.Tenantsubcat.Icon == nil {
+			break
+		}
+
+		return e.complexity.Tenantsubcat.Icon(childComplexity), true
+
 	case "tenantsubcat.Selected":
 		if e.complexity.Tenantsubcat.Selected == nil {
 			break
@@ -3761,8 +3777,10 @@ message:String!
 tenantsubcategories:[tenantsubcat]
 }
 type tenantsubcat{
+   Categoryid:Int!
    Subcategoryid:Int!
   Subcategoryname:String!
+  Icon:String!
   Selected:Int!
 }
 type getnonsubscribedcategorydata {
@@ -15823,6 +15841,41 @@ func (ec *executionContext) _subscriptionsdata_Locationcount(ctx context.Context
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _tenantsubcat_Categoryid(ctx context.Context, field graphql.CollectedField, obj *model.Tenantsubcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "tenantsubcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Categoryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _tenantsubcat_Subcategoryid(ctx context.Context, field graphql.CollectedField, obj *model.Tenantsubcat) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -15877,6 +15930,41 @@ func (ec *executionContext) _tenantsubcat_Subcategoryname(ctx context.Context, f
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Subcategoryname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _tenantsubcat_Icon(ctx context.Context, field graphql.CollectedField, obj *model.Tenantsubcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "tenantsubcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Icon, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -21601,6 +21689,11 @@ func (ec *executionContext) _tenantsubcat(ctx context.Context, sel ast.Selection
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("tenantsubcat")
+		case "Categoryid":
+			out.Values[i] = ec._tenantsubcat_Categoryid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Subcategoryid":
 			out.Values[i] = ec._tenantsubcat_Subcategoryid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -21608,6 +21701,11 @@ func (ec *executionContext) _tenantsubcat(ctx context.Context, sel ast.Selection
 			}
 		case "Subcategoryname":
 			out.Values[i] = ec._tenantsubcat_Subcategoryname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Icon":
+			out.Values[i] = ec._tenantsubcat_Icon(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

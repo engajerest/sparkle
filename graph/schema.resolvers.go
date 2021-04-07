@@ -665,7 +665,7 @@ func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	}
 	subcategoryGetAll = subscription.GetAllSubCategory()
 	for _, subcategory := range subcategoryGetAll {
-		sub = append(sub, &model.Subcat{Categoryid: subcategory.CategoryID, Subcategoryid: subcategory.SubCategoryID, Subcategoryname: subcategory.Name,Status: subcategory.Status, Icon: subcategory.Icon})
+		sub = append(sub, &model.Subcat{Categoryid: subcategory.CategoryID, Subcategoryid: subcategory.SubCategoryID, Subcategoryname: subcategory.Name, Status: subcategory.Status, Icon: subcategory.Icon})
 	}
 	packageGetAll = subscription.GetAllPackages()
 	for _, packdata := range packageGetAll {

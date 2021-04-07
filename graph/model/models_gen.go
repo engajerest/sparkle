@@ -624,8 +624,10 @@ type Subscriptionsdata struct {
 }
 
 type Tenantsubcat struct {
+	Categoryid      int    `json:"Categoryid"`
 	Subcategoryid   int    `json:"Subcategoryid"`
 	Subcategoryname string `json:"Subcategoryname"`
+	Icon            string `json:"Icon"`
 	Selected        int    `json:"Selected"`
 }
 
