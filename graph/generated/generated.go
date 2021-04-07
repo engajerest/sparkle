@@ -3130,8 +3130,8 @@ type Module{
  LogoUrl: String!
 }
 type Sparkle{
- category:[Category]!
- subcategory:[SubCategory]!
+ category:[Cat]!
+ subcategory:[subcat]!
  package:[Package]!
 
 }
@@ -7485,9 +7485,9 @@ func (ec *executionContext) _Sparkle_category(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Category)
+	res := resTmp.([]*model.Cat)
 	fc.Result = res
-	return ec.marshalNCategory2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
+	return ec.marshalNCat2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐCat(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Sparkle_subcategory(ctx context.Context, field graphql.CollectedField, obj *model.Sparkle) (ret graphql.Marshaler) {
@@ -7520,9 +7520,9 @@ func (ec *executionContext) _Sparkle_subcategory(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.SubCategory)
+	res := resTmp.([]*model.Subcat)
 	fc.Result = res
-	return ec.marshalNSubCategory2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubCategory(ctx, field.Selections, res)
+	return ec.marshalNsubcat2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcat(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Sparkle_package(ctx context.Context, field graphql.CollectedField, obj *model.Sparkle) (ret graphql.Marshaler) {
@@ -21951,7 +21951,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCategory2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v []*model.Category) graphql.Marshaler {
+func (ec *executionContext) marshalNCat2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐCat(ctx context.Context, sel ast.SelectionSet, v []*model.Cat) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -21975,7 +21975,7 @@ func (ec *executionContext) marshalNCategory2ᚕᚖgithubᚗcomᚋengajerestᚋs
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOCategory2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐCategory(ctx, sel, v[i])
+			ret[i] = ec.marshalOCat2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐCat(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -22092,43 +22092,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNSubCategory2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubCategory(ctx context.Context, sel ast.SelectionSet, v []*model.SubCategory) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOSubCategory2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubCategory(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
 }
 
 func (ec *executionContext) marshalNTenantData2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantData(ctx context.Context, sel ast.SelectionSet, v []*model.TenantData) graphql.Marshaler {
@@ -22402,6 +22365,43 @@ func (ec *executionContext) unmarshalNdata2githubᚗcomᚋengajerestᚋsparkle�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNsubcat2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcat(ctx context.Context, sel ast.SelectionSet, v []*model.Subcat) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOsubcat2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcat(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNuser2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -22495,13 +22495,6 @@ func (ec *executionContext) marshalOCat2ᚖgithubᚗcomᚋengajerestᚋsparkle�
 		return graphql.Null
 	}
 	return ec._Cat(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOCategory2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v *model.Category) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Category(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
@@ -22686,13 +22679,6 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
-}
-
-func (ec *executionContext) marshalOSubCategory2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubCategory(ctx context.Context, sel ast.SelectionSet, v *model.SubCategory) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._SubCategory(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOTenantAddress2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐTenantAddress(ctx context.Context, v interface{}) (*model.TenantAddress, error) {

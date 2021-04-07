@@ -651,8 +651,8 @@ func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	print("raju")
 	print(id.ID)
 
-	var cat []*model.Category
-	var sub []*model.SubCategory
+	var cat []*model.Cat
+	var sub []*model.Subcat
 	var pack []*model.Package
 	var categoryGetAll []subscription.Category
 	var subcategoryGetAll []subscription.SubCategory
@@ -660,12 +660,12 @@ func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 
 	categoryGetAll = subscription.GetAllCategory()
 	for _, category := range categoryGetAll {
-		cat = append(cat, &model.Category{Categoryid: category.CategoryID, Name: category.Name, Type: category.Typeid, SortOrder: category.SortOrder, Status: category.Status})
+		cat = append(cat, &model.Cat{Categoryid: category.CategoryID, Categoryname: category.Name, Categorytype: category.Typeid, Sortorder: category.SortOrder, Status: category.Status})
 
 	}
 	subcategoryGetAll = subscription.GetAllSubCategory()
 	for _, subcategory := range subcategoryGetAll {
-		sub = append(sub, &model.SubCategory{CategoryID: subcategory.CategoryID, SubCategoryID: subcategory.SubCategoryID, Name: subcategory.Name, Type: subcategory.Typeid, SortOrder: subcategory.SortOrder, Status: subcategory.Status, Icon: subcategory.Icon})
+		sub = append(sub, &model.Subcat{Categoryid: subcategory.CategoryID, Subcategoryid: subcategory.SubCategoryID, Subcategoryname: subcategory.Name,Status: subcategory.Status, Icon: subcategory.Icon})
 	}
 	packageGetAll = subscription.GetAllPackages()
 	for _, packdata := range packageGetAll {

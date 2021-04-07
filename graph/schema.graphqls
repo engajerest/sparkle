@@ -35,8 +35,8 @@ type Module{
  LogoUrl: String!
 }
 type Sparkle{
- category:[Category]!
- subcategory:[SubCategory]!
+ category:[Cat]!
+ subcategory:[subcat]!
  package:[Package]!
 
 }

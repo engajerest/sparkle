@@ -80,9 +80,9 @@ type Promotion struct {
 }
 
 type Sparkle struct {
-	Category    []*Category    `json:"category"`
-	Subcategory []*SubCategory `json:"subcategory"`
-	Package     []*Package     `json:"package"`
+	Category    []*Cat     `json:"category"`
+	Subcategory []*Subcat  `json:"subcategory"`
+	Package     []*Package `json:"package"`
 }
 
 type SubCategory struct {
