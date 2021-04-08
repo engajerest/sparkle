@@ -611,14 +611,15 @@ type Subscriptionnew struct {
 
 type Subscriptionsdata struct {
 	Packageid     *int     `json:"Packageid"`
-	Moduleid      *int     `json:"Moduleid"`
-	Tenantid      *int     `json:"Tenantid"`
-	Modulename    *string  `json:"Modulename"`
+	Moduleid      int      `json:"Moduleid"`
+	Tenantid      int      `json:"Tenantid"`
+	Modulename    string   `json:"Modulename"`
 	Packagename   *string  `json:"Packagename"`
-	LogoURL       *string  `json:"LogoUrl"`
+	LogoURL       string   `json:"LogoUrl"`
+	Iconurl       string   `json:"Iconurl"`
 	PackageIcon   *string  `json:"PackageIcon"`
 	PackageAmount *float64 `json:"PackageAmount"`
-	TotalAmount   *float64 `json:"TotalAmount"`
+	TotalAmount   float64  `json:"TotalAmount"`
 	Customercount *int     `json:"Customercount"`
 	Locationcount *int     `json:"Locationcount"`
 }

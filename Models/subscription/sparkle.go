@@ -367,6 +367,7 @@ type Subscribe struct {
 	PackageAmount float64 `json:"packageamount"`
 	Totalamount   float64 `json:"totalamount"`
 	Logourl       string  `json:"logourl"`
+	Iconurl string `json:"iconurl"`
 	PackageIcon   string  `json:"packageicon"`
 	Customercount int     `json:"customercount"`
 	Locationcount int     `json:"locationcount"`

@@ -454,6 +454,7 @@ type ComplexityRoot struct {
 
 	Subscriptionsdata struct {
 		Customercount func(childComplexity int) int
+		Iconurl       func(childComplexity int) int
 		Locationcount func(childComplexity int) int
 		LogoURL       func(childComplexity int) int
 		Moduleid      func(childComplexity int) int
@@ -2716,6 +2717,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscriptionsdata.Customercount(childComplexity), true
 
+	case "subscriptionsdata.Iconurl":
+		if e.complexity.Subscriptionsdata.Iconurl == nil {
+			break
+		}
+
+		return e.complexity.Subscriptionsdata.Iconurl(childComplexity), true
+
 	case "subscriptionsdata.Locationcount":
 		if e.complexity.Subscriptionsdata.Locationcount == nil {
 			break
@@ -3697,14 +3705,15 @@ subscribed:[subscriptionsdata]
 }
 type subscriptionsdata{
 Packageid:Int
-Moduleid:Int
-Tenantid:Int
-Modulename:String
+Moduleid:Int!
+Tenantid:Int!
+Modulename:String!
 Packagename:String
-LogoUrl:String
+LogoUrl:String!
+Iconurl:String!
 PackageIcon:String
 PackageAmount:Float
-TotalAmount:Float
+TotalAmount:Float!
 Customercount:Int
 Locationcount:Int
 }
@@ -15546,11 +15555,14 @@ func (ec *executionContext) _subscriptionsdata_Moduleid(ctx context.Context, fie
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _subscriptionsdata_Tenantid(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
@@ -15578,11 +15590,14 @@ func (ec *executionContext) _subscriptionsdata_Tenantid(ctx context.Context, fie
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _subscriptionsdata_Modulename(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
@@ -15610,11 +15625,14 @@ func (ec *executionContext) _subscriptionsdata_Modulename(ctx context.Context, f
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _subscriptionsdata_Packagename(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
@@ -15674,11 +15692,49 @@ func (ec *executionContext) _subscriptionsdata_LogoUrl(ctx context.Context, fiel
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subscriptionsdata_Iconurl(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscriptionsdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Iconurl, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _subscriptionsdata_PackageIcon(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
@@ -15770,11 +15826,14 @@ func (ec *executionContext) _subscriptionsdata_TotalAmount(ctx context.Context, 
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*float64)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _subscriptionsdata_Customercount(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
@@ -21649,20 +21708,40 @@ func (ec *executionContext) _subscriptionsdata(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._subscriptionsdata_Packageid(ctx, field, obj)
 		case "Moduleid":
 			out.Values[i] = ec._subscriptionsdata_Moduleid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Tenantid":
 			out.Values[i] = ec._subscriptionsdata_Tenantid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Modulename":
 			out.Values[i] = ec._subscriptionsdata_Modulename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Packagename":
 			out.Values[i] = ec._subscriptionsdata_Packagename(ctx, field, obj)
 		case "LogoUrl":
 			out.Values[i] = ec._subscriptionsdata_LogoUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Iconurl":
+			out.Values[i] = ec._subscriptionsdata_Iconurl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "PackageIcon":
 			out.Values[i] = ec._subscriptionsdata_PackageIcon(ctx, field, obj)
 		case "PackageAmount":
 			out.Values[i] = ec._subscriptionsdata_PackageAmount(ctx, field, obj)
 		case "TotalAmount":
 			out.Values[i] = ec._subscriptionsdata_TotalAmount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Customercount":
 			out.Values[i] = ec._subscriptionsdata_Customercount(ctx, field, obj)
 		case "Locationcount":

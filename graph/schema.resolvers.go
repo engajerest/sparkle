@@ -990,8 +990,8 @@ func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*mo
 	d = subscription.GetAllSubscription(tenantid)
 	if len(d) != 0 {
 		for _, k := range d {
-			data = append(data, &model.Subscriptionsdata{Packageid: &k.Packageid, Moduleid: &k.Moduleid, Tenantid: &k.Tenantid, Modulename: &k.Modulename, Packagename: &k.Packagename,
-				LogoURL: &k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: &k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
+			data = append(data, &model.Subscriptionsdata{Packageid: &k.Packageid, Moduleid: k.Moduleid, Tenantid: k.Tenantid, Modulename: k.Modulename, Packagename: &k.Packagename,
+				Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
 		}
 	}
 

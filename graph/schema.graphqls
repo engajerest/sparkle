@@ -586,14 +586,15 @@ subscribed:[subscriptionsdata]
 }
 type subscriptionsdata{
 Packageid:Int
-Moduleid:Int
-Tenantid:Int
-Modulename:String
+Moduleid:Int!
+Tenantid:Int!
+Modulename:String!
 Packagename:String
-LogoUrl:String
+LogoUrl:String!
+Iconurl:String!
 PackageIcon:String
 PackageAmount:Float
-TotalAmount:Float
+TotalAmount:Float!
 Customercount:Int
 Locationcount:Int
 }
