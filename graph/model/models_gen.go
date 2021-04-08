@@ -613,6 +613,8 @@ type Subscriptionsdata struct {
 	Packageid     *int     `json:"Packageid"`
 	Moduleid      int      `json:"Moduleid"`
 	Tenantid      int      `json:"Tenantid"`
+	Categoryid    int      `json:"Categoryid"`
+	Subcategoryid int      `json:"Subcategoryid"`
 	Modulename    string   `json:"Modulename"`
 	Packagename   *string  `json:"Packagename"`
 	LogoURL       string   `json:"LogoUrl"`

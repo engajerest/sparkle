@@ -453,6 +453,7 @@ type ComplexityRoot struct {
 	}
 
 	Subscriptionsdata struct {
+		Categoryid    func(childComplexity int) int
 		Customercount func(childComplexity int) int
 		Iconurl       func(childComplexity int) int
 		Locationcount func(childComplexity int) int
@@ -463,6 +464,7 @@ type ComplexityRoot struct {
 		PackageIcon   func(childComplexity int) int
 		Packageid     func(childComplexity int) int
 		Packagename   func(childComplexity int) int
+		Subcategoryid func(childComplexity int) int
 		Tenantid      func(childComplexity int) int
 		TotalAmount   func(childComplexity int) int
 	}
@@ -2710,6 +2712,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SubscribedDataResponse.Status(childComplexity), true
 
+	case "subscriptionsdata.Categoryid":
+		if e.complexity.Subscriptionsdata.Categoryid == nil {
+			break
+		}
+
+		return e.complexity.Subscriptionsdata.Categoryid(childComplexity), true
+
 	case "subscriptionsdata.Customercount":
 		if e.complexity.Subscriptionsdata.Customercount == nil {
 			break
@@ -2779,6 +2788,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Subscriptionsdata.Packagename(childComplexity), true
+
+	case "subscriptionsdata.Subcategoryid":
+		if e.complexity.Subscriptionsdata.Subcategoryid == nil {
+			break
+		}
+
+		return e.complexity.Subscriptionsdata.Subcategoryid(childComplexity), true
 
 	case "subscriptionsdata.Tenantid":
 		if e.complexity.Subscriptionsdata.Tenantid == nil {
@@ -3707,6 +3723,8 @@ type subscriptionsdata{
 Packageid:Int
 Moduleid:Int!
 Tenantid:Int!
+Categoryid:Int!
+Subcategoryid:Int!
 Modulename:String!
 Packagename:String
 LogoUrl:String!
@@ -15600,6 +15618,76 @@ func (ec *executionContext) _subscriptionsdata_Tenantid(ctx context.Context, fie
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _subscriptionsdata_Categoryid(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscriptionsdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Categoryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subscriptionsdata_Subcategoryid(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscriptionsdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subcategoryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _subscriptionsdata_Modulename(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -21713,6 +21801,16 @@ func (ec *executionContext) _subscriptionsdata(ctx context.Context, sel ast.Sele
 			}
 		case "Tenantid":
 			out.Values[i] = ec._subscriptionsdata_Tenantid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Categoryid":
+			out.Values[i] = ec._subscriptionsdata_Categoryid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Subcategoryid":
+			out.Values[i] = ec._subscriptionsdata_Subcategoryid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

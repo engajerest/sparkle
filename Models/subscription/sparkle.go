@@ -371,6 +371,8 @@ type Subscribe struct {
 	PackageIcon   string  `json:"packageicon"`
 	Customercount int     `json:"customercount"`
 	Locationcount int     `json:"locationcount"`
+	Subcategoryid int `json:"subcategoryid"`
+	Categoryid int `json:"categoryid"`
 }
 type User struct {
 	ID          int    `json:"id"`

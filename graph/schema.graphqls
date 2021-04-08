@@ -588,6 +588,8 @@ type subscriptionsdata{
 Packageid:Int
 Moduleid:Int!
 Tenantid:Int!
+Categoryid:Int!
+Subcategoryid:Int!
 Modulename:String!
 Packagename:String
 LogoUrl:String!
