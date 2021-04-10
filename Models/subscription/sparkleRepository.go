@@ -65,6 +65,7 @@ const (
 	getmodules                     = "SELECT moduleid,categoryid,modulename,content,IFNULL(logourl,'') AS logourl,IFNULL(iconurl,'') AS iconurl FROM app_module WHERE STATUS='Active' AND categoryid=?"
 	getpromo                       = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active' AND moduleid=?"
 	insertsubcategory              = "INSERT INTO tenantsubcategories (tenantid,moduleid,categoryid,subcategoryid,subcategoryname) VALUES(?,?,?,?,?)"
+	createUsernopassword       = "INSERT INTO app_users (authname,contactno,roleid,configid,referenceid) VALUES(?,?,?,?,?)"
 )
 
 func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, error) {
@@ -626,29 +627,7 @@ func userget(ids []int) ([]*users.User, []error) {
 
 	return users, nil
 }
-func (user *TenantUser) CreateTenantUser() int64 {
-	fmt.Println("0")
-	statement, err := database.Db.Prepare(createTenantUserQuery)
-	fmt.Println("1")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer statement.Close()
-	hashedPassword, err := HashPassword(user.Password)
-	fmt.Println("2")
 
-	res, err := statement.Exec(&user.Email, &user.Password, &hashedPassword, &user.Mobile, &user.RoleId, &user.TenantID)
-	if err != nil {
-
-		log.Fatal(err)
-	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal("Error:", err.Error())
-	}
-	log.Print("Row inserted in tenantuser!")
-	return id
-}
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
@@ -703,21 +682,55 @@ func GetAllTenantUsers(id int) []TenantUser {
 
 	return tenantuserlist
 }
-func (user *TenantUser) UpdateTenantUser() bool {
+func (user *TenantUser) CreateTenantUser() (int64 ,error){
+	fmt.Println("nopass")
+	statement, err := database.Db.Prepare(createUsernopassword)
+	fmt.Println("1")
+	if err != nil {
+	print(err)
+		return 0, err
+
+	}
+	defer statement.Close()
+
+	fmt.Println("2")
+
+	res, err1 := statement.Exec(&user.Email, &user.Mobile, &user.Roleid, &user.Configid,&user.Tenantid)
+	if err1 != nil {
+
+		fmt.Println(err1)
+
+		return 0, err1
+
+	}
+	id, err2 := res.LastInsertId()
+	if err2 != nil {
+		log.Fatal("Error:", err2.Error())
+		return 0, err
+	}
+	log.Print("Row inserted in tenantuser!")
+	return id, nil
+}
+func (user *TenantUser) UpdateTenantUser() (bool,error) {
 	statement, err := database.Db.Prepare(updateTenantUser)
 	print(statement)
 
 	if err != nil {
-		log.Fatal(err)
-	}
+		print(err)
+			return false, err
+	
+		}
 	defer statement.Close()
-	_, err = statement.Exec(user.Email, user.Mobile, user.FirstName, user.LastName, user.Email, user.Mobile, user.Locationid, user.Userid)
-	if err != nil {
-		log.Fatal(err)
-	}
+	_, err1 := statement.Exec(user.Email, user.Mobile, user.FirstName, user.LastName, user.Email, user.Mobile, user.Locationid, user.Userid)
+	if err1 != nil {
 
+		fmt.Println(err1)
+
+		return false, err1
+
+	}
 	log.Print("Row updated in tenant user profile!")
-	return true
+	return true,nil
 }
 func (user *BusinessUpdate) UpdateTenantBusiness() bool {
 	statement, err := database.Db.Prepare(updateTenantBusiness)

@@ -170,11 +170,11 @@ input tenantuser{
  TenantId:Int!
  firstname: String!
  lastname:String!
- password: String!
  mobile:String!
  email:String!
  locationid:Int!
  roleid:Int!
+ configid:Int!
 }
 input data{
  tenantinfo:TenantDetails
@@ -681,6 +681,24 @@ code:Int!
 message:String! 
 category:[Cat]
 }
+
+type Tenantschema{
+ Tenantid:Int!
+ Moduleid:Int!
+ Modulename:String!
+ brandname:String
+ about:String
+ email:String
+ phone:String
+ address:String
+ cod:Int
+ digital:Int
+ tenantaccid:String
+ tenanttoken:String
+ tenantimage:String
+}
+
+
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations

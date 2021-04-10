@@ -16,13 +16,14 @@ type SubCategory struct {
 	Status        string `json:"status"`
 	Icon          string `json:"icon"`
 }
+
 // type Appsubcategory struct{
 // 	Categoryid   int    `json:"categoryid"`
-// 	SubCategoryid int    `json:"subcategoryid"`	
+// 	SubCategoryid int    `json:"subcategoryid"`
 // 	Subcategoryname string `json:"subcategoryname"`
-// 	Status string 
+// 	Status string
 
-// } 
+// }
 type Modules struct {
 	CategoryID int    `json:"categoryId"`
 	ModuleID   int    `json:"moduleId"`
@@ -101,26 +102,26 @@ type Initialsubscriptiondata struct {
 }
 
 type TenantSubscription struct {
-	Date          string `json:"date"`
-	Packageid     int    `json:"packageid"`
-	Partnerid     int    `json:"partnerid"`
-	Moduleid      int    `json:"moduleId"`
-	Currencyid    int    `json:"currencyid"`
-	Categoryid    int    `json:"categoryid"`
-	SubCategoryid int    `json:"subcategoryid"`
+	Date            string `json:"date"`
+	Packageid       int    `json:"packageid"`
+	Partnerid       int    `json:"partnerid"`
+	Moduleid        int    `json:"moduleId"`
+	Currencyid      int    `json:"currencyid"`
+	Categoryid      int    `json:"categoryid"`
+	SubCategoryid   int    `json:"subcategoryid"`
 	Subcategoryname string `json:"subcategoryname"`
-	Tenantid      int    `json:"tenantid"`
-	Price         string `json:"price"`
-	TaxId         int    `json:"taxId"`
-	TaxAmount     string `json:"taxamount"`
-	TotalAmount   string `json:"totalamount"`
-	PaymentStatus int    `json:"paymentstatus"`
-	PaymentId     int    `json:"paymentId"`
-	Quantity      int    `json:"quantity"`
-	Promoid       int    `json:"promoid"`
-	Promovalue    string `json:"promovalue"`
-	Promostatus   bool   `json:"promostatus"`
-	Validitydate  string `json:"validitydate"`
+	Tenantid        int    `json:"tenantid"`
+	Price           string `json:"price"`
+	TaxId           int    `json:"taxId"`
+	TaxAmount       string `json:"taxamount"`
+	TotalAmount     string `json:"totalamount"`
+	PaymentStatus   int    `json:"paymentstatus"`
+	PaymentId       int    `json:"paymentId"`
+	Quantity        int    `json:"quantity"`
+	Promoid         int    `json:"promoid"`
+	Promovalue      string `json:"promovalue"`
+	Promostatus     bool   `json:"promostatus"`
+	Validitydate    string `json:"validitydate"`
 }
 
 type SubscriptionData struct {
@@ -136,12 +137,12 @@ type SubscribedData struct {
 	Subscriptionid int    `json:"subscriptionid"`
 	Locationid     int    `json:"locationid"`
 	Locationname   string `json:"locationname"`
-	Subcategoryid int `json:"subcategoryid"`
-	Categoryid int `json:"categoryid"`
+	Subcategoryid  int    `json:"subcategoryid"`
+	Categoryid     int    `json:"categoryid"`
 }
 
 type TenantUser struct {
-	TenantID     int    `json:"tenantid"`
+	Tenantid    int    `json:"tenantid"`
 	Userid       int    `json:"userid"`
 	FirstName    string `json:"firstname"`
 	LastName     string `json:"lastname"`
@@ -150,7 +151,8 @@ type TenantUser struct {
 	Mobile       string `json:"mobile"`
 	Locationid   int    `json:"locationid"`
 	Locationname string `json:"locationname"`
-	RoleId       int    `json:""roleid`
+	Roleid       int    `json:""roleid`
+	Configid     int    `json:"configid"`
 	Referenceid  int    `json:"referenceid"`
 	Status       string `json:"status"`
 	Created      string `json:created`
@@ -367,12 +369,12 @@ type Subscribe struct {
 	PackageAmount float64 `json:"packageamount"`
 	Totalamount   float64 `json:"totalamount"`
 	Logourl       string  `json:"logourl"`
-	Iconurl string `json:"iconurl"`
+	Iconurl       string  `json:"iconurl"`
 	PackageIcon   string  `json:"packageicon"`
 	Customercount int     `json:"customercount"`
 	Locationcount int     `json:"locationcount"`
-	Subcategoryid int `json:"subcategoryid"`
-	Categoryid int `json:"categoryid"`
+	Subcategoryid int     `json:"subcategoryid"`
+	Categoryid    int     `json:"categoryid"`
 }
 type User struct {
 	ID          int    `json:"id"`

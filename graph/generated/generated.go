@@ -183,6 +183,22 @@ type ComplexityRoot struct {
 		TenantName     func(childComplexity int) int
 	}
 
+	Tenantschema struct {
+		About       func(childComplexity int) int
+		Address     func(childComplexity int) int
+		Brandname   func(childComplexity int) int
+		Cod         func(childComplexity int) int
+		Digital     func(childComplexity int) int
+		Email       func(childComplexity int) int
+		Moduleid    func(childComplexity int) int
+		Modulename  func(childComplexity int) int
+		Phone       func(childComplexity int) int
+		Tenantaccid func(childComplexity int) int
+		Tenantid    func(childComplexity int) int
+		Tenantimage func(childComplexity int) int
+		Tenanttoken func(childComplexity int) int
+	}
+
 	Businessdata struct {
 		Code    func(childComplexity int) int
 		Message func(childComplexity int) int
@@ -1437,6 +1453,97 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TenantData.TenantName(childComplexity), true
+
+	case "Tenantschema.about":
+		if e.complexity.Tenantschema.About == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.About(childComplexity), true
+
+	case "Tenantschema.address":
+		if e.complexity.Tenantschema.Address == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Address(childComplexity), true
+
+	case "Tenantschema.brandname":
+		if e.complexity.Tenantschema.Brandname == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Brandname(childComplexity), true
+
+	case "Tenantschema.cod":
+		if e.complexity.Tenantschema.Cod == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Cod(childComplexity), true
+
+	case "Tenantschema.digital":
+		if e.complexity.Tenantschema.Digital == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Digital(childComplexity), true
+
+	case "Tenantschema.email":
+		if e.complexity.Tenantschema.Email == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Email(childComplexity), true
+
+	case "Tenantschema.Moduleid":
+		if e.complexity.Tenantschema.Moduleid == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Moduleid(childComplexity), true
+
+	case "Tenantschema.Modulename":
+		if e.complexity.Tenantschema.Modulename == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Modulename(childComplexity), true
+
+	case "Tenantschema.phone":
+		if e.complexity.Tenantschema.Phone == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Phone(childComplexity), true
+
+	case "Tenantschema.tenantaccid":
+		if e.complexity.Tenantschema.Tenantaccid == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Tenantaccid(childComplexity), true
+
+	case "Tenantschema.Tenantid":
+		if e.complexity.Tenantschema.Tenantid == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Tenantid(childComplexity), true
+
+	case "Tenantschema.tenantimage":
+		if e.complexity.Tenantschema.Tenantimage == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Tenantimage(childComplexity), true
+
+	case "Tenantschema.tenanttoken":
+		if e.complexity.Tenantschema.Tenanttoken == nil {
+			break
+		}
+
+		return e.complexity.Tenantschema.Tenanttoken(childComplexity), true
 
 	case "businessdata.code":
 		if e.complexity.Businessdata.Code == nil {
@@ -3305,11 +3412,11 @@ input tenantuser{
  TenantId:Int!
  firstname: String!
  lastname:String!
- password: String!
  mobile:String!
  email:String!
  locationid:Int!
  roleid:Int!
+ configid:Int!
 }
 input data{
  tenantinfo:TenantDetails
@@ -3816,6 +3923,24 @@ code:Int!
 message:String! 
 category:[Cat]
 }
+
+type Tenantschema{
+ Tenantid:Int!
+ Moduleid:Int!
+ Modulename:String!
+ brandname:String
+ about:String
+ email:String
+ phone:String
+ address:String
+ cod:Int
+ digital:Int
+ tenantaccid:String
+ tenanttoken:String
+ tenantimage:String
+}
+
+
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
@@ -8163,6 +8288,431 @@ func (ec *executionContext) _TenantData_Subcategoryid(ctx context.Context, field
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_Tenantid(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_Moduleid(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Moduleid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_Modulename(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Modulename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_brandname(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Brandname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_about(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.About, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_email(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_phone(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Phone, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_address(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Address, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_cod(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cod, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_digital(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Digital, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_tenantaccid(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantaccid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_tenanttoken(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenanttoken, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantschema_tenantimage(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantschema",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantimage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -18908,14 +19458,6 @@ func (ec *executionContext) unmarshalInputtenantuser(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "password":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "mobile":
 			var err error
 
@@ -18945,6 +19487,14 @@ func (ec *executionContext) unmarshalInputtenantuser(ctx context.Context, obj in
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roleid"))
 			it.Roleid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "configid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("configid"))
+			it.Configid, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20083,6 +20633,63 @@ func (ec *executionContext) _TenantData(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var tenantschemaImplementors = []string{"Tenantschema"}
+
+func (ec *executionContext) _Tenantschema(ctx context.Context, sel ast.SelectionSet, obj *model.Tenantschema) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tenantschemaImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Tenantschema")
+		case "Tenantid":
+			out.Values[i] = ec._Tenantschema_Tenantid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Moduleid":
+			out.Values[i] = ec._Tenantschema_Moduleid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Modulename":
+			out.Values[i] = ec._Tenantschema_Modulename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "brandname":
+			out.Values[i] = ec._Tenantschema_brandname(ctx, field, obj)
+		case "about":
+			out.Values[i] = ec._Tenantschema_about(ctx, field, obj)
+		case "email":
+			out.Values[i] = ec._Tenantschema_email(ctx, field, obj)
+		case "phone":
+			out.Values[i] = ec._Tenantschema_phone(ctx, field, obj)
+		case "address":
+			out.Values[i] = ec._Tenantschema_address(ctx, field, obj)
+		case "cod":
+			out.Values[i] = ec._Tenantschema_cod(ctx, field, obj)
+		case "digital":
+			out.Values[i] = ec._Tenantschema_digital(ctx, field, obj)
+		case "tenantaccid":
+			out.Values[i] = ec._Tenantschema_tenantaccid(ctx, field, obj)
+		case "tenanttoken":
+			out.Values[i] = ec._Tenantschema_tenanttoken(ctx, field, obj)
+		case "tenantimage":
+			out.Values[i] = ec._Tenantschema_tenantimage(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

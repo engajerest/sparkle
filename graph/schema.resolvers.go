@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/engajerest/auth/datacontext"
@@ -128,13 +129,27 @@ func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.T
 	var user subscription.TenantUser
 	user.FirstName = create.Firstname
 	user.LastName = create.Lastname
-	user.Password = create.Password
+	user.Configid = create.Configid
 	user.Email = create.Email
 	user.Mobile = create.Mobile
-	user.RoleId = create.Roleid
+	user.Roleid = create.Roleid
 	user.Locationid = create.Locationid
-	user.TenantID = create.TenantID
-	tenantuserid := user.CreateTenantUser()
+	user.Tenantid = create.TenantID
+	tenantuserid, err := user.CreateTenantUser()
+	if err != nil {
+		if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'authname'", user.Email) {
+			print("true")
+			return &model.Tenantuserdata{Status: false, Code: http.StatusConflict, Message: "Email Already Exists",
+				Tenantuser: &model.User{}}, nil
+		} else if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'contactno'", user.Mobile) {
+			return &model.Tenantuserdata{Status: false, Code: http.StatusConflict, Message: "Contactno Already Exists",
+				Tenantuser: &model.User{}}, nil
+		} else {
+			return nil, err
+		}
+
+	}
+
 	if tenantuserid != 0 {
 		tenantprofileid := user.InsertTenantUserintoProfile(tenantuserid)
 		print(tenantprofileid)
@@ -160,13 +175,27 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 	print(id.ID)
 	var data subscription.TenantUser
 	data.Userid = update.Userid
-	data.TenantID = update.Tenantid
+	data.Tenantid = update.Tenantid
 	data.FirstName = update.Firstname
 	data.LastName = update.Lastname
 	data.Email = update.Email
 	data.Mobile = update.Mobile
 	data.Locationid = update.Locationid
-	data1 := data.UpdateTenantUser()
+	data1,err := data.UpdateTenantUser()
+	if err != nil {
+		if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'authname'", data.Email) {
+			print("true")
+			return &model.Tenantupdatedata{Status: false, Code: http.StatusConflict, Message: "Email Already Exists",
+			Updated: 0,}, nil
+		} else if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'contactno'", data.Mobile) {
+			return &model.Tenantupdatedata{Status: false, Code: http.StatusConflict, Message: "Contactno Already Exists",
+			Updated: 0	}, nil
+		} else {
+			return nil, err
+		}
+
+	}
+
 	if data1 != false {
 		return &model.Tenantupdatedata{
 			Status:  true,
@@ -991,7 +1020,7 @@ func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*mo
 	if len(d) != 0 {
 		for _, k := range d {
 			data = append(data, &model.Subscriptionsdata{Packageid: &k.Packageid, Moduleid: k.Moduleid, Tenantid: k.Tenantid, Modulename: k.Modulename, Packagename: &k.Packagename,
-			Categoryid: k.Categoryid,Subcategoryid: k.Subcategoryid,	Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
+				Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
 		}
 	}
 

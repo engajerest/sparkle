@@ -132,6 +132,22 @@ type TenantDetails struct {
 	Tenanttoken     string `json:"Tenanttoken"`
 }
 
+type Tenantschema struct {
+	Tenantid    int     `json:"Tenantid"`
+	Moduleid    int     `json:"Moduleid"`
+	Modulename  string  `json:"Modulename"`
+	Brandname   *string `json:"brandname"`
+	About       *string `json:"about"`
+	Email       *string `json:"email"`
+	Phone       *string `json:"phone"`
+	Address     *string `json:"address"`
+	Cod         *int    `json:"cod"`
+	Digital     *int    `json:"digital"`
+	Tenantaccid *string `json:"tenantaccid"`
+	Tenanttoken *string `json:"tenanttoken"`
+	Tenantimage *string `json:"tenantimage"`
+}
+
 type Business struct {
 	Businessupdate *Businessupdatedata `json:"businessupdate"`
 	Socialadd      []*Socialadddata    `json:"socialadd"`
@@ -645,11 +661,11 @@ type Tenantuser struct {
 	TenantID   int    `json:"TenantId"`
 	Firstname  string `json:"firstname"`
 	Lastname   string `json:"lastname"`
-	Password   string `json:"password"`
 	Mobile     string `json:"mobile"`
 	Email      string `json:"email"`
 	Locationid int    `json:"locationid"`
 	Roleid     int    `json:"roleid"`
+	Configid   int    `json:"configid"`
 }
 
 type Tenantuserdata struct {
