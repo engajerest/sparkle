@@ -264,8 +264,8 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 	if er != nil {
 		return nil, er
 	}
-	if staffid != 0 {
-		if len(createlist) != 0 {
+	if len(createlist) != 0 {
+		if staffid != 0 {
 			for i := 0; i < len(createlist); i++ {
 				var d subscription.TenantUser
 				d.Userid = update.Userid
@@ -276,21 +276,22 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 				staffdetailid := d.InsertTenantstaffdetails()
 				print(staffdetailid)
 			}
-
-		}
-	} else {
-		var d subscription.TenantUser
-		d.Userid = update.Userid
-		d.Tenantid = update.Tenantid
-		d.Moduleid = update.Moduleid
-		status, err := d.TenantstaffCreation(createlist)
-		if err != nil {
-			return nil, err
-		}
-		if status == false {
-			return nil, errors.New("staff not created")
+	
+		} else {
+			var d subscription.TenantUser
+			d.Userid = update.Userid
+			d.Tenantid = update.Tenantid
+			d.Moduleid = update.Moduleid
+			status, err := d.TenantstaffCreation(createlist)
+			if err != nil {
+				return nil, err
+			}
+			if status == false {
+				return nil, errors.New("staff not created")
+			}
 		}
 	}
+
 
 	if data1 != false {
 		return &model.Tenantupdatedata{
