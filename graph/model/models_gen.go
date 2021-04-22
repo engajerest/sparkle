@@ -542,6 +542,7 @@ type Result struct {
 
 type Socialadddata struct {
 	Socialprofile *string `json:"socialprofile"`
+	Dailcode      *string `json:"dailcode"`
 	Sociallink    *string `json:"sociallink"`
 	Socialicon    *string `json:"socialicon"`
 }
@@ -549,6 +550,7 @@ type Socialadddata struct {
 type Socialinfo struct {
 	Socialid      int    `json:"socialid"`
 	Socialprofile string `json:"socialprofile"`
+	Dailcode      string `json:"dailcode"`
 	Sociallink    string `json:"sociallink"`
 	Socialicon    string `json:"socialicon"`
 }
@@ -556,6 +558,7 @@ type Socialinfo struct {
 type Socialupdatedata struct {
 	Socialid      *int    `json:"socialid"`
 	Socialprofile *string `json:"socialprofile"`
+	Dailcode      *string `json:"dailcode"`
 	Sociallink    *string `json:"sociallink"`
 	Socialicon    *string `json:"socialicon"`
 }

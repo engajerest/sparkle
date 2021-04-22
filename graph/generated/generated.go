@@ -447,6 +447,7 @@ type ComplexityRoot struct {
 	}
 
 	Socialinfo struct {
+		Dailcode      func(childComplexity int) int
 		Socialicon    func(childComplexity int) int
 		Socialid      func(childComplexity int) int
 		Sociallink    func(childComplexity int) int
@@ -2777,6 +2778,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Result.Status(childComplexity), true
 
+	case "socialinfo.dailcode":
+		if e.complexity.Socialinfo.Dailcode == nil {
+			break
+		}
+
+		return e.complexity.Socialinfo.Dailcode(childComplexity), true
+
 	case "socialinfo.socialicon":
 		if e.complexity.Socialinfo.Socialicon == nil {
 			break
@@ -3951,12 +3959,14 @@ input businessupdatedata{
 input socialupdatedata{
 socialid:Int
  socialprofile:String
+ dailcode:String
  sociallink:String
  socialicon:String
 }
 input socialadddata{
 
  socialprofile:String
+ dailcode:String
  sociallink:String
  socialicon:String
 }
@@ -3997,6 +4007,7 @@ type info{
 type socialinfo{
 socialid:Int!
  socialprofile:String!
+ dailcode:String!
  sociallink:String!
  socialicon:String!
 }
@@ -16000,6 +16011,41 @@ func (ec *executionContext) _socialinfo_socialprofile(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _socialinfo_dailcode(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "socialinfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Dailcode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _socialinfo_sociallink(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -20290,6 +20336,14 @@ func (ec *executionContext) unmarshalInputsocialadddata(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
+		case "dailcode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dailcode"))
+			it.Dailcode, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "sociallink":
 			var err error
 
@@ -20331,6 +20385,14 @@ func (ec *executionContext) unmarshalInputsocialupdatedata(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialprofile"))
 			it.Socialprofile, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "dailcode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dailcode"))
+			it.Dailcode, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23597,6 +23659,11 @@ func (ec *executionContext) _socialinfo(ctx context.Context, sel ast.SelectionSe
 			}
 		case "socialprofile":
 			out.Values[i] = ec._socialinfo_socialprofile(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "dailcode":
+			out.Values[i] = ec._socialinfo_dailcode(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

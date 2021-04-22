@@ -276,7 +276,7 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 				staffdetailid := d.InsertTenantstaffdetails()
 				print(staffdetailid)
 			}
-	
+
 		} else {
 			var d subscription.TenantUser
 			d.Userid = update.Userid
@@ -291,7 +291,6 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 			}
 		}
 	}
-
 
 	if data1 != false {
 		return &model.Tenantupdatedata{
@@ -334,14 +333,14 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	socialdelete := *&businessinfo.Socialdelete
 	data1 := data.UpdateTenantBusiness()
 	for _, v := range schemasocialadd {
-		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon})
+		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile,Dailcode: *v.Dailcode, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon})
 	}
 	if len(check) != 0 {
 		social := data.InsertTenantSocial(check, data.TenantID)
 		print(social)
 	}
 	for _, k := range schemasocialupdate {
-		updatedata = append(updatedata, subscription.Social{Socialid: *k.Socialid, SociaProfile: *k.Socialprofile, SocialLink: *k.Sociallink, SocialIcon: *k.Socialicon})
+		updatedata = append(updatedata, subscription.Social{Socialid: *k.Socialid, SociaProfile: *k.Socialprofile, Dailcode: *k.Dailcode,SocialLink: *k.Sociallink, SocialIcon: *k.Socialicon})
 	}
 	if len(updatedata) != 0 {
 		var s subscription.Social
@@ -350,6 +349,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 			s.SociaProfile = updatedata[i].SociaProfile
 			s.SocialIcon = updatedata[i].SocialIcon
 			s.SocialLink = updatedata[i].SocialLink
+			s.Dailcode=updatedata[i].Dailcode
 			status := s.UpdateTenantSocial(data.TenantID)
 			if status == false {
 				return nil, errors.New("error in updating socialinfo")
@@ -934,6 +934,7 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 		Result = append(Result, &model.Socialinfo{
 			Socialid:      user.Socialid,
 			Socialprofile: user.SociaProfile,
+			Dailcode: user.Dailcode,
 			Sociallink:    user.SocialLink,
 			Socialicon:    user.SocialIcon,
 		})

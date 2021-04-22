@@ -464,12 +464,14 @@ input businessupdatedata{
 input socialupdatedata{
 socialid:Int
  socialprofile:String
+ dailcode:String
  sociallink:String
  socialicon:String
 }
 input socialadddata{
 
  socialprofile:String
+ dailcode:String
  sociallink:String
  socialicon:String
 }
@@ -510,6 +512,7 @@ type info{
 type socialinfo{
 socialid:Int!
  socialprofile:String!
+ dailcode:String!
  sociallink:String!
  socialicon:String!
 }

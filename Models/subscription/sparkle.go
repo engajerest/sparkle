@@ -229,6 +229,7 @@ type AuthUser struct {
 type Social struct {
 	Socialid     int    `json:"socialid" `
 	SociaProfile string `json:"socialprofile"`
+	Dailcode string `json:"dailcode"`
 	SocialLink   string `json:"sociallink"`
 	SocialIcon   string `json:"socialicon"`
 }
