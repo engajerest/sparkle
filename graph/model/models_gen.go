@@ -534,6 +534,12 @@ type Promotypesdata struct {
 	Types   []*Typedata `json:"types"`
 }
 
+type Result struct {
+	Status  bool   `json:"status"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 type Socialadddata struct {
 	Socialprofile *string `json:"socialprofile"`
 	Sociallink    *string `json:"sociallink"`
@@ -552,6 +558,24 @@ type Socialupdatedata struct {
 	Socialprofile *string `json:"socialprofile"`
 	Sociallink    *string `json:"sociallink"`
 	Socialicon    *string `json:"socialicon"`
+}
+
+type Staffdetail struct {
+	Staffdetailid   int            `json:"Staffdetailid"`
+	Tenanatstaffid  int            `json:"Tenanatstaffid"`
+	Tenantid        int            `json:"Tenantid"`
+	Locationid      int            `json:"Locationid"`
+	Locationdetails *Stafflocation `json:"Locationdetails"`
+}
+
+type Stafflocation struct {
+	Locationid   int    `json:"Locationid"`
+	Locationname string `json:"Locationname"`
+	Email        string `json:"Email"`
+	Contact      string `json:"Contact"`
+	Address      string `json:"Address"`
+	City         string `json:"City"`
+	Postcode     string `json:"Postcode"`
 }
 
 type Subcat struct {
@@ -626,20 +650,23 @@ type Subscriptionnew struct {
 }
 
 type Subscriptionsdata struct {
-	Packageid     *int     `json:"Packageid"`
-	Moduleid      int      `json:"Moduleid"`
-	Tenantid      int      `json:"Tenantid"`
-	Categoryid    int      `json:"Categoryid"`
-	Subcategoryid int      `json:"Subcategoryid"`
-	Modulename    string   `json:"Modulename"`
-	Packagename   *string  `json:"Packagename"`
-	LogoURL       string   `json:"LogoUrl"`
-	Iconurl       string   `json:"Iconurl"`
-	PackageIcon   *string  `json:"PackageIcon"`
-	PackageAmount *float64 `json:"PackageAmount"`
-	TotalAmount   float64  `json:"TotalAmount"`
-	Customercount *int     `json:"Customercount"`
-	Locationcount *int     `json:"Locationcount"`
+	Subscriptionid       int      `json:"Subscriptionid"`
+	Packageid            *int     `json:"Packageid"`
+	Moduleid             int      `json:"Moduleid"`
+	Tenantid             int      `json:"Tenantid"`
+	Categoryid           int      `json:"Categoryid"`
+	Subcategoryid        int      `json:"Subcategoryid"`
+	Modulename           string   `json:"Modulename"`
+	Subscriptionaccid    string   `json:"Subscriptionaccid"`
+	Subscriptionmethodid string   `json:"Subscriptionmethodid"`
+	Packagename          *string  `json:"Packagename"`
+	LogoURL              string   `json:"LogoUrl"`
+	Iconurl              string   `json:"Iconurl"`
+	PackageIcon          *string  `json:"PackageIcon"`
+	PackageAmount        *float64 `json:"PackageAmount"`
+	TotalAmount          float64  `json:"TotalAmount"`
+	Customercount        *int     `json:"Customercount"`
+	Locationcount        *int     `json:"Locationcount"`
 }
 
 type Tenantsubcat struct {
@@ -658,12 +685,13 @@ type Tenantupdatedata struct {
 }
 
 type Tenantuser struct {
-	TenantID   int    `json:"TenantId"`
+	Tenantid   int    `json:"Tenantid"`
+	Moduleid   int    `json:"Moduleid"`
 	Firstname  string `json:"firstname"`
 	Lastname   string `json:"lastname"`
 	Mobile     string `json:"mobile"`
 	Email      string `json:"email"`
-	Locationid int    `json:"locationid"`
+	Locationid []int  `json:"locationid"`
 	Roleid     int    `json:"roleid"`
 	Configid   int    `json:"configid"`
 }
@@ -714,13 +742,16 @@ type Updateother struct {
 }
 
 type Updatetenant struct {
-	Userid     int    `json:"userid"`
-	Tenantid   int    `json:"tenantid"`
-	Firstname  string `json:"firstname"`
-	Lastname   string `json:"lastname"`
-	Mobile     string `json:"mobile"`
-	Email      string `json:"email"`
-	Locationid int    `json:"locationid"`
+	Tenantstaffid int    `json:"tenantstaffid"`
+	Userid        int    `json:"userid"`
+	Tenantid      int    `json:"tenantid"`
+	Moduleid      int    `json:"moduleid"`
+	Firstname     string `json:"firstname"`
+	Lastname      string `json:"lastname"`
+	Mobile        string `json:"mobile"`
+	Email         string `json:"email"`
+	Create        []int  `json:"create"`
+	Delete        []int  `json:"delete"`
 }
 
 type User struct {
@@ -728,16 +759,32 @@ type User struct {
 }
 
 type Userfromtenant struct {
-	UserID       int    `json:"userId"`
-	Locationid   int    `json:"locationid"`
-	LocationName string `json:"locationName"`
-	Tenantid     int    `json:"tenantid"`
-	Firstname    string `json:"firstname"`
-	Lastname     string `json:"lastname"`
-	Mobile       string `json:"mobile"`
-	Email        string `json:"email"`
-	Created      string `json:"created"`
-	Status       string `json:"status"`
+	Tenantstaffid int            `json:"Tenantstaffid"`
+	Tenantid      int            `json:"Tenantid"`
+	Moduleid      int            `json:"Moduleid"`
+	Userid        int            `json:"Userid"`
+	Firstname     string         `json:"Firstname"`
+	Lastname      string         `json:"Lastname"`
+	Email         string         `json:"Email"`
+	Contact       string         `json:"Contact"`
+	Staffdetails  []*Staffdetail `json:"Staffdetails"`
+}
+
+type Userinfodata struct {
+	Profileid int    `json:"Profileid"`
+	Userid    int    `json:"Userid"`
+	Firstname string `json:"Firstname"`
+	Lastname  string `json:"Lastname"`
+	Email     string `json:"Email"`
+	Contact   string `json:"Contact"`
+}
+
+type Userlist struct {
+	Tenantstaffid int           `json:"Tenantstaffid"`
+	Tenantid      int           `json:"Tenantid"`
+	Moduleid      int           `json:"Moduleid"`
+	Userid        int           `json:"Userid"`
+	Userinfo      *Userinfodata `json:"Userinfo"`
 }
 
 type Usersdata struct {
@@ -748,10 +795,9 @@ type Usersdata struct {
 }
 
 type Usertenant struct {
-	Userid         int    `json:"userid"`
-	Firstname      string `json:"firstname"`
-	Lastname       string `json:"lastname"`
-	Mobile         string `json:"mobile"`
-	Email          string `json:"email"`
-	Userlocationid int    `json:"Userlocationid"`
+	Staffdetailid  int         `json:"Staffdetailid"`
+	Tenanatstaffid int         `json:"Tenanatstaffid"`
+	Tenantid       int         `json:"Tenantid"`
+	Locationid     int         `json:"Locationid"`
+	Tenantusers    []*Userlist `json:"Tenantusers"`
 }

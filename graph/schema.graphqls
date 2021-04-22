@@ -167,12 +167,13 @@ TransactionDate:String!
 }
 
 input tenantuser{
- TenantId:Int!
+ Tenantid:Int!
+ Moduleid:Int!
  firstname: String!
  lastname:String!
  mobile:String!
  email:String!
- locationid:Int!
+ locationid:[Int!]
  roleid:Int!
  configid:Int!
 }
@@ -360,12 +361,26 @@ Slablimit:Int!
 Slabcharge:String!
 }
 type usertenant{
- userid:Int!
- firstname: String!
- lastname:String!
- mobile:String!
- email:String!
- Userlocationid:Int!
+Staffdetailid:Int!
+Tenanatstaffid:Int!
+Tenantid:Int!
+Locationid:Int!
+Tenantusers:[userlist]
+}
+type userlist{
+Tenantstaffid:Int!
+Tenantid:Int!
+Moduleid:Int!
+Userid:Int!
+Userinfo:userinfodata
+}
+type userinfodata{
+Profileid:Int!
+Userid:Int!
+Firstname:String!
+Lastname:String!
+Email:String!
+Contact:String!
 }
 type getalllocations{
  status:Boolean!
@@ -389,25 +404,47 @@ type usersdata{
  users:[userfromtenant]
 }
 type userfromtenant{
- userId: Int! 
- locationid:Int!
- locationName:String!
- tenantid:Int!
- firstname: String!
- lastname:String!
- mobile:String!
- email:String!
- created:String!
- status:String!
+Tenantstaffid:Int!
+Tenantid:Int!
+Moduleid:Int!
+Userid:Int!
+Firstname:String!
+Lastname:String!
+Email:String!
+Contact:String!
+Staffdetails:[staffdetail]
+ 
 }
+type staffdetail{
+Staffdetailid:Int!
+Tenanatstaffid:Int!
+Tenantid:Int!
+Locationid:Int!
+Locationdetails:stafflocation
+}
+type stafflocation{
+Locationid:Int!
+Locationname:String!
+Email:String!
+Contact:String!
+Address:String!
+City:String!
+Postcode:String!
+}
+
+
+
 input updatetenant{
+tenantstaffid:Int!
  userid: Int! 
  tenantid:Int!
+ moduleid:Int!
  firstname: String!
  lastname:String!
  mobile:String!
  email:String!
- locationid:Int!
+create:[Int!]
+delete:[Int!]
 }
 type tenantupdatedata{
  status:Boolean!
@@ -585,12 +622,15 @@ message:String!
 subscribed:[subscriptionsdata]  
 }
 type subscriptionsdata{
+Subscriptionid:Int!
 Packageid:Int
 Moduleid:Int!
 Tenantid:Int!
 Categoryid:Int!
 Subcategoryid:Int!
 Modulename:String!
+Subscriptionaccid:String!
+Subscriptionmethodid:String!
 Packagename:String
 LogoUrl:String!
 Iconurl:String!
@@ -599,6 +639,7 @@ PackageAmount:Float
 TotalAmount:Float!
 Customercount:Int
 Locationcount:Int
+
 }
 type getnonsubscribeddata{
 status:Boolean!
@@ -681,7 +722,11 @@ code:Int!
 message:String! 
 category:[Cat]
 }
-
+type result{
+ status:Boolean!
+code:Int!
+message:String!   
+}
 type Tenantschema{
  Tenantid:Int!
  Moduleid:Int!
@@ -702,7 +747,7 @@ type Tenantschema{
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
- tenantusers(tenantid:Int!):usersdata!
+ tenantusers(tenantid:Int!,userid:Int!):usersdata
  getBusiness(tenantid:Int!,categoryid:Int!):getBusinessdata
  getpromotions(tenantid:Int!):getpromotiondata
  getpromotypes:promotypesdata
@@ -716,6 +761,7 @@ type Query {
  getsubcategorybyid(categoryid:Int!): getsubcategorydata
  gettenantsubcategory(tenantid:Int!,categoryid:Int!,moduleid:Int!):gettenantsubcategorydata
  getnonsubscribedcategory(tenantid:Int!):getnonsubscribedcategorydata
+ gettenantinfo(tenantid:Int!):result
 
 
 }

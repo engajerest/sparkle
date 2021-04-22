@@ -142,20 +142,23 @@ type SubscribedData struct {
 }
 
 type TenantUser struct {
-	Tenantid    int    `json:"tenantid"`
-	Userid       int    `json:"userid"`
-	FirstName    string `json:"firstname"`
-	LastName     string `json:"lastname"`
-	Password     string `json:"password"`
-	Email        string `json:"email"`
-	Mobile       string `json:"mobile"`
-	Locationid   int    `json:"locationid"`
-	Locationname string `json:"locationname"`
-	Roleid       int    `json:""roleid`
-	Configid     int    `json:"configid"`
-	Referenceid  int    `json:"referenceid"`
-	Status       string `json:"status"`
-	Created      string `json:created`
+	Tenantid      int    `json:"tenantid"`
+	Userid        int    `json:"userid"`
+	FirstName     string `json:"firstname"`
+	LastName      string `json:"lastname"`
+	Password      string `json:"password"`
+	Email         string `json:"email"`
+	Mobile        string `json:"mobile"`
+	Locationid    int    `json:"locationid"`
+	Locationname  string `json:"locationname"`
+	Roleid        int    `json:"roleid"`
+	Configid      int    `json:"configid"`
+	Referenceid   int    `json:"referenceid"`
+	Status        string `json:"status"`
+	Created       string `json:"created`
+	Moduleid      int    `json:"moduleid"`
+	Tenantstaffid int    `json:"tenantstaffid"`
+	Staffdetailid int `json:"staffdetailid"`
 }
 type Location struct {
 	LocationId   int    `json:"locationid"`
@@ -238,29 +241,29 @@ type Tenantsocial struct {
 }
 type Tenantlocation struct {
 	// gorm.Model
-	Locationid   int    `json:"locationid" gorm:"primary_key"`
-	Tenantid     int    `json:"tenantid" gorm:"ForeignKey"`
-	Locationname string `json:"locationname"`
-	Email        string `json:"email"`
-	Contactno    string `json:"contactno"`
-	Address      string `json:"address"`
-	City         string `json:"city"`
-	State        string `json:"state"`
-	Postcode     string `json:"postcode"`
-	Countrycode  string `json:"countrycode"`
-	Latitude     string `json:"latitude"`
-	Longitude    string `json:"longitude"`
-	Opentime     string `json:""opentime`
-	Closetime    string `json:"closetime"`
-	Delivery     bool   `json:"delivery"`
-	Deliverytype string `json:"deliverytype"`
-	Deliverymins int    `json:"deliverymins"`
-	Createdby    int    `json:"createdby"`
-	Status       string `json:"status"`
-
-	Appuserprofiles []App_userprofiles `json:"appuserprofile" gorm:"ForeignKey:userlocationid"`
-	Tenantcharges   []Tenantcharge     `json:"tenantcharge" gorm:"ForeignKey:locationid"`
-	Tenantsettings  []Tenantsetting    `json:"tenantsetting" gorm:"ForeignKey:locationid"`
+	Locationid         int                  `json:"locationid" gorm:"primary_key"`
+	Tenantid           int                  `json:"tenantid" gorm:"ForeignKey"`
+	Locationname       string               `json:"locationname"`
+	Email              string               `json:"email"`
+	Contactno          string               `json:"contactno"`
+	Address            string               `json:"address"`
+	City               string               `json:"city"`
+	State              string               `json:"state"`
+	Postcode           string               `json:"postcode"`
+	Countrycode        string               `json:"countrycode"`
+	Latitude           string               `json:"latitude"`
+	Longitude          string               `json:"longitude"`
+	Opentime           string               `json:""opentime`
+	Closetime          string               `json:"closetime"`
+	Delivery           bool                 `json:"delivery"`
+	Deliverytype       string               `json:"deliverytype"`
+	Deliverymins       int                  `json:"deliverymins"`
+	Createdby          int                  `json:"createdby"`
+	Status             string               `json:"status"`
+	Tenantstaffdetails []Tenantstaffdetails `json:"tenantstaffdetails" gorm:"ForeignKey:locationid"`
+	// Appuserprofiles []App_userprofiles `json:"appuserprofile" gorm:"ForeignKey:userlocationid"`
+	Tenantcharges  []Tenantcharge  `json:"tenantcharge" gorm:"ForeignKey:locationid"`
+	Tenantsettings []Tenantsetting `json:"tenantsetting" gorm:"ForeignKey:locationid"`
 }
 type App_userprofiles struct {
 	// gorm.Model
@@ -361,20 +364,23 @@ type Customer struct {
 	Address    string `json:"address"`
 }
 type Subscribe struct {
-	Packageid     int     `json:"packageid"`
-	Tenantid      int     `json:"tenantid"`
-	Moduleid      int     `json:"moduleId"`
-	Modulename    string  `json:"modulename"`
-	Packagename   string  `json:"packagename"`
-	PackageAmount float64 `json:"packageamount"`
-	Totalamount   float64 `json:"totalamount"`
-	Logourl       string  `json:"logourl"`
-	Iconurl       string  `json:"iconurl"`
-	PackageIcon   string  `json:"packageicon"`
-	Customercount int     `json:"customercount"`
-	Locationcount int     `json:"locationcount"`
-	Subcategoryid int     `json:"subcategoryid"`
-	Categoryid    int     `json:"categoryid"`
+	Packageid            int     `json:"packageid"`
+	Subscriptionid       int     `json:"subscriptionid"`
+	Subscriptionaccid    string  `json:"subscriptionaccid"`
+	Subscriptionmethodid string  `json:"subscriptionmethodid"`
+	Tenantid             int     `json:"tenantid"`
+	Moduleid             int     `json:"moduleId"`
+	Modulename           string  `json:"modulename"`
+	Packagename          string  `json:"packagename"`
+	PackageAmount        float64 `json:"packageamount"`
+	Totalamount          float64 `json:"totalamount"`
+	Logourl              string  `json:"logourl"`
+	Iconurl              string  `json:"iconurl"`
+	PackageIcon          string  `json:"packageicon"`
+	Customercount        int     `json:"customercount"`
+	Locationcount        int     `json:"locationcount"`
+	Subcategoryid        int     `json:"subcategoryid"`
+	Categoryid           int     `json:"categoryid"`
 }
 type User struct {
 	ID          int    `json:"id"`
@@ -402,4 +408,88 @@ type Module struct {
 	Content    string `json:"content"`
 	Logourl    string `json:"logourl"`
 	Iconurl    string `json:"iconurl"`
+}
+type Tenants struct {
+	Tenantid            int                  `json:"tenantid" gorm:"primary_key"`
+	Partnerid           int                  `json:"partnerid"`
+	Registrationno      string               `json:"registrationno"`
+	Tenanttoken         string               `json:"tenanttoken"`
+	Tenantname          string               `json:"tenantname"`
+	Primaryemail        string               `json:"primaryemail"`
+	Primarycontact      string               `json:"primarycontact"`
+	Brandname           string               `json:"brandname"`
+	TenantaccId         int                  `json:"tenantaccid"`
+	About               string               `json:"about"`
+	Email               string               `json:"email"`
+	Phone               string               `json:"phone"`
+	Address             string               `json:"address"`
+	Paymode1            int                  `json:"paymode1"`
+	Paymode2            int                  `json:"paymode2"`
+	Tenantsubscriptions []Tenantsubscription `json:"tenantsubscriptions" gorm:"ForeignKey:tenantid;references:tenantid"`
+	Tenantlocations     []Tenantlocation     `json:"tenantlocations" gorm:"ForeignKey:tenantid;references:tenantid"`
+	Tenantsubcategories []Tenantsubcategory  `json:"tenantsubcategories" gorm:"ForeignKey:tenantid;references:tenantid"`
+}
+type Tenantsubcategory struct {
+	Tenantid        int    `json:"tenantid"`
+	Moduleid        int    `json:"moduleid"`
+	Categoryid      int    `json:"categoryid"`
+	Subcategoryid   int    `json:"subcategoryid"`
+	Subcategoryname string `json:"subcategoryname"`
+}
+type Tenantsubscription struct {
+	Date            string `json:"date"`
+	Packageid       int    `json:"packageid"`
+	Partnerid       int    `json:"partnerid"`
+	Moduleid        int    `json:"moduleId"`
+	Currencyid      int    `json:"currencyid"`
+	Categoryid      int    `json:"categoryid"`
+	SubCategoryid   int    `json:"subcategoryid"`
+	Subcategoryname string `json:"subcategoryname"`
+	Tenantid        int    `json:"tenantid"`
+	Price           string `json:"price"`
+	TaxId           int    `json:"taxId"`
+	TaxAmount       string `json:"taxamount"`
+	TotalAmount     string `json:"totalamount"`
+	PaymentStatus   int    `json:"paymentstatus"`
+	PaymentId       int    `json:"paymentId"`
+	Quantity        int    `json:"quantity"`
+	Promoid         int    `json:"promoid"`
+	Promovalue      string `json:"promovalue"`
+	Promostatus     bool   `json:"promostatus"`
+	Validitydate    string `json:"validitydate"`
+}
+type Tenantstaff struct {
+	Tenantstaffid      int                 `json:"tenantstaffid" gorm:"primary_key"`
+	Tenantid           int                 `json:"tenantid"`
+	Moduleid           int                 `json:"moduleid"`
+	Userid             int                 `json:"userid"`
+	Firstname          string              `json:"firstname"`
+	Lastname           string              `json:"lastname"`
+	Email              string              `json:"email"`
+	Contactno          string              `json:"contactno"`
+	Tenantstaffdetails []Tenantstaffdetail `json:"tenantstaffdetails" gorm:"ForeignKey:tenantstaffid;references:tenantstaffid"`
+}
+type Tenantstaffdetail struct {
+	Staffdetailid   int            `json:"staffdetailid"`
+	Tenantstaffid   int            `json:"tenantstaffid"`
+	Tenantid        int            `json:"tenantid"`
+	Locationid      int            `json:"locationid"`
+	Tenantlocations Tenantlocation `json:"tenantlocation" gorm:"ForeignKey:locationid;references:locationid"`
+}
+
+//seperation process
+type Tenantstaffdetails struct {
+	Staffdetailid int            `json:"staffdetailid"`
+	Tenantstaffid int            `json:"tenantstaffid"`
+	Tenantid      int            `json:"tenantid"`
+	Locationid    int            `json:"locationid"`
+	Tenantstaffs  []Tenantstaffs `json:"tenantstaffs" gorm:"ForeignKey:tenantstaffid;references:tenantstaffid"`
+}
+
+type Tenantstaffs struct {
+	Tenantstaffid   int              `json:"tenantstaffid" gorm:"primary_key"`
+	Tenantid        int              `json:"tenantid"`
+	Moduleid        int              `json:"moduleid"`
+	Userid          int              `json:"userid"`
+	Appuserprofiles App_userprofiles `json:"appuserprofiles" gorm:"ForeignKey:userid;references:userid"`
 }

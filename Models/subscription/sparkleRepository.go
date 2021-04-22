@@ -32,9 +32,15 @@ const (
 	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocations WHERE status='Active' AND locationid=? "
 	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocations WHERE status='Active' AND tenantid=? "
 	createTenantUserQuery          = "INSERT INTO app_users (authname,password,hashsalt,contactno,roleid,referenceid) VALUES(?,?,?,?,?,?)"
-	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofiles (userid,firstname,lastname,email,contactno,userlocationid) VALUES(?,?,?,?,?,?)"
+	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofiles (userid,firstname,lastname,email,contactno) VALUES(?,?,?,?,?)"
+	insertTenantstaff              = "INSERT INTO tenantstaffs (tenantid,moduleid,userid) VALUES(?,?,?)"
+	insertTenantstaffdetails       = "INSERT INTO tenantstaffdetails (tenantstaffid,tenantid,locationid) VALUES(?,?,?)"
+	checktenantstaffid             = "SELECT IFNULL(tenantstaffid,0) AS tenantstaffid FROM tenantstaffs WHERE tenantid=? AND moduleid=? AND  userid=?"
+	checkfordeletestaff = "SELECT IFNULL(staffdetailid,0) AS staffdetailid FROM tenantstaffdetails WHERE tenantstaffid=?"
+	deletetenantstaff              = "DELETE FROM tenantstaffs WHERE tenantstaffid=?"
+	deletetenantstaffdetails       = "DELETE FROM tenantstaffdetails WHERE staffdetailid=?"
 	getAllTenantUsers              = "SELECT a.firstname,a.lastname,a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocations b, app_users c WHERE  a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=?"
-	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
+	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=? WHERE a.userid=b.userid AND a.userid=?"
 	getAllTenantUserByLocationId   = ""
 	updateTenantBusiness           = "UPDATE tenants SET brandname=?,tenantinfo=?,paymode1=?,paymode2=?,tenantimage=? WHERE tenantid=?"
 	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,sociallink,socialicon) VALUES"
@@ -55,7 +61,7 @@ const (
 	updatelocationstatus           = "UPDATE tenantlocations SET status=? WHERE tenantid= ? AND locationid=?"
 	updatedeliverystatus           = "UPDATE tenantlocations SET delivery=? WHERE tenantid= ? AND locationid=?"
 	getCustomerByid                = "SELECT customerid,firstname,lastname,contactno,email,IFNULL(configid,0) AS configid  FROM customers WHERE customerid=?"
-	getsubscription                = "SELECT a.packageid,a.moduleid,a.tenantid,a.categoryid,a.subcategoryid,a.totalamount,b.modulename,b.logourl,b.iconurl,'' as packagename,'0.0' AS packageamount,'' as packageicon, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b WHERE a.moduleid=b.moduleid AND   a.tenantid=?"
+	getsubscription                = "SELECT a.subscriptionid,a.packageid,a.moduleid,a.tenantid,a.categoryid,a.subcategoryid,a.totalamount,ifnull(a.subscriptionaccid,'') as subscriptionaccid,ifnull(a.subscriptionmethodid,'') as subscriptionmethodid, b.modulename,b.logourl,b.iconurl,'' as packagename,'0.0' AS packageamount,'' as packageicon, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b WHERE a.moduleid=b.moduleid AND   a.tenantid=?"
 	nonsubscribed                  = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(d.promocodeid,0) AS promocodeid,IFNULL(d.promoname ,'') AS promoname,IFNULL(d.promodescription,'') AS promodescription,IFNULL(d.promotype ,'') AS promotype,IFNULL(d.promovalue,0) AS promovalue,IFNULL(d.packageexpiry,0) AS packageexpiry,IFNULL(d.validity,'') AS validity,IF(d.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid INNER JOIN  app_promocodes d ON a.packageid=d.packageid WHERE a.`status`='Active' AND  a.packageid  NOT IN (SELECT packageid FROM tenantsubscription WHERE tenantid= ? )"
 	getpayments                    = "SELECT a.paymentid,a.packageid,IFNULL(a.paymentref,'') AS paymentref,IFNULL(a.locationid,0) AS locationid,a.paymenttypeid,a.tenantid,IFNULL(a.customerid,0) AS customerid,a.transactiondate,IFNULL(a.orderid,0) AS orderid,a.chargeid,a.amount,a.refundamt,a.paymentstatus,a.created,IFNULL(b.packagename,'') AS  packagename,IFNULL(c.firstname,'') AS firstname,IFNULL(c.lastname,'')AS lastname,IFNULL(c.contactno,'')AS contactno,IFNULL(c.email,'')AS email FROM payments a LEFT OUTER JOIN  app_package b ON a.packageid=b.packageid LEFT OUTER JOIN customers c ON  a.customerid=c.customerid WHERE tenantid=? AND paymenttypeid=?"
 	getbusinessforassist           = "SELECT a.tenantid,IFNULL(a.brandname,'') AS brandname,IFNULL(a.tenantinfo,'') AS tenantinfo,IFNULL(a.paymode1,0) AS paymode1,IFNULL(a.paymode2,0) AS paymode2,IFNULL(a.tenantaccid,0) AS tenantaccid,IFNULL(a.address,'') AS address,IFNULL(a.primaryemail,'') AS primaryemail,IFNULL(a.primarycontact,'') AS  primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage,IFNULL(b.moduleid,0) AS moduleid,IFNULL(d.modulename,'') AS modulename FROM tenants a, tenantsubscription b , app_category c, app_module d WHERE a.tenantid=b.tenantid AND b.moduleid=d.moduleid AND c.categoryid=d.categoryid AND a.tenantid=? AND  c.categoryid=?"
@@ -65,7 +71,7 @@ const (
 	getmodules                     = "SELECT moduleid,categoryid,modulename,content,IFNULL(logourl,'') AS logourl,IFNULL(iconurl,'') AS iconurl FROM app_module WHERE STATUS='Active' AND categoryid=?"
 	getpromo                       = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active' AND moduleid=?"
 	insertsubcategory              = "INSERT INTO tenantsubcategories (tenantid,moduleid,categoryid,subcategoryid,subcategoryname) VALUES(?,?,?,?,?)"
-	createUsernopassword       = "INSERT INTO app_users (authname,contactno,roleid,configid,referenceid) VALUES(?,?,?,?,?)"
+	createUsernopassword           = "INSERT INTO app_users (authname,contactno,roleid,configid,referenceid) VALUES(?,?,?,?,?)"
 )
 
 func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, error) {
@@ -561,15 +567,15 @@ func LocationTest(id int) []Tenantlocation {
 		log.Println("Connection Established")
 	}
 
-	var orders []Tenantlocation
+	var data []Tenantlocation
 
-	DB.Table("tenantlocations").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&orders)
+	DB.Table("tenantlocations").Preload("Tenantstaffdetails").Preload("Tenantstaffdetails.Tenantstaffs").
+	Preload("Tenantstaffdetails.Tenantstaffs.Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&data)
+	for index, value := range data {
+		fmt.Println(index, " = ", value)
+	}
 
-	// fmt.Println(orders)
-	// for index, value := range orders {
-	// 	fmt.Println(index, " = ", value)
-	// log.Print(pretty.Sprint(tentlocation))
-	return orders
+	return data
 
 }
 
@@ -585,7 +591,8 @@ func Locationbyid(tenantid, locationid int) *Tenantlocation {
 
 	var data Tenantlocation
 
-	DB.Table("tenantlocations").Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=? AND locationid=?", tenantid, locationid).Find(&data)
+	DB.Table("tenantlocations").Preload("Tenantstaffdetails").Preload("Tenantstaffdetails.Tenantstaffs").
+	Preload("Tenantstaffdetails.Tenantstaffs.Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=? AND locationid=?", tenantid, locationid).Find(&data)
 
 	fmt.Println(data)
 
@@ -640,7 +647,7 @@ func (user *TenantUser) InsertTenantUserintoProfile(id int64) int64 {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(id, &user.FirstName, &user.LastName, &user.Email, &user.Mobile, &user.Locationid)
+	res, err := statement.Exec(id, &user.FirstName, &user.LastName, &user.Email, &user.Mobile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -650,6 +657,85 @@ func (user *TenantUser) InsertTenantUserintoProfile(id int64) int64 {
 	}
 	log.Print("Row inserted in tenant user profile!")
 	return id
+}
+func (user *TenantUser) InsertTenantstaffs() int64 {
+	statement, err := database.Db.Prepare(insertTenantstaff)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer statement.Close()
+	res, err := statement.Exec(&user.Tenantid, &user.Moduleid, &user.Locationid, &user.Userid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	id, err1 := res.LastInsertId()
+	if err1 != nil {
+		log.Fatal("Error:", err1.Error())
+	}
+	log.Print("Row inserted in tenantstaffs!")
+	return id
+}
+func (user *TenantUser) InsertTenantstaffdetails() int64 {
+	statement, err := database.Db.Prepare(insertTenantstaffdetails)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer statement.Close()
+	res, err := statement.Exec(&user.Tenantstaffid,
+		&user.Tenantid, &user.Locationid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	id, err1 := res.LastInsertId()
+	if err1 != nil {
+		log.Fatal("Error:", err1.Error())
+	}
+	log.Print("Row inserted in tenantstaffdetails!")
+	return id
+}
+func (c *TenantUser) Deletetenantstaff() bool {
+
+	statement, err := database.Db.Prepare(deletetenantstaff)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	_, err = statement.Exec(&c.Tenantstaffid)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	log.Print("Row deleted in tenantstaffs!")
+	return true
+
+}
+func (c *TenantUser) Deletetenantstaffdetails() bool {
+
+	statement, err := database.Db.Prepare(deletetenantstaffdetails)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	_, err = statement.Exec(&c.Staffdetailid)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	log.Print("Row deleted in tenantstaffs!")
+	return true
+
 }
 func GetAllTenantUsers(id int) []TenantUser {
 	stmt, err := database.Db.Prepare(getAllTenantUsers)
@@ -682,12 +768,12 @@ func GetAllTenantUsers(id int) []TenantUser {
 
 	return tenantuserlist
 }
-func (user *TenantUser) CreateTenantUser() (int64 ,error){
+func (user *TenantUser) CreateTenantUser() (int64, error) {
 	fmt.Println("nopass")
 	statement, err := database.Db.Prepare(createUsernopassword)
 	fmt.Println("1")
 	if err != nil {
-	print(err)
+		print(err)
 		return 0, err
 
 	}
@@ -695,7 +781,7 @@ func (user *TenantUser) CreateTenantUser() (int64 ,error){
 
 	fmt.Println("2")
 
-	res, err1 := statement.Exec(&user.Email, &user.Mobile, &user.Roleid, &user.Configid,&user.Tenantid)
+	res, err1 := statement.Exec(&user.Email, &user.Mobile, &user.Roleid, &user.Configid, &user.Tenantid)
 	if err1 != nil {
 
 		fmt.Println(err1)
@@ -711,17 +797,17 @@ func (user *TenantUser) CreateTenantUser() (int64 ,error){
 	log.Print("Row inserted in tenantuser!")
 	return id, nil
 }
-func (user *TenantUser) UpdateTenantUser() (bool,error) {
+func (user *TenantUser) UpdateTenantUser() (bool, error) {
 	statement, err := database.Db.Prepare(updateTenantUser)
 	print(statement)
 
 	if err != nil {
 		print(err)
-			return false, err
-	
-		}
+		return false, err
+
+	}
 	defer statement.Close()
-	_, err1 := statement.Exec(user.Email, user.Mobile, user.FirstName, user.LastName, user.Email, user.Mobile, user.Locationid, user.Userid)
+	_, err1 := statement.Exec(user.Email, user.Mobile, user.FirstName, user.LastName, user.Email, user.Mobile, user.Userid)
 	if err1 != nil {
 
 		fmt.Println(err1)
@@ -730,7 +816,7 @@ func (user *TenantUser) UpdateTenantUser() (bool,error) {
 
 	}
 	log.Print("Row updated in tenant user profile!")
-	return true,nil
+	return true, nil
 }
 func (user *BusinessUpdate) UpdateTenantBusiness() bool {
 	statement, err := database.Db.Prepare(updateTenantBusiness)
@@ -1134,7 +1220,7 @@ func Getunsubscribecategory(tenantid int) []*model.Cat {
 	var q1 string
 	n1 := int64(tenantid)
 	tent := strconv.FormatInt(n1, 10)
-q1="SELECT categoryid,categoryname,categorytype,sortorder,`status` FROM app_category WHERE categoryid NOT IN(SELECT categoryid FROM tenantsubscription WHERE tenantid= "+tent+  " )"
+	q1 = "SELECT categoryid,categoryname,categorytype,sortorder,`status` FROM app_category WHERE categoryid NOT IN(SELECT categoryid FROM tenantsubscription WHERE tenantid= " + tent + " )"
 	var data []*model.Cat
 
 	DB.Raw(q1).Find(&data)
@@ -1184,7 +1270,7 @@ func Gettenantsubcat(moduleid, tenantid, categoryid int) []*model.Tenantsubcat {
 	cat := strconv.FormatInt(n3, 10)
 
 	q1 = "SELECT categoryid,subcategoryid,subcategoryname,icon,0 AS selected FROM app_subcategory WHERE categoryid=" + cat + "  AND STATUS='Active' AND subcategoryid NOT IN"
-	q2 = "(SELECT subcategoryid FROM tenantsubcategories WHERE tenantid=" + tent + "  AND moduleid="+ mod +" ) UNION"
+	q2 = "(SELECT subcategoryid FROM tenantsubcategories WHERE tenantid=" + tent + "  AND moduleid=" + mod + " ) UNION"
 	q3 = "  SELECT a.categoryid,a.subcategoryid,a.subcategoryname,IFNULL(b.icon,'') AS icon,1 AS selected FROM tenantsubcategories a, app_subcategory b WHERE a.subcategoryid=b.subcategoryid AND a.tenantid=" + tent + "  AND a.moduleid=" + mod + "  AND a.STATUS='Active'"
 	var data []*model.Tenantsubcat
 
@@ -1264,6 +1350,33 @@ func (o *Ordersequence) Insertcustomersequence() (int64, error) {
 
 	fmt.Println("2")
 	res, err := statement.Exec(&o.Tenantid, "customer", &o.Seqno, "CUS", &o.Subprefix)
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal("Error:", err.Error())
+
+	}
+	log.Print("Row inserted in CUSTOMERsequence!")
+	return id, nil
+}
+func (o *Ordersequence) Insertappointmentsequence() (int64, error) {
+
+	fmt.Println("0")
+
+	statement, err := database.Db.Prepare(insertsequence)
+	print(statement)
+	fmt.Println("1")
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+	defer statement.Close()
+
+	fmt.Println("2")
+	res, err := statement.Exec(&o.Tenantid, "appointment", &o.Seqno, "APP", &o.Subprefix)
 	if err != nil {
 		log.Fatal(err)
 
@@ -1470,7 +1583,7 @@ func GetAllSubscription(tenantid int) []Subscribe {
 
 	for rows.Next() {
 		var s Subscribe
-		err := rows.Scan(&s.Packageid, &s.Moduleid, &s.Tenantid,&s.Categoryid ,&s.Subcategoryid,&s.Totalamount, &s.Modulename, &s.Logourl,&s.Iconurl, &s.Packagename,
+		err := rows.Scan(&s.Subscriptionid, &s.Packageid, &s.Moduleid, &s.Tenantid, &s.Categoryid, &s.Subcategoryid, &s.Totalamount, &s.Subscriptionaccid, &s.Subscriptionmethodid, &s.Modulename, &s.Logourl, &s.Iconurl, &s.Packagename,
 			&s.PackageAmount, &s.PackageIcon, &s.Locationcount, &s.Customercount)
 		if err != nil {
 			log.Fatal(err)
@@ -1567,4 +1680,167 @@ func (d *TenantSubscription) Insertsubcategory() (int64, error) {
 	}
 	log.Print("Row inserted in subcat!")
 	return id, nil
+}
+func Gettenantinfo(tenantid int) Tenants {
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+	var data Tenants
+	DB.Table("tenants").Preload("Tenantsubscriptions").Preload("Tenantlocations").Preload("Tenantlocations.Appuserprofiles").Preload("Tenantlocations.Tenantcharges").Preload("Tenantlocations.Tenantsettings").Preload("Tenantsubcategories").Where("tenantid=?", tenantid).Find(&data)
+	fmt.Println(data)
+	return data
+}
+func Gettenantusers(tenantid, userid int) []Tenantstaff {
+
+	n := int64(tenantid)
+	tent := strconv.FormatInt(n, 10)
+	var user string
+	if userid != 0 {
+		n1 := int64(userid)
+		user = strconv.FormatInt(n1, 10)
+	}
+	var q1 string
+
+	if userid != 0 {
+		q1 = "SELECT a.tenantstaffid,a.tenantid,a.moduleid,a.userid,b.tenantname,c.firstname,c.lastname,c.email,c.contactno FROM tenantstaffs a,tenants b, app_userprofiles c WHERE a.tenantid=b.tenantid AND a.userid=c.userid AND a.tenantid= " + tent + " AND a.userid=" + user
+	} else {
+		q1 = "SELECT a.tenantstaffid,a.tenantid,a.moduleid,a.userid,b.tenantname,c.firstname,c.lastname,c.email,c.contactno FROM tenantstaffs a,tenants b, app_userprofiles c WHERE a.tenantid=b.tenantid AND a.userid=c.userid AND a.tenantid= " + tent
+	}
+
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+
+	var data []Tenantstaff
+	
+	DB.Raw(q1).Preload("Tenantstaffdetails").Preload("Tenantstaffdetails.Tenantlocations").Find(&data)
+	for index, value := range data {
+		fmt.Println(index, " = ", value)
+	}
+	return data
+}
+func Checkstaffdata(tenantid, moduleid, userid int) (int, error) {
+	var staffid int
+	fmt.Println("enrty in staffs")
+
+	stmt, err := database.Db.Prepare(checktenantstaffid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	row := stmt.QueryRow(tenantid, moduleid, userid)
+	// print(row)
+	err = row.Scan(&staffid)
+	print(err)
+	fmt.Println("2")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("no rows found")
+			data1 := Errors.RestError{}
+			data1.Error = err
+			return 0, nil
+		} else {
+
+			fmt.Println("nodata")
+			var data1 *Errors.RestError
+			data1.Error = err
+			return 0, nil
+		}
+
+	}
+
+	fmt.Println("completed")
+	return staffid, nil
+}
+func Checkfordeletestaffdata(tenantstaffid int) (int, error) {
+	var staffid int
+	fmt.Println("enrty in staffs")
+
+	stmt, err := database.Db.Prepare(checkfordeletestaff)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	row := stmt.QueryRow(tenantstaffid)
+	// print(row)
+	err = row.Scan(&staffid)
+	print(err)
+	fmt.Println("2")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("no rows found")
+			data1 := Errors.RestError{}
+			data1.Error = err
+			return 0, nil
+		} else {
+
+			fmt.Println("nodata")
+			var data1 *Errors.RestError
+			data1.Error = err
+			return 0, nil
+		}
+
+	}
+
+	fmt.Println("completed")
+	return staffid, nil
+}
+
+func (s *TenantUser) TenantstaffCreation(data []int) (bool, error) {
+	var staffid int64
+	var err error
+	tx, err := database.Db.Begin()
+	if err != nil {
+		return false, err
+	}
+	{
+		print("entry in tenanstaff")
+		stmt, err := tx.Prepare(insertTenantstaff)
+		if err != nil {
+			tx.Rollback()
+			return false, err
+		}
+		defer stmt.Close()
+
+		res, err := stmt.Exec(&s.Tenantid, &s.Moduleid, &s.Userid)
+		if err != nil {
+			tx.Rollback() // return an error too, we may want to wrap them
+			return false, err
+		}
+		staffid, err = res.LastInsertId()
+		print("tenantstaffid=", staffid)
+	}
+	datalist := data
+	if len(datalist) != 0 {
+		var a TenantUser
+		for i := 0; i < len(datalist); i++ {
+			a.Tenantstaffid = int(staffid)
+			a.Tenantid = s.Tenantid
+			a.Locationid = datalist[i]
+			{
+				print("entry in tenantstaffdetails")
+				stmt, err := tx.Prepare(insertTenantstaffdetails)
+				if err != nil {
+					tx.Rollback()
+					return false, err
+				}
+				defer stmt.Close()
+				if _, err := stmt.Exec(&a.Tenantstaffid, &a.Tenantid, &a.Locationid); err != nil {
+					tx.Rollback() // return an error too, we may want to wrap them
+					return false, err
+				}
+			}
+		}
+
+	}
+	tx.Commit()
+	return true, nil
 }
