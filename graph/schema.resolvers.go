@@ -137,6 +137,7 @@ func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.T
 	user.LastName = create.Lastname
 	user.Configid = create.Configid
 	user.Email = create.Email
+	user.Profileimage = create.Profileimage
 	user.Mobile = create.Mobile
 	user.Roleid = create.Roleid
 	intlist := create.Locationid
@@ -220,6 +221,7 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 	data.FirstName = update.Firstname
 	data.LastName = update.Lastname
 	data.Email = update.Email
+	data.Profileimage = update.Profileimage
 	data.Mobile = update.Mobile
 	createlist := update.Create
 	deletelist := update.Delete
@@ -832,7 +834,7 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 			for j, n := range k.Tenantstaffs {
 				staffresult[j] = &model.Userlist{Tenantstaffid: n.Tenantstaffid, Tenantid: n.Tenantid, Moduleid: n.Moduleid, Userid: n.Userid,
 					Userinfo: &model.Userinfodata{Profileid: n.Appuserprofiles.Profileid, Userid: n.Appuserprofiles.Userid, Firstname: n.Appuserprofiles.Firstname,
-						Lastname: n.Appuserprofiles.Lastname, Email: n.Appuserprofiles.Email, Contact: n.Appuserprofiles.Contactno}}
+						Lastname: n.Appuserprofiles.Lastname, Email: n.Appuserprofiles.Email, Contact: n.Appuserprofiles.Contactno, Profileimage: n.Appuserprofiles.Profileimage}}
 			}
 			userresult[i] = &model.Usertenant{Staffdetailid: k.Staffdetailid, Tenanatstaffid: k.Tenantstaffid, Tenantid: k.Tenantid, Locationid: k.Locationid,
 				Tenantusers: staffresult}
@@ -906,7 +908,7 @@ func (r *queryResolver) Tenantusers(ctx context.Context, tenantid int, userid in
 		}
 		Result = append(Result, &model.Userfromtenant{Tenantstaffid: k.Tenantstaffid, Tenantid: k.Tenantid,
 			Moduleid: k.Moduleid, Userid: k.Userid, Firstname: k.Firstname, Lastname: k.Lastname, Email: k.Email, Contact: k.Contactno,
-			Staffdetails: data1})
+			Profileimage: k.Profileimage, Staffdetails: data1})
 	}
 
 	return &model.Usersdata{
@@ -1120,7 +1122,7 @@ func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*mo
 		for _, k := range d {
 			data = append(data, &model.Subscriptionsdata{Packageid: &k.Packageid, Moduleid: k.Moduleid, Tenantid: k.Tenantid, Modulename: k.Modulename, Packagename: &k.Packagename,
 				Subscriptionid: k.Subscriptionid, Subscriptionaccid: k.Subscriptionaccid, Subscriptionmethodid: k.Subscriptionmethodid,
-			Paymentstatus: k.Paymentstatus,	Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
+				Paymentstatus: k.Paymentstatus, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
 		}
 	}
 
@@ -1144,7 +1146,7 @@ func (r *queryResolver) Getnonsubscribed(ctx context.Context, tenantid int) (*mo
 	return &model.Getnonsubscribeddata{Status: true, Code: http.StatusCreated, Message: "Success", Nonsubscribed: pack}, nil
 }
 
-func (r *queryResolver) Getallmodule(ctx context.Context, categoryid int, tenantid int) (*model.Getallmoduledata, error) {
+func (r *queryResolver) Getallmodule(ctx context.Context, categoryid int, tenantid int, mode bool) (*model.Getallmoduledata, error) {
 	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
@@ -1153,7 +1155,7 @@ func (r *queryResolver) Getallmodule(ctx context.Context, categoryid int, tenant
 	print(id.ID)
 	var mods []*model.Mod
 
-	mods = subscription.Getmodules(categoryid, tenantid)
+	mods = subscription.Getmodules(categoryid, tenantid,mode)
 	return &model.Getallmoduledata{Status: true, Code: http.StatusOK, Message: "Success", Modules: mods}, nil
 }
 

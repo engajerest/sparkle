@@ -149,6 +149,7 @@ type TenantUser struct {
 	Password      string `json:"password"`
 	Email         string `json:"email"`
 	Mobile        string `json:"mobile"`
+	Profileimage string `json:"profileimage"`
 	Locationid    int    `json:"locationid"`
 	Locationname  string `json:"locationname"`
 	Roleid        int    `json:"roleid"`
@@ -274,6 +275,7 @@ type App_userprofiles struct {
 	Lastname       string `json:"lastname"`
 	Email          string `json:"email"`
 	Contactno      string `json:"contactno"`
+	Profileimage string `json:"profileimage"`
 	Userlocationid int    `json:"userlocationid"`
 }
 type Promotion struct {
@@ -469,6 +471,7 @@ type Tenantstaff struct {
 	Lastname           string              `json:"lastname"`
 	Email              string              `json:"email"`
 	Contactno          string              `json:"contactno"`
+	Profileimage string `json:"profileimage"`
 	Tenantstaffdetails []Tenantstaffdetail `json:"tenantstaffdetails" gorm:"ForeignKey:tenantstaffid;references:tenantstaffid"`
 }
 type Tenantstaffdetail struct {

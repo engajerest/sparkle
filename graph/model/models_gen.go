@@ -689,15 +689,16 @@ type Tenantupdatedata struct {
 }
 
 type Tenantuser struct {
-	Tenantid   int    `json:"Tenantid"`
-	Moduleid   int    `json:"Moduleid"`
-	Firstname  string `json:"firstname"`
-	Lastname   string `json:"lastname"`
-	Mobile     string `json:"mobile"`
-	Email      string `json:"email"`
-	Locationid []int  `json:"locationid"`
-	Roleid     int    `json:"roleid"`
-	Configid   int    `json:"configid"`
+	Tenantid     int    `json:"Tenantid"`
+	Moduleid     int    `json:"Moduleid"`
+	Firstname    string `json:"firstname"`
+	Lastname     string `json:"lastname"`
+	Mobile       string `json:"mobile"`
+	Email        string `json:"email"`
+	Profileimage string `json:"profileimage"`
+	Locationid   []int  `json:"locationid"`
+	Roleid       int    `json:"roleid"`
+	Configid     int    `json:"configid"`
 }
 
 type Tenantuserdata struct {
@@ -754,6 +755,7 @@ type Updatetenant struct {
 	Lastname      string `json:"lastname"`
 	Mobile        string `json:"mobile"`
 	Email         string `json:"email"`
+	Profileimage  string `json:"profileimage"`
 	Create        []int  `json:"create"`
 	Delete        []int  `json:"delete"`
 }
@@ -771,16 +773,18 @@ type Userfromtenant struct {
 	Lastname      string         `json:"Lastname"`
 	Email         string         `json:"Email"`
 	Contact       string         `json:"Contact"`
+	Profileimage  string         `json:"Profileimage"`
 	Staffdetails  []*Staffdetail `json:"Staffdetails"`
 }
 
 type Userinfodata struct {
-	Profileid int    `json:"Profileid"`
-	Userid    int    `json:"Userid"`
-	Firstname string `json:"Firstname"`
-	Lastname  string `json:"Lastname"`
-	Email     string `json:"Email"`
-	Contact   string `json:"Contact"`
+	Profileid    int    `json:"Profileid"`
+	Userid       int    `json:"Userid"`
+	Firstname    string `json:"Firstname"`
+	Lastname     string `json:"Lastname"`
+	Email        string `json:"Email"`
+	Contact      string `json:"Contact"`
+	Profileimage string `json:"Profileimage"`
 }
 
 type Userlist struct {

@@ -173,6 +173,7 @@ input tenantuser{
  lastname:String!
  mobile:String!
  email:String!
+ profileimage:String!
  locationid:[Int!]
  roleid:Int!
  configid:Int!
@@ -381,6 +382,7 @@ Firstname:String!
 Lastname:String!
 Email:String!
 Contact:String!
+Profileimage:String!
 }
 type getalllocations{
  status:Boolean!
@@ -412,6 +414,7 @@ Firstname:String!
 Lastname:String!
 Email:String!
 Contact:String!
+Profileimage:String!
 Staffdetails:[staffdetail]
  
 }
@@ -443,6 +446,7 @@ tenantstaffid:Int!
  lastname:String!
  mobile:String!
  email:String!
+ profileimage:String!
 create:[Int!]
 delete:[Int!]
 }
@@ -760,7 +764,7 @@ type Query {
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
  getnonsubscribed(tenantid:Int!):getnonsubscribeddata
- getallmodule(categoryid:Int!,tenantid:Int!):getallmoduledata
+ getallmodule(categoryid:Int!,tenantid:Int!,mode:Boolean!):getallmoduledata
  getallpromos(moduleid:Int!):getallpromodata
  getsubcategorybyid(categoryid:Int!): getsubcategorydata
  gettenantsubcategory(tenantid:Int!,categoryid:Int!,moduleid:Int!):gettenantsubcategorydata

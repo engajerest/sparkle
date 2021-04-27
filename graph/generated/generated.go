@@ -138,7 +138,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetBusiness              func(childComplexity int, tenantid int, categoryid int) int
-		Getallmodule             func(childComplexity int, categoryid int, tenantid int) int
+		Getallmodule             func(childComplexity int, categoryid int, tenantid int, mode bool) int
 		Getallpromos             func(childComplexity int, moduleid int) int
 		Getchargetypes           func(childComplexity int) int
 		Getlocationbyid          func(childComplexity int, tenantid int, locationid int) int
@@ -553,6 +553,7 @@ type ComplexityRoot struct {
 		Firstname     func(childComplexity int) int
 		Lastname      func(childComplexity int) int
 		Moduleid      func(childComplexity int) int
+		Profileimage  func(childComplexity int) int
 		Staffdetails  func(childComplexity int) int
 		Tenantid      func(childComplexity int) int
 		Tenantstaffid func(childComplexity int) int
@@ -560,12 +561,13 @@ type ComplexityRoot struct {
 	}
 
 	Userinfodata struct {
-		Contact   func(childComplexity int) int
-		Email     func(childComplexity int) int
-		Firstname func(childComplexity int) int
-		Lastname  func(childComplexity int) int
-		Profileid func(childComplexity int) int
-		Userid    func(childComplexity int) int
+		Contact      func(childComplexity int) int
+		Email        func(childComplexity int) int
+		Firstname    func(childComplexity int) int
+		Lastname     func(childComplexity int) int
+		Profileid    func(childComplexity int) int
+		Profileimage func(childComplexity int) int
+		Userid       func(childComplexity int) int
 	}
 
 	Userlist struct {
@@ -619,7 +621,7 @@ type QueryResolver interface {
 	Getpayments(ctx context.Context, tenantid int, typeid int) (*model.Getpaymentdata, error)
 	Getsubscriptions(ctx context.Context, tenantid int) (*model.Getsubscriptionsdata, error)
 	Getnonsubscribed(ctx context.Context, tenantid int) (*model.Getnonsubscribeddata, error)
-	Getallmodule(ctx context.Context, categoryid int, tenantid int) (*model.Getallmoduledata, error)
+	Getallmodule(ctx context.Context, categoryid int, tenantid int, mode bool) (*model.Getallmoduledata, error)
 	Getallpromos(ctx context.Context, moduleid int) (*model.Getallpromodata, error)
 	Getsubcategorybyid(ctx context.Context, categoryid int) (*model.Getsubcategorydata, error)
 	Gettenantsubcategory(ctx context.Context, tenantid int, categoryid int, moduleid int) (*model.Gettenantsubcategorydata, error)
@@ -1212,7 +1214,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Getallmodule(childComplexity, args["categoryid"].(int), args["tenantid"].(int)), true
+		return e.complexity.Query.Getallmodule(childComplexity, args["categoryid"].(int), args["tenantid"].(int), args["mode"].(bool)), true
 
 	case "Query.getallpromos":
 		if e.complexity.Query.Getallpromos == nil {
@@ -3269,6 +3271,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Userfromtenant.Moduleid(childComplexity), true
 
+	case "userfromtenant.Profileimage":
+		if e.complexity.Userfromtenant.Profileimage == nil {
+			break
+		}
+
+		return e.complexity.Userfromtenant.Profileimage(childComplexity), true
+
 	case "userfromtenant.Staffdetails":
 		if e.complexity.Userfromtenant.Staffdetails == nil {
 			break
@@ -3331,6 +3340,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Userinfodata.Profileid(childComplexity), true
+
+	case "userinfodata.Profileimage":
+		if e.complexity.Userinfodata.Profileimage == nil {
+			break
+		}
+
+		return e.complexity.Userinfodata.Profileimage(childComplexity), true
 
 	case "userinfodata.Userid":
 		if e.complexity.Userinfodata.Userid == nil {
@@ -3676,6 +3692,7 @@ input tenantuser{
  lastname:String!
  mobile:String!
  email:String!
+ profileimage:String!
  locationid:[Int!]
  roleid:Int!
  configid:Int!
@@ -3884,6 +3901,7 @@ Firstname:String!
 Lastname:String!
 Email:String!
 Contact:String!
+Profileimage:String!
 }
 type getalllocations{
  status:Boolean!
@@ -3915,6 +3933,7 @@ Firstname:String!
 Lastname:String!
 Email:String!
 Contact:String!
+Profileimage:String!
 Staffdetails:[staffdetail]
  
 }
@@ -3946,6 +3965,7 @@ tenantstaffid:Int!
  lastname:String!
  mobile:String!
  email:String!
+ profileimage:String!
 create:[Int!]
 delete:[Int!]
 }
@@ -4263,7 +4283,7 @@ type Query {
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
  getnonsubscribed(tenantid:Int!):getnonsubscribeddata
- getallmodule(categoryid:Int!,tenantid:Int!):getallmoduledata
+ getallmodule(categoryid:Int!,tenantid:Int!,mode:Boolean!):getallmoduledata
  getallpromos(moduleid:Int!):getallpromodata
  getsubcategorybyid(categoryid:Int!): getsubcategorydata
  gettenantsubcategory(tenantid:Int!,categoryid:Int!,moduleid:Int!):gettenantsubcategorydata
@@ -4548,6 +4568,15 @@ func (ec *executionContext) field_Query_getallmodule_args(ctx context.Context, r
 		}
 	}
 	args["tenantid"] = arg1
+	var arg2 bool
+	if tmp, ok := rawArgs["mode"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
+		arg2, err = ec.unmarshalNBoolean2bool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["mode"] = arg2
 	return args, nil
 }
 
@@ -7714,7 +7743,7 @@ func (ec *executionContext) _Query_getallmodule(ctx context.Context, field graph
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Getallmodule(rctx, args["categoryid"].(int), args["tenantid"].(int))
+		return ec.resolvers.Query().Getallmodule(rctx, args["categoryid"].(int), args["tenantid"].(int), args["mode"].(bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -18473,6 +18502,41 @@ func (ec *executionContext) _userfromtenant_Contact(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _userfromtenant_Profileimage(ctx context.Context, field graphql.CollectedField, obj *model.Userfromtenant) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "userfromtenant",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Profileimage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _userfromtenant_Staffdetails(ctx context.Context, field graphql.CollectedField, obj *model.Userfromtenant) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -18699,6 +18763,41 @@ func (ec *executionContext) _userinfodata_Contact(ctx context.Context, field gra
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Contact, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _userinfodata_Profileimage(ctx context.Context, field graphql.CollectedField, obj *model.Userinfodata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "userinfodata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Profileimage, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -20870,6 +20969,14 @@ func (ec *executionContext) unmarshalInputtenantuser(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "profileimage":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("profileimage"))
+			it.Profileimage, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "locationid":
 			var err error
 
@@ -21175,6 +21282,14 @@ func (ec *executionContext) unmarshalInputupdatetenant(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "profileimage":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("profileimage"))
+			it.Profileimage, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24293,6 +24408,11 @@ func (ec *executionContext) _userfromtenant(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "Profileimage":
+			out.Values[i] = ec._userfromtenant_Profileimage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Staffdetails":
 			out.Values[i] = ec._userfromtenant_Staffdetails(ctx, field, obj)
 		default:
@@ -24344,6 +24464,11 @@ func (ec *executionContext) _userinfodata(ctx context.Context, sel ast.Selection
 			}
 		case "Contact":
 			out.Values[i] = ec._userinfodata_Contact(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Profileimage":
+			out.Values[i] = ec._userinfodata_Profileimage(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
