@@ -506,6 +506,7 @@ type ComplexityRoot struct {
 		PackageIcon          func(childComplexity int) int
 		Packageid            func(childComplexity int) int
 		Packagename          func(childComplexity int) int
+		Paymentstatus        func(childComplexity int) int
 		Subcategoryid        func(childComplexity int) int
 		Subscriptionaccid    func(childComplexity int) int
 		Subscriptionid       func(childComplexity int) int
@@ -3065,6 +3066,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscriptionsdata.Packagename(childComplexity), true
 
+	case "subscriptionsdata.Paymentstatus":
+		if e.complexity.Subscriptionsdata.Paymentstatus == nil {
+			break
+		}
+
+		return e.complexity.Subscriptionsdata.Paymentstatus(childComplexity), true
+
 	case "subscriptionsdata.Subcategoryid":
 		if e.complexity.Subscriptionsdata.Subcategoryid == nil {
 			break
@@ -4129,6 +4137,7 @@ Subcategoryid:Int!
 Modulename:String!
 Subscriptionaccid:String!
 Subscriptionmethodid:String!
+Paymentstatus:Boolean!
 Packagename:String
 LogoUrl:String!
 Iconurl:String!
@@ -4189,7 +4198,7 @@ City:String!
 Postcode:String!
 }
 type getsubcategorydata{
-  status:Boolean!
+status:Boolean!
 code:Int!
 message:String! 
 subcategories:[subcat]   
@@ -4260,8 +4269,6 @@ type Query {
  gettenantsubcategory(tenantid:Int!,categoryid:Int!,moduleid:Int!):gettenantsubcategorydata
  getnonsubscribedcategory(tenantid:Int!):getnonsubscribedcategorydata
  gettenantinfo(tenantid:Int!):result
-
-
 }
 
 type Mutation {
@@ -17297,6 +17304,41 @@ func (ec *executionContext) _subscriptionsdata_Subscriptionmethodid(ctx context.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _subscriptionsdata_Paymentstatus(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscriptionsdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Paymentstatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _subscriptionsdata_Packagename(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -23967,6 +24009,11 @@ func (ec *executionContext) _subscriptionsdata(ctx context.Context, sel ast.Sele
 			}
 		case "Subscriptionmethodid":
 			out.Values[i] = ec._subscriptionsdata_Subscriptionmethodid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Paymentstatus":
+			out.Values[i] = ec._subscriptionsdata_Paymentstatus(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

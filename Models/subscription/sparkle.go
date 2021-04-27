@@ -382,6 +382,7 @@ type Subscribe struct {
 	Locationcount        int     `json:"locationcount"`
 	Subcategoryid        int     `json:"subcategoryid"`
 	Categoryid           int     `json:"categoryid"`
+	Paymentstatus bool `json:"paymentstatus"`
 }
 type User struct {
 	ID          int    `json:"id"`

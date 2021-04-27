@@ -662,6 +662,7 @@ type Subscriptionsdata struct {
 	Modulename           string   `json:"Modulename"`
 	Subscriptionaccid    string   `json:"Subscriptionaccid"`
 	Subscriptionmethodid string   `json:"Subscriptionmethodid"`
+	Paymentstatus        bool     `json:"Paymentstatus"`
 	Packagename          *string  `json:"Packagename"`
 	LogoURL              string   `json:"LogoUrl"`
 	Iconurl              string   `json:"Iconurl"`

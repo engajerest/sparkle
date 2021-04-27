@@ -634,6 +634,7 @@ Subcategoryid:Int!
 Modulename:String!
 Subscriptionaccid:String!
 Subscriptionmethodid:String!
+Paymentstatus:Boolean!
 Packagename:String
 LogoUrl:String!
 Iconurl:String!
@@ -694,7 +695,7 @@ City:String!
 Postcode:String!
 }
 type getsubcategorydata{
-  status:Boolean!
+status:Boolean!
 code:Int!
 message:String! 
 subcategories:[subcat]   
@@ -765,8 +766,6 @@ type Query {
  gettenantsubcategory(tenantid:Int!,categoryid:Int!,moduleid:Int!):gettenantsubcategorydata
  getnonsubscribedcategory(tenantid:Int!):getnonsubscribedcategorydata
  gettenantinfo(tenantid:Int!):result
-
-
 }
 
 type Mutation {

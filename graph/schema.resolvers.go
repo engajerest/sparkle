@@ -333,14 +333,14 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	socialdelete := *&businessinfo.Socialdelete
 	data1 := data.UpdateTenantBusiness()
 	for _, v := range schemasocialadd {
-		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile,Dailcode: *v.Dailcode, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon})
+		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile, Dailcode: *v.Dailcode, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon})
 	}
 	if len(check) != 0 {
 		social := data.InsertTenantSocial(check, data.TenantID)
 		print(social)
 	}
 	for _, k := range schemasocialupdate {
-		updatedata = append(updatedata, subscription.Social{Socialid: *k.Socialid, SociaProfile: *k.Socialprofile, Dailcode: *k.Dailcode,SocialLink: *k.Sociallink, SocialIcon: *k.Socialicon})
+		updatedata = append(updatedata, subscription.Social{Socialid: *k.Socialid, SociaProfile: *k.Socialprofile, Dailcode: *k.Dailcode, SocialLink: *k.Sociallink, SocialIcon: *k.Socialicon})
 	}
 	if len(updatedata) != 0 {
 		var s subscription.Social
@@ -349,7 +349,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 			s.SociaProfile = updatedata[i].SociaProfile
 			s.SocialIcon = updatedata[i].SocialIcon
 			s.SocialLink = updatedata[i].SocialLink
-			s.Dailcode=updatedata[i].Dailcode
+			s.Dailcode = updatedata[i].Dailcode
 			status := s.UpdateTenantSocial(data.TenantID)
 			if status == false {
 				return nil, errors.New("error in updating socialinfo")
@@ -934,7 +934,7 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 		Result = append(Result, &model.Socialinfo{
 			Socialid:      user.Socialid,
 			Socialprofile: user.SociaProfile,
-			Dailcode: user.Dailcode,
+			Dailcode:      user.Dailcode,
 			Sociallink:    user.SocialLink,
 			Socialicon:    user.SocialIcon,
 		})
@@ -1120,7 +1120,7 @@ func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*mo
 		for _, k := range d {
 			data = append(data, &model.Subscriptionsdata{Packageid: &k.Packageid, Moduleid: k.Moduleid, Tenantid: k.Tenantid, Modulename: k.Modulename, Packagename: &k.Packagename,
 				Subscriptionid: k.Subscriptionid, Subscriptionaccid: k.Subscriptionaccid, Subscriptionmethodid: k.Subscriptionmethodid,
-				Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
+			Paymentstatus: k.Paymentstatus,	Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
 		}
 	}
 
