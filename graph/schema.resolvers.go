@@ -668,7 +668,6 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 			data1.Partnerid = intlist[i].Partnerid
 			data1.Categoryid = intlist[i].CategoryID
 			data1.SubCategoryid = intlist[i].SubCategoryID
-
 			data1.Moduleid = intlist[i].Moduleid
 			data1.PaymentId = *intlist[i].Paymentid
 			data1.PaymentStatus = intlist[i].PaymentStatus
@@ -688,16 +687,22 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 			print(intlist[i].Tenantid)
 		}
 	}
-	var d subscription.TenantSubscription
-	d.Categoryid = intlist[0].CategoryID
-	d.SubCategoryid = intlist[0].SubCategoryID
-	d.Moduleid = intlist[0].Moduleid
-	d.Tenantid = intlist[0].Tenantid
-	d.Subcategoryname = intlist[0].Subcategoryname
-	_, er := d.Insertsubcategory()
-	if er != nil {
-		print(er)
+	if len(intlist) != 0 {
+		for i := 0; i < len(intlist); i++{
+			var d subscription.TenantSubscription
+			d.Categoryid = intlist[i].CategoryID
+			d.SubCategoryid = intlist[i].SubCategoryID
+			d.Moduleid = intlist[i].Moduleid
+			d.Tenantid = intlist[i].Tenantid
+			d.Subcategoryname = intlist[i].Subcategoryname
+			_, er := d.Insertsubcategory()
+			if er != nil {
+				print(er)
+			}
+		}
 	}
+
+
 
 	list1 = data2.GetSubscribedData(int64(intlist[0].Tenantid))
 	if len(list1) != 0 {
