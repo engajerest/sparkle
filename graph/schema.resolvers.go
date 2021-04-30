@@ -30,12 +30,10 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	var list []*model.TenantData
 	Subscribelist := *&input.Subscriptiondetails
 	d.Userid = id.ID
-	d.Categoryid = input.Tenantinfo.CategoryID
 	d.Regno = input.Tenantinfo.Regno
 	d.Name = input.Tenantinfo.Name
 	d.Email = input.Tenantinfo.Email
 	d.Mobile = input.Tenantinfo.Mobile
-	d.SubCategoryid = input.Tenantinfo.SubCategoryID
 	d.Tenanttoken = input.Tenantinfo.Tenanttoken
 	d.Address = input.Tenantlocation.Address
 	d.State = input.Tenantlocation.State
@@ -47,13 +45,12 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	d.TimeZone = input.Tenantlocation.TimeZone
 	d.OpenTime = input.Tenantlocation.Opentime
 	d.CloseTime = input.Tenantlocation.Closetime
-	d.Subcategoryname = input.Tenantinfo.Subcategoryname
 	d.Partnerid = input.Subscriptiondetails[0].Partnerid
 	if len(Subscribelist) != 0 {
 		for _, k := range Subscribelist {
 			slist = append(slist, subscription.TenantSubscription{
 				Date: k.TransactionDate, Packageid: k.Packageid, Partnerid: k.Partnerid, Moduleid: k.Moduleid,
-				Currencyid: k.Currencyid, Categoryid: input.Tenantinfo.CategoryID, SubCategoryid: input.Tenantinfo.SubCategoryID,
+				Currencyid: k.Currencyid, Categoryid: k.Categoryid, SubCategoryid: k.SubCategoryid, Subcategoryname: k.Subcategoryname,
 				Price: k.Price, TaxId: k.TaxID, TaxAmount: k.TaxAmount, TotalAmount: k.TotalAmount, PaymentStatus: k.PaymentStatus,
 				PaymentId: *k.Paymentid, Quantity: k.Quantity, Promoid: k.Promoid, Promovalue: k.Promovalue, Validitydate: k.Validitydate, Promostatus: true,
 			})
@@ -140,7 +137,7 @@ func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.T
 	user.Profileimage = create.Profileimage
 	user.Mobile = create.Mobile
 	user.Roleid = create.Roleid
-	intlist := create.Locationid
+	user.Locationid = create.Locationid
 	user.Tenantid = create.Tenantid
 	tenantuserid, err := user.CreateTenantUser()
 	if err != nil {
@@ -161,38 +158,38 @@ func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.T
 		tenantprofileid := user.InsertTenantUserintoProfile(tenantuserid)
 		print(tenantprofileid)
 
-		staffid, er := subscription.Checkstaffdata(create.Tenantid, create.Moduleid, int(tenantuserid))
-		print("initstaffid=", staffid)
-		if er != nil {
-			return nil, er
-		}
-		if staffid != 0 {
-			if len(intlist) != 0 {
-				for i := 0; i < len(intlist); i++ {
-					var d subscription.TenantUser
-					d.Userid = int(tenantuserid)
-					d.Tenantid = create.Tenantid
-					d.Moduleid = create.Moduleid
-					d.Tenantstaffid = staffid
-					d.Locationid = intlist[i]
-					staffdetailid := d.InsertTenantstaffdetails()
-					print(staffdetailid)
-				}
+		// staffid, er := subscription.Checkstaffdata(create.Tenantid, create.Moduleid, int(tenantuserid))
+		// print("initstaffid=", staffid)
+		// if er != nil {
+		// 	return nil, er
+		// }
+		// if staffid != 0 {
+		// 	if len(intlist) != 0 {
+		// 		for i := 0; i < len(intlist); i++ {
+		// 			var d subscription.TenantUser
+		// 			d.Userid = int(tenantuserid)
+		// 			d.Tenantid = create.Tenantid
+		// 			d.Moduleid = create.Moduleid
+		// 			d.Tenantstaffid = staffid
+		// 			d.Locationid = intlist[i]
+		// 			staffdetailid := d.InsertTenantstaffdetails()
+		// 			print(staffdetailid)
+		// 		}
 
-			}
-		} else {
-			var d subscription.TenantUser
-			d.Userid = int(tenantuserid)
-			d.Tenantid = create.Tenantid
-			d.Moduleid = create.Moduleid
-			status, err := d.TenantstaffCreation(intlist)
-			if err != nil {
-				return nil, err
-			}
-			if status == false {
-				return nil, errors.New("staff not created")
-			}
-		}
+		// 	}
+		// } else {
+		// 	var d subscription.TenantUser
+		// 	d.Userid = int(tenantuserid)
+		// 	d.Tenantid = create.Tenantid
+		// 	d.Moduleid = create.Moduleid
+		// 	status, err := d.TenantstaffCreation(intlist)
+		// 	if err != nil {
+		// 		return nil, err
+		// 	}
+		// 	if status == false {
+		// 		return nil, errors.New("staff not created")
+		// 	}
+		// }
 
 	}
 
@@ -216,15 +213,15 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 	print(id.ID)
 	var data subscription.TenantUser
 	data.Userid = update.Userid
-	data.Tenantstaffid = update.Tenantstaffid
+	
 	data.Tenantid = update.Tenantid
 	data.FirstName = update.Firstname
 	data.LastName = update.Lastname
 	data.Email = update.Email
 	data.Profileimage = update.Profileimage
 	data.Mobile = update.Mobile
-	createlist := update.Create
-	deletelist := update.Delete
+	data.Locationid = update.Locationid
+
 	data1, err := data.UpdateTenantUser()
 	if err != nil {
 		if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'authname'", data.Email) {
@@ -240,59 +237,59 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 
 	}
 
-	if len(deletelist) != 0 {
-		for i := 0; i < len(deletelist); i++ {
-			var c subscription.TenantUser
-			c.Staffdetailid = deletelist[i]
-			status1 := c.Deletetenantstaffdetails()
-			print(status1)
-		}
-		tenantstaffid, err1 := subscription.Checkfordeletestaffdata(update.Tenantstaffid)
-		if err1 != nil {
-			print(err1)
-		}
-		if tenantstaffid == 0 {
-			print("staff header must be deleted")
-			var c subscription.TenantUser
-			c.Tenantstaffid = update.Tenantstaffid
-			status := c.Deletetenantstaff()
-			print(status)
-		}
+	// if len(deletelist) != 0 {
+	// 	for i := 0; i < len(deletelist); i++ {
+	// 		var c subscription.TenantUser
+	// 		c.Staffdetailid = deletelist[i]
+	// 		status1 := c.Deletetenantstaffdetails()
+	// 		print(status1)
+	// 	}
+	// 	tenantstaffid, err1 := subscription.Checkfordeletestaffdata(update.Tenantstaffid)
+	// 	if err1 != nil {
+	// 		print(err1)
+	// 	}
+	// 	if tenantstaffid == 0 {
+	// 		print("staff header must be deleted")
+	// 		var c subscription.TenantUser
+	// 		c.Tenantstaffid = update.Tenantstaffid
+	// 		status := c.Deletetenantstaff()
+	// 		print(status)
+	// 	}
 
-	}
+	// }
 
-	staffid, er := subscription.Checkstaffdata(update.Tenantid, update.Moduleid, update.Userid)
-	print("initstaffid=", staffid)
-	if er != nil {
-		return nil, er
-	}
-	if len(createlist) != 0 {
-		if staffid != 0 {
-			for i := 0; i < len(createlist); i++ {
-				var d subscription.TenantUser
-				d.Userid = update.Userid
-				d.Tenantid = update.Tenantid
-				d.Moduleid = update.Moduleid
-				d.Tenantstaffid = staffid
-				d.Locationid = createlist[i]
-				staffdetailid := d.InsertTenantstaffdetails()
-				print(staffdetailid)
-			}
+	// staffid, er := subscription.Checkstaffdata(update.Tenantid, update.Moduleid, update.Userid)
+	// print("initstaffid=", staffid)
+	// if er != nil {
+	// 	return nil, er
+	// }
+	// if len(createlist) != 0 {
+	// 	if staffid != 0 {
+	// 		for i := 0; i < len(createlist); i++ {
+	// 			var d subscription.TenantUser
+	// 			d.Userid = update.Userid
+	// 			d.Tenantid = update.Tenantid
+	// 			d.Moduleid = update.Moduleid
+	// 			d.Tenantstaffid = staffid
+	// 			d.Locationid = createlist[i]
+	// 			staffdetailid := d.InsertTenantstaffdetails()
+	// 			print(staffdetailid)
+	// 		}
 
-		} else {
-			var d subscription.TenantUser
-			d.Userid = update.Userid
-			d.Tenantid = update.Tenantid
-			d.Moduleid = update.Moduleid
-			status, err := d.TenantstaffCreation(createlist)
-			if err != nil {
-				return nil, err
-			}
-			if status == false {
-				return nil, errors.New("staff not created")
-			}
-		}
-	}
+	// 	} else {
+	// 		var d subscription.TenantUser
+	// 		d.Userid = update.Userid
+	// 		d.Tenantid = update.Tenantid
+	// 		d.Moduleid = update.Moduleid
+	// 		status, err := d.TenantstaffCreation(createlist)
+	// 		if err != nil {
+	// 			return nil, err
+	// 		}
+	// 		if status == false {
+	// 			return nil, errors.New("staff not created")
+	// 		}
+	// 	}
+	// }
 
 	if data1 != false {
 		return &model.Tenantupdatedata{
@@ -819,8 +816,8 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 	print(id.ID)
 
 	var Result []*model.Locationgetall
-	var userresult []*model.Usertenant
-	var staffresult []*model.Userlist
+	var userresult []*model.Userinfodata
+
 	var otherchargeresult []*model.Othercharge
 	var deliverychargeresult []*model.Deliverycharge
 	var locationGetAll []subscription.Tenantlocation
@@ -828,17 +825,20 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 	locationGetAll = subscription.LocationTest(tenantid)
 
 	for _, loco := range locationGetAll {
-		userresult = make([]*model.Usertenant, len(loco.Tenantstaffdetails))
-		for i, k := range loco.Tenantstaffdetails {
-			staffresult = make([]*model.Userlist, len(k.Tenantstaffs))
-			for j, n := range k.Tenantstaffs {
-				staffresult[j] = &model.Userlist{Tenantstaffid: n.Tenantstaffid, Tenantid: n.Tenantid, Moduleid: n.Moduleid, Userid: n.Userid,
-					Userinfo: &model.Userinfodata{Profileid: n.Appuserprofiles.Profileid, Userid: n.Appuserprofiles.Userid, Firstname: n.Appuserprofiles.Firstname,
-						Lastname: n.Appuserprofiles.Lastname, Email: n.Appuserprofiles.Email, Contact: n.Appuserprofiles.Contactno, Profileimage: n.Appuserprofiles.Profileimage}}
-			}
-			userresult[i] = &model.Usertenant{Staffdetailid: k.Staffdetailid, Tenanatstaffid: k.Tenantstaffid, Tenantid: k.Tenantid, Locationid: k.Locationid,
-				Tenantusers: staffresult}
+		userresult = make([]*model.Userinfodata, len(loco.Appuserprofiles))
+		for l, n := range loco.Appuserprofiles {
+			userresult[l] = &model.Userinfodata{Profileid: n.Profileid, Userid: n.Userid, Locationid: n.Userlocationid,
+				Firstname: n.Firstname, Lastname: n.Lastname, Email: n.Email, Contact: n.Contactno, Profileimage: n.Profileimage}
 		}
+		// for i, k := range loco.Tenantstaffdetails {
+		// 	staffresult = make([]*model.Userlist, len(k.Tenantstaffs))
+		// 	for j, n := range k.Tenantstaffs {
+		// 		staffresult[j] = &model.Userlist{Tenantstaffid: n.Tenantstaffid, Tenantid: n.Tenantid, Moduleid: n.Moduleid, Userid: n.Userid,
+		// 			Userinfo: &model.Userinfodata{Profileid: n.Appuserprofiles.Profileid, Userid: n.Appuserprofiles.Userid, Firstname: n.Appuserprofiles.Firstname,
+		// 				Lastname: n.Appuserprofiles.Lastname, Email: n.Appuserprofiles.Email, Contact: n.Appuserprofiles.Contactno, Profileimage: n.Appuserprofiles.Profileimage}}
+		// 	}
+
+		// }
 		otherchargeresult = make([]*model.Othercharge, len(loco.Tenantcharges))
 		for j, k := range loco.Tenantcharges {
 			otherchargeresult[j] = &model.Othercharge{Tenantchargeid: k.Tenantchargeid, Tenantid: k.Tenantid, Locationid: k.Locationid,
@@ -898,18 +898,24 @@ func (r *queryResolver) Tenantusers(ctx context.Context, tenantid int, userid in
 	data := subscription.Gettenantusers(tenantid, userid)
 
 	for _, k := range data {
-
-		data1 := make([]*model.Staffdetail, len(k.Tenantstaffdetails))
-		for i, n := range k.Tenantstaffdetails {
-			data1[i] = &model.Staffdetail{Staffdetailid: n.Staffdetailid, Tenanatstaffid: n.Tenantstaffid, Tenantid: n.Tenantid,
-				Locationid: n.Locationid, Locationdetails: &model.Stafflocation{Locationid: n.Tenantlocations.Locationid,
-					Locationname: n.Tenantlocations.Locationname, Email: n.Tenantlocations.Email, Contact: n.Tenantlocations.Contactno,
-					Address: n.Tenantlocations.Address, City: n.Tenantlocations.City, Postcode: n.Tenantlocations.Postcode}}
-		}
-		Result = append(Result, &model.Userfromtenant{Tenantstaffid: k.Tenantstaffid, Tenantid: k.Tenantid,
-			Moduleid: k.Moduleid, Userid: k.Userid, Firstname: k.Firstname, Lastname: k.Lastname, Email: k.Email, Contact: k.Contactno,
-			Profileimage: k.Profileimage, Staffdetails: data1})
+		Result = append(Result, &model.Userfromtenant{Tenantid: k.Referenceid, Userid: k.Userid, Firstname: k.Firstname,
+			Lastname: k.Lastname, Email: k.Email, Contact: k.Contactno, Profileimage: k.Profileimage,
+			Locationid: k.Userlocationid, Locationname: k.Locationname})
 	}
+
+	// for _, k := range data {
+
+	// 	data1 := make([]*model.Staffdetail, len(k.Tenantstaffdetails))
+	// 	for i, n := range k.Tenantstaffdetails {
+	// 		data1[i] = &model.Staffdetail{Staffdetailid: n.Staffdetailid, Tenanatstaffid: n.Tenantstaffid, Tenantid: n.Tenantid,
+	// 			Locationid: n.Locationid, Locationdetails: &model.Stafflocation{Locationid: n.Tenantlocations.Locationid,
+	// 				Locationname: n.Tenantlocations.Locationname, Email: n.Tenantlocations.Email, Contact: n.Tenantlocations.Contactno,
+	// 				Address: n.Tenantlocations.Address, City: n.Tenantlocations.City, Postcode: n.Tenantlocations.Postcode}}
+	// 	}
+	// 	Result = append(Result, &model.Userfromtenant{Tenantstaffid: k.Tenantstaffid, Tenantid: k.Tenantid,
+	// 		Moduleid: k.Moduleid, Userid: k.Userid, Firstname: k.Firstname, Lastname: k.Lastname, Email: k.Email, Contact: k.Contactno,
+	// 		Profileimage: k.Profileimage, Staffdetails: data1})
+	// }
 
 	return &model.Usersdata{
 		Status:  true,
@@ -988,7 +994,7 @@ func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int) (*model
 	for _, p := range promotionGetAll {
 		promo = append(promo, &model.Promotion{
 			Promotionid: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: p.Promoname, Tenantid: p.Tenantid, Tenantame: p.Tenantname, Promocode: p.Promocode,
-			Promoterms: p.Promoterms, Promovalue: p.Promovalue, Promotag: p.Promotag, Promotype: p.Promotype, Startdate: p.Startdate, Enddate: p.Enddate, Status: &p.Status,
+			Broadstatus: p.Broadcaststatus, Success: p.Success, Failure: p.Failure, Promoterms: p.Promoterms, Promovalue: p.Promovalue, Promotag: p.Promotag, Promotype: p.Promotype, Startdate: p.Startdate, Enddate: p.Enddate, Status: &p.Status,
 		})
 	}
 	return &model.Getpromotiondata{
@@ -1034,8 +1040,7 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 	print("userid==")
 	print(id.ID)
 
-	var userresult []*model.Usertenant
-	var staffresult []*model.Userlist
+	var userresult []*model.Userinfodata
 
 	var otherchargeresult []*model.Othercharge
 	var deliverychargeresult []*model.Deliverycharge
@@ -1043,17 +1048,11 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 	if loco.Locationid == 0 {
 		return &model.Locationbyiddata{Status: false, Code: http.StatusBadRequest, Message: "Unsuccess", Locationdata: nil}, nil
 	}
-	if len(loco.Tenantstaffdetails) != 0 {
-		userresult = make([]*model.Usertenant, len(loco.Tenantstaffdetails))
-		for i, k := range loco.Tenantstaffdetails {
-			staffresult = make([]*model.Userlist, len(k.Tenantstaffs))
-			for j, n := range k.Tenantstaffs {
-				staffresult[j] = &model.Userlist{Tenantstaffid: n.Tenantstaffid, Tenantid: n.Tenantid, Moduleid: n.Moduleid, Userid: n.Userid,
-					Userinfo: &model.Userinfodata{Profileid: n.Appuserprofiles.Profileid, Userid: n.Appuserprofiles.Userid, Firstname: n.Appuserprofiles.Firstname,
-						Lastname: n.Appuserprofiles.Lastname, Email: n.Appuserprofiles.Email, Contact: n.Appuserprofiles.Contactno}}
-			}
-			userresult[i] = &model.Usertenant{Staffdetailid: k.Staffdetailid, Tenanatstaffid: k.Tenantstaffid, Tenantid: k.Tenantid, Locationid: k.Locationid,
-				Tenantusers: staffresult}
+	if len(loco.Appuserprofiles) != 0 {
+		userresult = make([]*model.Userinfodata, len(loco.Appuserprofiles))
+		for l, n := range loco.Appuserprofiles {
+			userresult[l] = &model.Userinfodata{Profileid: n.Profileid, Userid: n.Userid, Locationid: n.Userlocationid,
+				Firstname: n.Firstname, Lastname: n.Lastname, Email: n.Email, Contact: n.Contactno, Profileimage: n.Profileimage}
 		}
 	}
 	if len(loco.Tenantcharges) != 0 {
@@ -1155,7 +1154,7 @@ func (r *queryResolver) Getallmodule(ctx context.Context, categoryid int, tenant
 	print(id.ID)
 	var mods []*model.Mod
 
-	mods = subscription.Getmodules(categoryid, tenantid,mode)
+	mods = subscription.Getmodules(categoryid, tenantid, mode)
 	return &model.Getallmoduledata{Status: true, Code: http.StatusOK, Message: "Success", Modules: mods}, nil
 }
 

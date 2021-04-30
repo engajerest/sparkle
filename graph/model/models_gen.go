@@ -76,6 +76,9 @@ type Promotion struct {
 	Promotype       string  `json:"Promotype"`
 	Startdate       string  `json:"Startdate"`
 	Enddate         string  `json:"Enddate"`
+	Broadstatus     bool    `json:"Broadstatus"`
+	Success         int     `json:"Success"`
+	Failure         int     `json:"Failure"`
 	Status          *string `json:"Status"`
 }
 
@@ -121,15 +124,12 @@ type TenantData struct {
 }
 
 type TenantDetails struct {
-	Name            string `json:"Name"`
-	Regno           string `json:"Regno"`
-	Email           string `json:"Email"`
-	Mobile          string `json:"Mobile"`
-	CategoryID      int    `json:"CategoryId"`
-	SubCategoryID   int    `json:"SubCategoryId"`
-	Subcategoryname string `json:"Subcategoryname"`
-	Type            int    `json:"Type"`
-	Tenanttoken     string `json:"Tenanttoken"`
+	Name        string `json:"Name"`
+	Regno       string `json:"Regno"`
+	Email       string `json:"Email"`
+	Mobile      string `json:"Mobile"`
+	Type        int    `json:"Type"`
+	Tenanttoken string `json:"Tenanttoken"`
 }
 
 type Tenantschema struct {
@@ -343,6 +343,9 @@ type Initialsubscribe struct {
 	Packageid       int    `json:"Packageid"`
 	Partnerid       int    `json:"Partnerid"`
 	Moduleid        int    `json:"Moduleid"`
+	Categoryid      int    `json:"Categoryid"`
+	SubCategoryid   int    `json:"SubCategoryid"`
+	Subcategoryname string `json:"Subcategoryname"`
 	Currencyid      int    `json:"Currencyid"`
 	CurrencyCode    string `json:"CurrencyCode"`
 	Price           string `json:"Price"`
@@ -410,7 +413,7 @@ type Locationgetall struct {
 	Deliverymins    int               `json:"deliverymins"`
 	Status          string            `json:"status"`
 	Createdby       int               `json:"createdby"`
-	Tenantusers     []*Usertenant     `json:"tenantusers"`
+	Tenantusers     []*Userinfodata   `json:"tenantusers"`
 	Othercharges    []*Othercharge    `json:"othercharges"`
 	Deliverycharges []*Deliverycharge `json:"deliverycharges"`
 }
@@ -696,7 +699,7 @@ type Tenantuser struct {
 	Mobile       string `json:"mobile"`
 	Email        string `json:"email"`
 	Profileimage string `json:"profileimage"`
-	Locationid   []int  `json:"locationid"`
+	Locationid   int    `json:"locationid"`
 	Roleid       int    `json:"roleid"`
 	Configid     int    `json:"configid"`
 }
@@ -747,17 +750,15 @@ type Updateother struct {
 }
 
 type Updatetenant struct {
-	Tenantstaffid int    `json:"tenantstaffid"`
-	Userid        int    `json:"userid"`
-	Tenantid      int    `json:"tenantid"`
-	Moduleid      int    `json:"moduleid"`
-	Firstname     string `json:"firstname"`
-	Lastname      string `json:"lastname"`
-	Mobile        string `json:"mobile"`
-	Email         string `json:"email"`
-	Profileimage  string `json:"profileimage"`
-	Create        []int  `json:"create"`
-	Delete        []int  `json:"delete"`
+	Userid       int    `json:"userid"`
+	Tenantid     int    `json:"tenantid"`
+	Moduleid     int    `json:"moduleid"`
+	Locationid   int    `json:"locationid"`
+	Firstname    string `json:"firstname"`
+	Lastname     string `json:"lastname"`
+	Mobile       string `json:"mobile"`
+	Email        string `json:"email"`
+	Profileimage string `json:"profileimage"`
 }
 
 type User struct {
@@ -765,21 +766,21 @@ type User struct {
 }
 
 type Userfromtenant struct {
-	Tenantstaffid int            `json:"Tenantstaffid"`
-	Tenantid      int            `json:"Tenantid"`
-	Moduleid      int            `json:"Moduleid"`
-	Userid        int            `json:"Userid"`
-	Firstname     string         `json:"Firstname"`
-	Lastname      string         `json:"Lastname"`
-	Email         string         `json:"Email"`
-	Contact       string         `json:"Contact"`
-	Profileimage  string         `json:"Profileimage"`
-	Staffdetails  []*Staffdetail `json:"Staffdetails"`
+	Tenantid     int    `json:"Tenantid"`
+	Userid       int    `json:"Userid"`
+	Firstname    string `json:"Firstname"`
+	Lastname     string `json:"Lastname"`
+	Email        string `json:"Email"`
+	Contact      string `json:"Contact"`
+	Profileimage string `json:"Profileimage"`
+	Locationid   int    `json:"Locationid"`
+	Locationname string `json:"Locationname"`
 }
 
 type Userinfodata struct {
 	Profileid    int    `json:"Profileid"`
 	Userid       int    `json:"Userid"`
+	Locationid   int    `json:"Locationid"`
 	Firstname    string `json:"Firstname"`
 	Lastname     string `json:"Lastname"`
 	Email        string `json:"Email"`

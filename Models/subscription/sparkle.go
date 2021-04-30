@@ -262,8 +262,8 @@ type Tenantlocation struct {
 	Deliverymins       int                  `json:"deliverymins"`
 	Createdby          int                  `json:"createdby"`
 	Status             string               `json:"status"`
-	Tenantstaffdetails []Tenantstaffdetails `json:"tenantstaffdetails" gorm:"ForeignKey:locationid"`
-	// Appuserprofiles []App_userprofiles `json:"appuserprofile" gorm:"ForeignKey:userlocationid"`
+	// Tenantstaffdetails []Tenantstaffdetails `json:"tenantstaffdetails" gorm:"ForeignKey:locationid"`
+	Appuserprofiles []App_userprofiles `json:"appuserprofile" gorm:"ForeignKey:userlocationid"`
 	Tenantcharges  []Tenantcharge  `json:"tenantcharge" gorm:"ForeignKey:locationid"`
 	Tenantsettings []Tenantsetting `json:"tenantsetting" gorm:"ForeignKey:locationid"`
 }
@@ -291,6 +291,9 @@ type Promotion struct {
 	Promotag        string `json:"promotag"`
 	Startdate       string `json:"startdate"`
 	Enddate         string `json:"enddate"`
+	Broadcaststatus bool `json:"broadcaststatus"`
+	Success int `json:"success"`
+	Failure int `json:"failure"`
 	Status          string `json:"status"`
 }
 type Ordersequence struct {
@@ -497,4 +500,16 @@ type Tenantstaffs struct {
 	Moduleid        int              `json:"moduleid"`
 	Userid          int              `json:"userid"`
 	Appuserprofiles App_userprofiles `json:"appuserprofiles" gorm:"ForeignKey:userid;references:userid"`
+}
+type TenantUsers struct{
+Firstname string `json:"firstname"`
+Lastname string `json:"lastname"`
+Profileimage string `json:"profileimage"`
+Userlocationid int `json:"userlocationid"`
+Userid int `json:"userid"`
+Created string `json:"created"`
+Contactno string `json:"contactno"`	
+Email string `json:"email"`
+Locationname string `json:"locationname"`
+Referenceid int `json:"referenceid"`
 }

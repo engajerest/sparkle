@@ -66,9 +66,6 @@ input TenantDetails{
  Regno:String!
  Email:String!
  Mobile:String!
- CategoryId: Int!
- SubCategoryId: Int!
- Subcategoryname:String!
  Type: Int!
  Tenanttoken:String!
 }
@@ -130,6 +127,9 @@ TransactionDate:String!
  Packageid:Int!
  Partnerid:Int!
  Moduleid:Int!
+ Categoryid: Int!
+ SubCategoryid: Int!
+ Subcategoryname:String!
  Currencyid:Int!
  CurrencyCode:String!
  Price:String!
@@ -174,7 +174,7 @@ input tenantuser{
  mobile:String!
  email:String!
  profileimage:String!
- locationid:[Int!]
+ locationid:Int!
  roleid:Int!
  configid:Int!
 }
@@ -339,7 +339,7 @@ type locationgetall {
  deliverymins:Int!
  status:String!
  createdby:Int!
- tenantusers:[usertenant]
+ tenantusers:[userinfodata]
  othercharges:[othercharge]
  deliverycharges:[deliverycharge]
 }
@@ -378,6 +378,7 @@ Userinfo:userinfodata
 type userinfodata{
 Profileid:Int!
 Userid:Int!
+Locationid:Int!
 Firstname:String!
 Lastname:String!
 Email:String!
@@ -406,16 +407,16 @@ type usersdata{
  users:[userfromtenant]
 }
 type userfromtenant{
-Tenantstaffid:Int!
 Tenantid:Int!
-Moduleid:Int!
 Userid:Int!
 Firstname:String!
 Lastname:String!
 Email:String!
 Contact:String!
 Profileimage:String!
-Staffdetails:[staffdetail]
+Locationid:Int!
+Locationname:String!
+
  
 }
 type staffdetail{
@@ -438,17 +439,17 @@ Postcode:String!
 
 
 input updatetenant{
-tenantstaffid:Int!
+
  userid: Int! 
  tenantid:Int!
  moduleid:Int!
+ locationid:Int!
  firstname: String!
  lastname:String!
  mobile:String!
  email:String!
  profileimage:String!
-create:[Int!]
-delete:[Int!]
+
 }
 type tenantupdatedata{
  status:Boolean!
@@ -533,6 +534,9 @@ type Promotion {
 Promotype:String!
  Startdate:String!
  Enddate: String!
+ Broadstatus:Boolean!
+ Success:Int!
+ Failure:Int!
  Status:String
 }
 

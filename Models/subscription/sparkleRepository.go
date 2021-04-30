@@ -32,7 +32,7 @@ const (
 	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocations WHERE status='Active' AND locationid=? "
 	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocations WHERE status='Active' AND tenantid=? "
 	createTenantUserQuery          = "INSERT INTO app_users (authname,password,hashsalt,contactno,roleid,referenceid) VALUES(?,?,?,?,?,?)"
-	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofiles (userid,firstname,lastname,email,contactno,profileimage) VALUES(?,?,?,?,?,?)"
+	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofiles (userid,firstname,lastname,email,contactno,profileimage,userlocationid) VALUES(?,?,?,?,?,?,?)"
 	insertTenantstaff              = "INSERT INTO tenantstaffs (tenantid,moduleid,userid) VALUES(?,?,?)"
 	insertTenantstaffdetails       = "INSERT INTO tenantstaffdetails (tenantstaffid,tenantid,locationid) VALUES(?,?,?)"
 	checktenantstaffid             = "SELECT IFNULL(tenantstaffid,0) AS tenantstaffid FROM tenantstaffs WHERE tenantid=? AND moduleid=? AND  userid=?"
@@ -40,7 +40,7 @@ const (
 	deletetenantstaff              = "DELETE FROM tenantstaffs WHERE tenantstaffid=?"
 	deletetenantstaffdetails       = "DELETE FROM tenantstaffdetails WHERE staffdetailid=?"
 	getAllTenantUsers              = "SELECT a.firstname,a.lastname,a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocations b, app_users c WHERE  a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=?"
-	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.profileimage=? WHERE a.userid=b.userid AND a.userid=?"
+	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.profileimage=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 	getAllTenantUserByLocationId   = ""
 	updateTenantBusiness           = "UPDATE tenants SET brandname=?,tenantinfo=?,paymode1=?,paymode2=?,tenantimage=? WHERE tenantid=?"
 	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,dailcode,sociallink,socialicon) VALUES"
@@ -49,7 +49,7 @@ const (
 	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid,IFNULL(address,'') AS address,IFNULL(primaryemail,'') AS primaryemail,IFNULL(primarycontact,'') AS  primarycontact,IFNULL(tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage FROM tenants WHERE tenantid=?"
 	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile ,IFNULL(dailcode,'') AS dailcode, IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
 	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
-	Getpromotions                  = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
+	Getpromotions                  = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,IFNULL(a.broadcaststatus,0) as broadcaststatus,IFNULL(a.success,0) as success,IFNULL(a.failure,0) as failure,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
 	createpromotion                = "INSERT INTO promotions (promotiontypeid,tenantid,promoname,promocode,promoterms,promovalue,startdate,enddate,createdby) VALUES(?,?,?,?,?,?,?,?,?)"
 	insertsequence                 = "INSERT INTO ordersequence (tenantid,sequencename,seqno,prefix,subprefix) VALUES(?,?,?,?,?)"
 	insertcharge                   = "INSERT INTO tenantcharges (tenantid,locationid,chargeid,chargename,chargetype,chargevalue,createdby) VALUES"
@@ -130,6 +130,9 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 	if len(datalist) != 0 {
 		var a TenantSubscription
 		for i := 0; i < len(datalist); i++ {
+			a.Categoryid = datalist[i].Categoryid
+			a.SubCategoryid = datalist[i].SubCategoryid
+			a.Subcategoryname = datalist[i].Subcategoryname
 			a.Currencyid = datalist[i].Currencyid
 			a.Partnerid = datalist[i].Partnerid
 			a.Date = datalist[i].Date
@@ -155,7 +158,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 				}
 				defer stmt.Close()
 				if _, err := stmt.Exec(tenantid, &a.Date, &a.Packageid, &a.Partnerid, &a.Moduleid,
-					&s.Categoryid, &s.SubCategoryid,
+					&a.Categoryid, &a.SubCategoryid,
 					&a.Currencyid, &a.Price, &a.Quantity, &a.TaxId, &a.TaxAmount,
 					&a.TotalAmount, &a.PaymentStatus, &a.PaymentId, &a.Promoid,
 					&a.Promovalue, &a.Promostatus, &a.Validitydate); err != nil {
@@ -166,22 +169,33 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 		}
 
 	}
-	{
-		print("entry in subcat")
-		stmt, err := tx.Prepare(insertsubcategory)
-		if err != nil {
-			tx.Rollback()
-			return false, nil, err
-		}
-		defer stmt.Close()
+	datalist1 := s.Tenantsubscribe
 
-		res, err := stmt.Exec(tenantid, &s.Tenantsubscribe[0].Moduleid, &s.Categoryid, &s.SubCategoryid, &s.Subcategoryname)
-		if err != nil {
-			tx.Rollback() // return an error too, we may want to wrap them
-			return false, nil, err
+	if len(datalist1) != 0 {
+		var d TenantSubscription
+		for i := 0; i < len(datalist1); i++ {
+			d.Categoryid = datalist1[i].Categoryid
+			d.SubCategoryid = datalist1[i].SubCategoryid
+			d.Subcategoryname = datalist1[i].Subcategoryname
+			d.Moduleid = datalist1[i].Moduleid
+			print("entry in subcat")
+			stmt, err := tx.Prepare(insertsubcategory)
+			if err != nil {
+				tx.Rollback()
+				return false, nil, err
+			}
+			defer stmt.Close()
+
+			res, err := stmt.Exec(tenantid, &d.Moduleid, &d.Categoryid, &d.SubCategoryid, &d.Subcategoryname)
+			if err != nil {
+				tx.Rollback() // return an error too, we may want to wrap them
+				return false, nil, err
+			}
+			subcatid, err = res.LastInsertId()
+			print("subcat=", subcatid)
+
 		}
-		subcatid, err = res.LastInsertId()
-		print("subcat=", subcatid)
+
 	}
 
 	data.TenantID = int(tenantid)
@@ -569,8 +583,8 @@ func LocationTest(id int) []Tenantlocation {
 
 	var data []Tenantlocation
 
-	DB.Table("tenantlocations").Preload("Tenantstaffdetails").Preload("Tenantstaffdetails.Tenantstaffs").
-		Preload("Tenantstaffdetails.Tenantstaffs.Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&data)
+	DB.Table("tenantlocations").
+		Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&data)
 	for index, value := range data {
 		fmt.Println(index, " = ", value)
 	}
@@ -591,8 +605,8 @@ func Locationbyid(tenantid, locationid int) *Tenantlocation {
 
 	var data Tenantlocation
 
-	DB.Table("tenantlocations").Preload("Tenantstaffdetails").Preload("Tenantstaffdetails.Tenantstaffs").
-		Preload("Tenantstaffdetails.Tenantstaffs.Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=? AND locationid=?", tenantid, locationid).Find(&data)
+	DB.Table("tenantlocations").
+		Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=? AND locationid=?", tenantid, locationid).Find(&data)
 
 	fmt.Println(data)
 
@@ -647,7 +661,7 @@ func (user *TenantUser) InsertTenantUserintoProfile(id int64) int64 {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(id, &user.FirstName, &user.LastName, &user.Email, &user.Mobile, &user.Profileimage)
+	res, err := statement.Exec(id, &user.FirstName, &user.LastName, &user.Email, &user.Mobile, &user.Profileimage, &user.Locationid)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -807,7 +821,7 @@ func (user *TenantUser) UpdateTenantUser() (bool, error) {
 
 	}
 	defer statement.Close()
-	_, err1 := statement.Exec(user.Email, user.Mobile, user.FirstName, user.LastName, user.Email, user.Mobile,user.Profileimage, user.Userid)
+	_, err1 := statement.Exec(user.Email, user.Mobile, user.FirstName, user.LastName, user.Email, user.Mobile, user.Profileimage, user.Locationid, user.Userid)
 	if err1 != nil {
 
 		fmt.Println(err1)
@@ -1076,7 +1090,7 @@ func GetAllPromotions(tenantid int) []Promotion {
 	for rows.Next() {
 		var promo Promotion
 		err := rows.Scan(&promo.Promotionid, &promo.Promotiontypeid, &promo.Tenantid, &promo.Promoname, &promo.Promocode, &promo.Promoterms, &promo.Promovalue,
-			&promo.Startdate, &promo.Enddate, &promo.Status, &promo.Promotype, &promo.Promotag, &promo.Tenantname)
+			&promo.Startdate, &promo.Enddate, &promo.Broadcaststatus, &promo.Success, &promo.Failure, &promo.Status, &promo.Promotype, &promo.Promotag, &promo.Tenantname)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -1173,7 +1187,7 @@ func Getmodules(catid, tenantid int, mode bool) []*model.Mod {
 		print("con3")
 		n1 := int64(catid)
 		cat := strconv.FormatInt(n1, 10)
-		DB.Table("app_module").Where("status='Active' and categoryid NOT IN ("+cat+")").Find(&data)
+		DB.Table("app_module").Where("status='Active' and categoryid NOT IN (" + cat + ")").Find(&data)
 	} else {
 		print("con4")
 
@@ -1699,7 +1713,7 @@ func Gettenantinfo(tenantid int) Tenants {
 	fmt.Println(data)
 	return data
 }
-func Gettenantusers(tenantid, userid int) []Tenantstaff {
+func Gettenantusers(tenantid, userid int) []TenantUsers {
 
 	n := int64(tenantid)
 	tent := strconv.FormatInt(n, 10)
@@ -1711,9 +1725,9 @@ func Gettenantusers(tenantid, userid int) []Tenantstaff {
 	var q1 string
 
 	if userid != 0 {
-		q1 = "SELECT a.tenantstaffid,a.tenantid,a.moduleid,a.userid,b.tenantname,c.firstname,c.lastname,c.email,c.contactno,IFNULL(c.profileimage,'') AS profileimage FROM tenantstaffs a,tenants b, app_userprofiles c WHERE a.tenantid=b.tenantid AND a.userid=c.userid AND a.tenantid= " + tent + " AND a.userid=" + user
+		q1 = "SELECT a.firstname,a.lastname,IFNULL(a.profileimage,'') AS profileimage, a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocations b, app_users c WHERE a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid= " + tent + "  AND a.userid=" + user
 	} else {
-		q1 = "SELECT a.tenantstaffid,a.tenantid,a.moduleid,a.userid,b.tenantname,c.firstname,c.lastname,c.email,c.contactno,IFNULL(c.profileimage,'') AS profileimage FROM tenantstaffs a,tenants b, app_userprofiles c WHERE a.tenantid=b.tenantid AND a.userid=c.userid AND a.tenantid= " + tent
+		q1 = "SELECT a.firstname,a.lastname,IFNULL(a.profileimage,'') AS profileimage, a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocations b, app_users c WHERE a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=" + tent
 	}
 
 	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
@@ -1724,9 +1738,9 @@ func Gettenantusers(tenantid, userid int) []Tenantstaff {
 		log.Println("Connection Established")
 	}
 
-	var data []Tenantstaff
+	var data []TenantUsers
 
-	DB.Raw(q1).Preload("Tenantstaffdetails").Preload("Tenantstaffdetails.Tenantlocations").Find(&data)
+	DB.Raw(q1).Find(&data)
 	for index, value := range data {
 		fmt.Println(index, " = ", value)
 	}
