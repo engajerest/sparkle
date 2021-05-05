@@ -109,8 +109,8 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	response := s.GetSubscribedData(int64(tenantdata.TenantID))
 	if len(response) != 0 {
 		for _, k := range response {
-			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
-				Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+			list = append(list, &model.TenantData{Tenantid: k.TenantID, Tenantname: k.TenantName, Moduleid: k.ModuleID,
+				Taxamount: k.Taxamount,Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 	return &model.SubscribedData{
@@ -213,7 +213,7 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 	print(id.ID)
 	var data subscription.TenantUser
 	data.Userid = update.Userid
-	
+
 	data.Tenantid = update.Tenantid
 	data.FirstName = update.Firstname
 	data.LastName = update.Lastname
@@ -688,7 +688,7 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 		}
 	}
 	if len(intlist) != 0 {
-		for i := 0; i < len(intlist); i++{
+		for i := 0; i < len(intlist); i++ {
 			var d subscription.TenantSubscription
 			d.Categoryid = intlist[i].CategoryID
 			d.SubCategoryid = intlist[i].SubCategoryID
@@ -702,13 +702,11 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 		}
 	}
 
-
-
 	list1 = data2.GetSubscribedData(int64(intlist[0].Tenantid))
 	if len(list1) != 0 {
 		for _, k := range list1 {
-			list = append(list, &model.TenantData{TenantID: k.TenantID, TenantName: k.TenantName, Moduleid: k.ModuleID,
-				Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+			list = append(list, &model.TenantData{Tenantid: k.TenantID, Tenantname: k.TenantName, Moduleid: k.ModuleID,
+				Taxamount: k.Taxamount,Totalamount: k.Totalamount, 	Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 
@@ -1126,7 +1124,7 @@ func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*mo
 		for _, k := range d {
 			data = append(data, &model.Subscriptionsdata{Packageid: &k.Packageid, Moduleid: k.Moduleid, Tenantid: k.Tenantid, Modulename: k.Modulename, Packagename: &k.Packagename,
 				Subscriptionid: k.Subscriptionid, Subscriptionaccid: k.Subscriptionaccid, Subscriptionmethodid: k.Subscriptionmethodid,
-				Paymentstatus: k.Paymentstatus, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
+				Taxamount: k.Taxamount, Tenantaccid: k.Tenantaccid, Paymentstatus: k.Paymentstatus, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
 		}
 	}
 

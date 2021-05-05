@@ -139,6 +139,9 @@ type SubscribedData struct {
 	Locationname   string `json:"locationname"`
 	Subcategoryid  int    `json:"subcategoryid"`
 	Categoryid     int    `json:"categoryid"`
+	Tenantaccid    string `json:"tenantaccid"`
+	Taxamount float64 `json:"taxamount"`
+	Totalamount float64 `json:"totalamount"`
 }
 
 type TenantUser struct {
@@ -149,7 +152,7 @@ type TenantUser struct {
 	Password      string `json:"password"`
 	Email         string `json:"email"`
 	Mobile        string `json:"mobile"`
-	Profileimage string `json:"profileimage"`
+	Profileimage  string `json:"profileimage"`
 	Locationid    int    `json:"locationid"`
 	Locationname  string `json:"locationname"`
 	Roleid        int    `json:"roleid"`
@@ -159,7 +162,7 @@ type TenantUser struct {
 	Created       string `json:"created`
 	Moduleid      int    `json:"moduleid"`
 	Tenantstaffid int    `json:"tenantstaffid"`
-	Staffdetailid int `json:"staffdetailid"`
+	Staffdetailid int    `json:"staffdetailid"`
 }
 type Location struct {
 	LocationId   int    `json:"locationid"`
@@ -230,7 +233,7 @@ type AuthUser struct {
 type Social struct {
 	Socialid     int    `json:"socialid" `
 	SociaProfile string `json:"socialprofile"`
-	Dailcode string `json:"dailcode"`
+	Dailcode     string `json:"dailcode"`
 	SocialLink   string `json:"sociallink"`
 	SocialIcon   string `json:"socialicon"`
 }
@@ -243,29 +246,29 @@ type Tenantsocial struct {
 }
 type Tenantlocation struct {
 	// gorm.Model
-	Locationid         int                  `json:"locationid" gorm:"primary_key"`
-	Tenantid           int                  `json:"tenantid" gorm:"ForeignKey"`
-	Locationname       string               `json:"locationname"`
-	Email              string               `json:"email"`
-	Contactno          string               `json:"contactno"`
-	Address            string               `json:"address"`
-	City               string               `json:"city"`
-	State              string               `json:"state"`
-	Postcode           string               `json:"postcode"`
-	Countrycode        string               `json:"countrycode"`
-	Latitude           string               `json:"latitude"`
-	Longitude          string               `json:"longitude"`
-	Opentime           string               `json:""opentime`
-	Closetime          string               `json:"closetime"`
-	Delivery           bool                 `json:"delivery"`
-	Deliverytype       string               `json:"deliverytype"`
-	Deliverymins       int                  `json:"deliverymins"`
-	Createdby          int                  `json:"createdby"`
-	Status             string               `json:"status"`
+	Locationid   int    `json:"locationid" gorm:"primary_key"`
+	Tenantid     int    `json:"tenantid" gorm:"ForeignKey"`
+	Locationname string `json:"locationname"`
+	Email        string `json:"email"`
+	Contactno    string `json:"contactno"`
+	Address      string `json:"address"`
+	City         string `json:"city"`
+	State        string `json:"state"`
+	Postcode     string `json:"postcode"`
+	Countrycode  string `json:"countrycode"`
+	Latitude     string `json:"latitude"`
+	Longitude    string `json:"longitude"`
+	Opentime     string `json:""opentime`
+	Closetime    string `json:"closetime"`
+	Delivery     bool   `json:"delivery"`
+	Deliverytype string `json:"deliverytype"`
+	Deliverymins int    `json:"deliverymins"`
+	Createdby    int    `json:"createdby"`
+	Status       string `json:"status"`
 	// Tenantstaffdetails []Tenantstaffdetails `json:"tenantstaffdetails" gorm:"ForeignKey:locationid"`
 	Appuserprofiles []App_userprofiles `json:"appuserprofile" gorm:"ForeignKey:userlocationid"`
-	Tenantcharges  []Tenantcharge  `json:"tenantcharge" gorm:"ForeignKey:locationid"`
-	Tenantsettings []Tenantsetting `json:"tenantsetting" gorm:"ForeignKey:locationid"`
+	Tenantcharges   []Tenantcharge     `json:"tenantcharge" gorm:"ForeignKey:locationid"`
+	Tenantsettings  []Tenantsetting    `json:"tenantsetting" gorm:"ForeignKey:locationid"`
 }
 type App_userprofiles struct {
 	// gorm.Model
@@ -275,7 +278,7 @@ type App_userprofiles struct {
 	Lastname       string `json:"lastname"`
 	Email          string `json:"email"`
 	Contactno      string `json:"contactno"`
-	Profileimage string `json:"profileimage"`
+	Profileimage   string `json:"profileimage"`
 	Userlocationid int    `json:"userlocationid"`
 }
 type Promotion struct {
@@ -291,9 +294,9 @@ type Promotion struct {
 	Promotag        string `json:"promotag"`
 	Startdate       string `json:"startdate"`
 	Enddate         string `json:"enddate"`
-	Broadcaststatus bool `json:"broadcaststatus"`
-	Success int `json:"success"`
-	Failure int `json:"failure"`
+	Broadcaststatus bool   `json:"broadcaststatus"`
+	Success         int    `json:"success"`
+	Failure         int    `json:"failure"`
 	Status          string `json:"status"`
 }
 type Ordersequence struct {
@@ -379,15 +382,17 @@ type Subscribe struct {
 	Modulename           string  `json:"modulename"`
 	Packagename          string  `json:"packagename"`
 	PackageAmount        float64 `json:"packageamount"`
-	Totalamount          float64 `json:"totalamount"`
-	Logourl              string  `json:"logourl"`
-	Iconurl              string  `json:"iconurl"`
-	PackageIcon          string  `json:"packageicon"`
-	Customercount        int     `json:"customercount"`
-	Locationcount        int     `json:"locationcount"`
-	Subcategoryid        int     `json:"subcategoryid"`
-	Categoryid           int     `json:"categoryid"`
-	Paymentstatus bool `json:"paymentstatus"`
+	Totalamount   float64 `json:"totalamount"`
+	Taxamount     float64 `json:"taxamount"`
+	Logourl       string  `json:"logourl"`
+	Iconurl       string  `json:"iconurl"`
+	PackageIcon   string  `json:"packageicon"`
+	Tenantaccid   string  `json:"tenantaccid"`
+	Customercount int     `json:"customercount"`
+	Locationcount int     `json:"locationcount"`
+	Subcategoryid int     `json:"subcategoryid"`
+	Categoryid    int     `json:"categoryid"`
+	Paymentstatus bool    `json:"paymentstatus"`
 }
 type User struct {
 	ID          int    `json:"id"`
@@ -474,7 +479,7 @@ type Tenantstaff struct {
 	Lastname           string              `json:"lastname"`
 	Email              string              `json:"email"`
 	Contactno          string              `json:"contactno"`
-	Profileimage string `json:"profileimage"`
+	Profileimage       string              `json:"profileimage"`
 	Tenantstaffdetails []Tenantstaffdetail `json:"tenantstaffdetails" gorm:"ForeignKey:tenantstaffid;references:tenantstaffid"`
 }
 type Tenantstaffdetail struct {
@@ -501,15 +506,15 @@ type Tenantstaffs struct {
 	Userid          int              `json:"userid"`
 	Appuserprofiles App_userprofiles `json:"appuserprofiles" gorm:"ForeignKey:userid;references:userid"`
 }
-type TenantUsers struct{
-Firstname string `json:"firstname"`
-Lastname string `json:"lastname"`
-Profileimage string `json:"profileimage"`
-Userlocationid int `json:"userlocationid"`
-Userid int `json:"userid"`
-Created string `json:"created"`
-Contactno string `json:"contactno"`	
-Email string `json:"email"`
-Locationname string `json:"locationname"`
-Referenceid int `json:"referenceid"`
+type TenantUsers struct {
+	Firstname      string `json:"firstname"`
+	Lastname       string `json:"lastname"`
+	Profileimage   string `json:"profileimage"`
+	Userlocationid int    `json:"userlocationid"`
+	Userid         int    `json:"userid"`
+	Created        string `json:"created"`
+	Contactno      string `json:"contactno"`
+	Email          string `json:"email"`
+	Locationname   string `json:"locationname"`
+	Referenceid    int    `json:"referenceid"`
 }

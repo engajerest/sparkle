@@ -183,8 +183,11 @@ type ComplexityRoot struct {
 		Modulename     func(childComplexity int) int
 		Subcategoryid  func(childComplexity int) int
 		Subscriptionid func(childComplexity int) int
-		TenantID       func(childComplexity int) int
-		TenantName     func(childComplexity int) int
+		Taxamount      func(childComplexity int) int
+		Tenantaccid    func(childComplexity int) int
+		Tenantid       func(childComplexity int) int
+		Tenantname     func(childComplexity int) int
+		Totalamount    func(childComplexity int) int
 	}
 
 	Tenantschema struct {
@@ -514,6 +517,8 @@ type ComplexityRoot struct {
 		Subscriptionaccid    func(childComplexity int) int
 		Subscriptionid       func(childComplexity int) int
 		Subscriptionmethodid func(childComplexity int) int
+		Taxamount            func(childComplexity int) int
+		Tenantaccid          func(childComplexity int) int
 		Tenantid             func(childComplexity int) int
 		TotalAmount          func(childComplexity int) int
 	}
@@ -1524,19 +1529,40 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TenantData.Subscriptionid(childComplexity), true
 
-	case "TenantData.TenantId":
-		if e.complexity.TenantData.TenantID == nil {
+	case "TenantData.Taxamount":
+		if e.complexity.TenantData.Taxamount == nil {
 			break
 		}
 
-		return e.complexity.TenantData.TenantID(childComplexity), true
+		return e.complexity.TenantData.Taxamount(childComplexity), true
 
-	case "TenantData.TenantName":
-		if e.complexity.TenantData.TenantName == nil {
+	case "TenantData.Tenantaccid":
+		if e.complexity.TenantData.Tenantaccid == nil {
 			break
 		}
 
-		return e.complexity.TenantData.TenantName(childComplexity), true
+		return e.complexity.TenantData.Tenantaccid(childComplexity), true
+
+	case "TenantData.Tenantid":
+		if e.complexity.TenantData.Tenantid == nil {
+			break
+		}
+
+		return e.complexity.TenantData.Tenantid(childComplexity), true
+
+	case "TenantData.Tenantname":
+		if e.complexity.TenantData.Tenantname == nil {
+			break
+		}
+
+		return e.complexity.TenantData.Tenantname(childComplexity), true
+
+	case "TenantData.Totalamount":
+		if e.complexity.TenantData.Totalamount == nil {
+			break
+		}
+
+		return e.complexity.TenantData.Totalamount(childComplexity), true
 
 	case "Tenantschema.about":
 		if e.complexity.Tenantschema.About == nil {
@@ -3127,6 +3153,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscriptionsdata.Subscriptionmethodid(childComplexity), true
 
+	case "subscriptionsdata.Taxamount":
+		if e.complexity.Subscriptionsdata.Taxamount == nil {
+			break
+		}
+
+		return e.complexity.Subscriptionsdata.Taxamount(childComplexity), true
+
+	case "subscriptionsdata.Tenantaccid":
+		if e.complexity.Subscriptionsdata.Tenantaccid == nil {
+			break
+		}
+
+		return e.complexity.Subscriptionsdata.Tenantaccid(childComplexity), true
+
 	case "subscriptionsdata.Tenantid":
 		if e.complexity.Subscriptionsdata.Tenantid == nil {
 			break
@@ -3625,15 +3665,18 @@ input TenantAddress{
  Closetime:String!
 }
 type TenantData{
- TenantId:Int!
- TenantName:String!
+ Tenantid:Int!
+ Tenantname:String!
  Moduleid:Int! 
  Modulename:String!
  Subscriptionid:Int!
+ Tenantaccid:String!
  Locationid:Int!
  Locationname:String!
  Categoryid:Int!
  Subcategoryid:Int!
+ Taxamount:Float!
+ Totalamount:Float!
 }
 type subscribedData{
  status:Boolean!
@@ -4192,6 +4235,8 @@ Iconurl:String!
 PackageIcon:String
 PackageAmount:Float
 TotalAmount:Float!
+Taxamount:Float!
+Tenantaccid:String!
 Customercount:Int
 Locationcount:Int
 
@@ -8506,7 +8551,7 @@ func (ec *executionContext) _SubCategory_Icon(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TenantData_TenantId(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+func (ec *executionContext) _TenantData_Tenantid(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8524,7 +8569,7 @@ func (ec *executionContext) _TenantData_TenantId(ctx context.Context, field grap
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TenantID, nil
+		return obj.Tenantid, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8541,7 +8586,7 @@ func (ec *executionContext) _TenantData_TenantId(ctx context.Context, field grap
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TenantData_TenantName(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+func (ec *executionContext) _TenantData_Tenantname(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8559,7 +8604,7 @@ func (ec *executionContext) _TenantData_TenantName(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TenantName, nil
+		return obj.Tenantname, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8679,6 +8724,41 @@ func (ec *executionContext) _TenantData_Subscriptionid(ctx context.Context, fiel
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TenantData_Tenantaccid(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TenantData",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantaccid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TenantData_Locationid(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
@@ -8819,6 +8899,76 @@ func (ec *executionContext) _TenantData_Subcategoryid(ctx context.Context, field
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TenantData_Taxamount(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TenantData",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Taxamount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TenantData_Totalamount(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TenantData",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Totalamount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Tenantschema_Tenantid(ctx context.Context, field graphql.CollectedField, obj *model.Tenantschema) (ret graphql.Marshaler) {
@@ -17702,6 +17852,76 @@ func (ec *executionContext) _subscriptionsdata_TotalAmount(ctx context.Context, 
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _subscriptionsdata_Taxamount(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscriptionsdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Taxamount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _subscriptionsdata_Tenantaccid(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscriptionsdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantaccid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _subscriptionsdata_Customercount(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -22266,13 +22486,13 @@ func (ec *executionContext) _TenantData(ctx context.Context, sel ast.SelectionSe
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TenantData")
-		case "TenantId":
-			out.Values[i] = ec._TenantData_TenantId(ctx, field, obj)
+		case "Tenantid":
+			out.Values[i] = ec._TenantData_Tenantid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "TenantName":
-			out.Values[i] = ec._TenantData_TenantName(ctx, field, obj)
+		case "Tenantname":
+			out.Values[i] = ec._TenantData_Tenantname(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -22288,6 +22508,11 @@ func (ec *executionContext) _TenantData(ctx context.Context, sel ast.SelectionSe
 			}
 		case "Subscriptionid":
 			out.Values[i] = ec._TenantData_Subscriptionid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Tenantaccid":
+			out.Values[i] = ec._TenantData_Tenantaccid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -22308,6 +22533,16 @@ func (ec *executionContext) _TenantData(ctx context.Context, sel ast.SelectionSe
 			}
 		case "Subcategoryid":
 			out.Values[i] = ec._TenantData_Subcategoryid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Taxamount":
+			out.Values[i] = ec._TenantData_Taxamount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Totalamount":
+			out.Values[i] = ec._TenantData_Totalamount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -24285,6 +24520,16 @@ func (ec *executionContext) _subscriptionsdata(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._subscriptionsdata_PackageAmount(ctx, field, obj)
 		case "TotalAmount":
 			out.Values[i] = ec._subscriptionsdata_TotalAmount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Taxamount":
+			out.Values[i] = ec._subscriptionsdata_Taxamount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Tenantaccid":
+			out.Values[i] = ec._subscriptionsdata_Tenantaccid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

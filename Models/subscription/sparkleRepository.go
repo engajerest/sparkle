@@ -26,7 +26,7 @@ const (
 	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,partnerid,moduleid,categoryid,subcategoryid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid,promoid,promoprice,promostatus,validitydate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname ,b.moduleid,b.subscriptionid,b.categoryid,b.subcategoryid, c.modulename ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND  a.tenantid=?"
+	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname,IFNULL(a.tenantaccid,'') AS tenantaccid, b.moduleid,b.subscriptionid,b.categoryid,b.subcategoryid, b.taxamount,b.totalamount, c.modulename ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND  a.tenantid=?"
 	createLocationQuery            = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	updatelocation                 = "UPDATE tenantlocations SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
 	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocations WHERE status='Active' AND locationid=? "
@@ -61,7 +61,7 @@ const (
 	updatelocationstatus           = "UPDATE tenantlocations SET status=? WHERE tenantid= ? AND locationid=?"
 	updatedeliverystatus           = "UPDATE tenantlocations SET delivery=? WHERE tenantid= ? AND locationid=?"
 	getCustomerByid                = "SELECT customerid,firstname,lastname,contactno,email,IFNULL(configid,0) AS configid  FROM customers WHERE customerid=?"
-	getsubscription                = "SELECT a.subscriptionid,a.packageid,a.moduleid,a.tenantid,a.categoryid,a.subcategoryid,a.totalamount,ifnull(a.subscriptionaccid,'') as subscriptionaccid,ifnull(a.subscriptionmethodid,'') as subscriptionmethodid, a.paymentstatus, b.modulename,b.logourl,b.iconurl,'' as packagename,'0.0' AS packageamount,'' as packageicon, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b WHERE a.moduleid=b.moduleid AND   a.tenantid=?"
+	getsubscription                = "SELECT a.subscriptionid,a.packageid,a.moduleid,a.tenantid,a.categoryid,a.subcategoryid,a.totalamount,a.taxamount,ifnull(a.subscriptionaccid,'') as subscriptionaccid,ifnull(a.subscriptionmethodid,'') as subscriptionmethodid, a.paymentstatus, b.modulename,b.logourl,b.iconurl,'' as packagename,'0.0' AS packageamount,'' as packageicon,IFNULL(c.tenantaccid,'') AS tenantaccid, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,tenants c WHERE a.moduleid=b.moduleid AND a.tenantid=c.tenantid AND   a.tenantid=?"
 	nonsubscribed                  = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(d.promocodeid,0) AS promocodeid,IFNULL(d.promoname ,'') AS promoname,IFNULL(d.promodescription,'') AS promodescription,IFNULL(d.promotype ,'') AS promotype,IFNULL(d.promovalue,0) AS promovalue,IFNULL(d.packageexpiry,0) AS packageexpiry,IFNULL(d.validity,'') AS validity,IF(d.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid INNER JOIN  app_promocodes d ON a.packageid=d.packageid WHERE a.`status`='Active' AND  a.packageid  NOT IN (SELECT packageid FROM tenantsubscription WHERE tenantid= ? )"
 	getpayments                    = "SELECT a.paymentid,a.packageid,IFNULL(a.paymentref,'') AS paymentref,IFNULL(a.locationid,0) AS locationid,a.paymenttypeid,a.tenantid,IFNULL(a.customerid,0) AS customerid,a.transactiondate,IFNULL(a.orderid,0) AS orderid,a.chargeid,a.amount,a.refundamt,a.paymentstatus,a.created,IFNULL(b.packagename,'') AS  packagename,IFNULL(c.firstname,'') AS firstname,IFNULL(c.lastname,'')AS lastname,IFNULL(c.contactno,'')AS contactno,IFNULL(c.email,'')AS email FROM payments a LEFT OUTER JOIN  app_package b ON a.packageid=b.packageid LEFT OUTER JOIN customers c ON  a.customerid=c.customerid WHERE tenantid=? AND paymenttypeid=?"
 	getbusinessforassist           = "SELECT a.tenantid,IFNULL(a.brandname,'') AS brandname,IFNULL(a.tenantinfo,'') AS tenantinfo,IFNULL(a.paymode1,0) AS paymode1,IFNULL(a.paymode2,0) AS paymode2,IFNULL(a.tenantaccid,0) AS tenantaccid,IFNULL(a.address,'') AS address,IFNULL(a.primaryemail,'') AS primaryemail,IFNULL(a.primarycontact,'') AS  primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage,IFNULL(b.moduleid,0) AS moduleid,IFNULL(d.modulename,'') AS modulename FROM tenants a, tenantsubscription b , app_category c, app_module d WHERE a.tenantid=b.tenantid AND b.moduleid=d.moduleid AND c.categoryid=d.categoryid AND a.tenantid=? AND  c.categoryid=?"
@@ -404,7 +404,7 @@ func (info *SubscribedData) GetSubscribedData(tenantid int64) []SubscribedData {
 
 	for rows.Next() {
 		var p SubscribedData
-		err := rows.Scan(&p.TenantID, &p.TenantName, &p.ModuleID, &p.Subscriptionid, &p.Categoryid, &p.Subcategoryid, &p.ModuleName, &p.Locationid, &p.Locationname)
+		err := rows.Scan(&p.TenantID, &p.TenantName, &p.Tenantaccid, &p.ModuleID, &p.Subscriptionid, &p.Categoryid, &p.Subcategoryid,&p.Taxamount,&p.Totalamount, &p.ModuleName, &p.Locationid, &p.Locationname)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -426,7 +426,7 @@ func (info *SubscribedData) GetInitialSubscribedData(tenantid int64) *Subscribed
 	row := stmt.QueryRow(tenantid)
 	// print(row)
 	var p SubscribedData
-	err = row.Scan(&p.TenantID, &p.TenantName, &p.ModuleID, &p.Subscriptionid, &p.ModuleName, &p.Locationid, &p.Locationname)
+	err = row.Scan(&p.TenantID, &p.TenantName, &p.Tenantaccid, &p.ModuleID, &p.Subscriptionid, &p.ModuleName, &p.Locationid, &p.Locationname)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -1602,8 +1602,8 @@ func GetAllSubscription(tenantid int) []Subscribe {
 
 	for rows.Next() {
 		var s Subscribe
-		err := rows.Scan(&s.Subscriptionid, &s.Packageid, &s.Moduleid, &s.Tenantid, &s.Categoryid, &s.Subcategoryid, &s.Totalamount, &s.Subscriptionaccid, &s.Subscriptionmethodid, &s.Paymentstatus, &s.Modulename, &s.Logourl, &s.Iconurl, &s.Packagename,
-			&s.PackageAmount, &s.PackageIcon, &s.Locationcount, &s.Customercount)
+		err := rows.Scan(&s.Subscriptionid, &s.Packageid, &s.Moduleid, &s.Tenantid, &s.Categoryid, &s.Subcategoryid, &s.Totalamount, &s.Taxamount, &s.Subscriptionaccid, &s.Subscriptionmethodid, &s.Paymentstatus, &s.Modulename, &s.Logourl, &s.Iconurl, &s.Packagename,
+			&s.PackageAmount, &s.PackageIcon, &s.Tenantaccid, &s.Locationcount, &s.Customercount)
 		if err != nil {
 			log.Fatal(err)
 		}

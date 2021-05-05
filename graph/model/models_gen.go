@@ -112,15 +112,18 @@ type TenantAddress struct {
 }
 
 type TenantData struct {
-	TenantID       int    `json:"TenantId"`
-	TenantName     string `json:"TenantName"`
-	Moduleid       int    `json:"Moduleid"`
-	Modulename     string `json:"Modulename"`
-	Subscriptionid int    `json:"Subscriptionid"`
-	Locationid     int    `json:"Locationid"`
-	Locationname   string `json:"Locationname"`
-	Categoryid     int    `json:"Categoryid"`
-	Subcategoryid  int    `json:"Subcategoryid"`
+	Tenantid       int     `json:"Tenantid"`
+	Tenantname     string  `json:"Tenantname"`
+	Moduleid       int     `json:"Moduleid"`
+	Modulename     string  `json:"Modulename"`
+	Subscriptionid int     `json:"Subscriptionid"`
+	Tenantaccid    string  `json:"Tenantaccid"`
+	Locationid     int     `json:"Locationid"`
+	Locationname   string  `json:"Locationname"`
+	Categoryid     int     `json:"Categoryid"`
+	Subcategoryid  int     `json:"Subcategoryid"`
+	Taxamount      float64 `json:"Taxamount"`
+	Totalamount    float64 `json:"Totalamount"`
 }
 
 type TenantDetails struct {
@@ -672,6 +675,8 @@ type Subscriptionsdata struct {
 	PackageIcon          *string  `json:"PackageIcon"`
 	PackageAmount        *float64 `json:"PackageAmount"`
 	TotalAmount          float64  `json:"TotalAmount"`
+	Taxamount            float64  `json:"Taxamount"`
+	Tenantaccid          string   `json:"Tenantaccid"`
 	Customercount        *int     `json:"Customercount"`
 	Locationcount        *int     `json:"Locationcount"`
 }

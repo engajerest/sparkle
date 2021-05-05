@@ -82,15 +82,18 @@ input TenantAddress{
  Closetime:String!
 }
 type TenantData{
- TenantId:Int!
- TenantName:String!
+ Tenantid:Int!
+ Tenantname:String!
  Moduleid:Int! 
  Modulename:String!
  Subscriptionid:Int!
+ Tenantaccid:String!
  Locationid:Int!
  Locationname:String!
  Categoryid:Int!
  Subcategoryid:Int!
+ Taxamount:Float!
+ Totalamount:Float!
 }
 type subscribedData{
  status:Boolean!
@@ -649,6 +652,8 @@ Iconurl:String!
 PackageIcon:String
 PackageAmount:Float
 TotalAmount:Float!
+Taxamount:Float!
+Tenantaccid:String!
 Customercount:Int
 Locationcount:Int
 
