@@ -99,16 +99,19 @@ type SubCategory struct {
 }
 
 type TenantAddress struct {
-	Address     string `json:"Address"`
-	Suburb      string `json:"Suburb"`
-	State       string `json:"State"`
-	Zip         string `json:"Zip"`
-	Countrycode string `json:"Countrycode"`
-	Latitude    string `json:"Latitude"`
-	Longitude   string `json:"Longitude"`
-	TimeZone    string `json:"TimeZone"`
-	Opentime    string `json:"Opentime"`
-	Closetime   string `json:"Closetime"`
+	Address        string `json:"Address"`
+	Suburb         string `json:"Suburb"`
+	State          string `json:"State"`
+	Zip            string `json:"Zip"`
+	Countrycode    string `json:"Countrycode"`
+	Currencyid     int    `json:"Currencyid"`
+	Currencycode   string `json:"Currencycode"`
+	Currencysymbol string `json:"Currencysymbol"`
+	Latitude       string `json:"Latitude"`
+	Longitude      string `json:"Longitude"`
+	TimeZone       string `json:"TimeZone"`
+	Opentime       string `json:"Opentime"`
+	Closetime      string `json:"Closetime"`
 }
 
 type TenantData struct {

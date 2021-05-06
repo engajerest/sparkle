@@ -45,12 +45,16 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	d.TimeZone = input.Tenantlocation.TimeZone
 	d.OpenTime = input.Tenantlocation.Opentime
 	d.CloseTime = input.Tenantlocation.Closetime
+	d.Currencyid=input.Tenantlocation.Currencyid
+	d.CurrencyCode=input.Tenantlocation.Currencycode
+	d.Currencysymbol=input.Tenantlocation.Currencysymbol
+
 	d.Partnerid = input.Subscriptiondetails[0].Partnerid
 	if len(Subscribelist) != 0 {
 		for _, k := range Subscribelist {
 			slist = append(slist, subscription.TenantSubscription{
 				Date: k.TransactionDate, Packageid: k.Packageid, Partnerid: k.Partnerid, Moduleid: k.Moduleid,
-				Currencyid: k.Currencyid, Categoryid: k.Categoryid, SubCategoryid: k.SubCategoryid, Subcategoryname: k.Subcategoryname,
+				 Currencyid: k.Currencyid, Categoryid: k.Categoryid, SubCategoryid: k.SubCategoryid, Subcategoryname: k.Subcategoryname,
 				Price: k.Price, TaxId: k.TaxID, TaxAmount: k.TaxAmount, TotalAmount: k.TotalAmount, PaymentStatus: k.PaymentStatus,
 				PaymentId: *k.Paymentid, Quantity: k.Quantity, Promoid: k.Promoid, Promovalue: k.Promovalue, Validitydate: k.Validitydate, Promostatus: true,
 			})
@@ -110,7 +114,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	if len(response) != 0 {
 		for _, k := range response {
 			list = append(list, &model.TenantData{Tenantid: k.TenantID, Tenantname: k.TenantName, Moduleid: k.ModuleID,
-				Taxamount: k.Taxamount,Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+				Taxamount: k.Taxamount, Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 	return &model.SubscribedData{
@@ -706,7 +710,7 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 	if len(list1) != 0 {
 		for _, k := range list1 {
 			list = append(list, &model.TenantData{Tenantid: k.TenantID, Tenantname: k.TenantName, Moduleid: k.ModuleID,
-				Taxamount: k.Taxamount,Totalamount: k.Totalamount, 	Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+				Taxamount: k.Taxamount, Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 

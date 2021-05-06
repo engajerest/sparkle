@@ -23,7 +23,7 @@ const (
 	getAllCategoryQuery            = "SELECT categoryid,categoryname,categorytype,sortorder,status FROM app_category WHERE STATUS='Active'"
 	getAllSubCategoryQuery         = "SELECT  subcategoryid,categorytypeid,categoryid,subcategoryname,status,icon FROM app_subcategory WHERE statuscode=1"
 	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(c.promocodeid,0) AS promocodeid,IFNULL(c.promoname ,'') AS promoname,IFNULL(c.promodescription,'') AS promodescription,IFNULL(c.packageexpiry,0) AS packageexpiry,IFNULL(c.promotype ,'') AS promotype,IFNULL(c.promovalue,0) AS promovalue,IFNULL(c.validity,'') AS validity,IF(c.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid LEFT OUTER JOIN  app_promocodes c ON a.packageid=c.packageid WHERE a.`status`='Active' "
-	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencycode,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencyid,currencycode,currencysymbol,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,partnerid,moduleid,categoryid,subcategoryid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid,promoid,promoprice,promostatus,validitydate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname,IFNULL(a.tenantaccid,'') AS tenantaccid, b.moduleid,b.subscriptionid,b.categoryid,b.subcategoryid, b.taxamount,b.totalamount, c.modulename ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND  a.tenantid=?"
@@ -96,7 +96,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 
 		res, err := stmt.Exec(&s.Userid, &s.Partnerid, &s.Regno, &s.Name, &s.Email, &s.Mobile,
 			&s.Address, &s.State, &s.Suburb, &s.Latitude, &s.Longitude, &s.Zip, &s.Countrycode,
-			&s.TimeZone, &s.CurrencyCode, &s.Tenanttoken)
+			&s.TimeZone,&s.Currencyid, &s.CurrencyCode,&s.Currencysymbol, &s.Tenanttoken)
 		if err != nil {
 			tx.Rollback() // return an error too, we may want to wrap them
 			return false, nil, err

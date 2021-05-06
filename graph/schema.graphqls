@@ -75,6 +75,9 @@ input TenantAddress{
  State:String!
  Zip:String!
  Countrycode:String!
+ Currencyid:Int!
+ Currencycode:String!
+ Currencysymbol:String!
  Latitude:String!
  Longitude:String!
  TimeZone:String!

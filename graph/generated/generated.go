@@ -3658,6 +3658,9 @@ input TenantAddress{
  State:String!
  Zip:String!
  Countrycode:String!
+ Currencyid:Int!
+ Currencycode:String!
+ Currencysymbol:String!
  Latitude:String!
  Longitude:String!
  TimeZone:String!
@@ -19698,6 +19701,30 @@ func (ec *executionContext) unmarshalInputTenantAddress(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Countrycode"))
 			it.Countrycode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Currencyid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Currencyid"))
+			it.Currencyid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Currencycode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Currencycode"))
+			it.Currencycode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Currencysymbol":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Currencysymbol"))
+			it.Currencysymbol, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

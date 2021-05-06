@@ -90,6 +90,9 @@ type Initialsubscriptiondata struct {
 	State           string               `json:"state"`
 	Zip             string               `json:"zip"`
 	Countrycode     string               `json:"countrycode"`
+	Currencyid int `json:"currencyid"`
+	
+	Currencysymbol string `json:"currencysymbol"`
 	Latitude        string               `json:"latitude"`
 	Longitude       string               `json:"longitude"`
 	TimeZone        string               `json:"timezone"`
@@ -107,6 +110,7 @@ type TenantSubscription struct {
 	Partnerid       int    `json:"partnerid"`
 	Moduleid        int    `json:"moduleId"`
 	Currencyid      int    `json:"currencyid"`
+
 	Categoryid      int    `json:"categoryid"`
 	SubCategoryid   int    `json:"subcategoryid"`
 	Subcategoryname string `json:"subcategoryname"`
