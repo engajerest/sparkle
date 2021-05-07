@@ -314,20 +314,23 @@ type ComplexityRoot struct {
 	}
 
 	Info struct {
-		About       func(childComplexity int) int
-		Address     func(childComplexity int) int
-		Brandname   func(childComplexity int) int
-		Cod         func(childComplexity int) int
-		Digital     func(childComplexity int) int
-		Email       func(childComplexity int) int
-		Moduleid    func(childComplexity int) int
-		Modulename  func(childComplexity int) int
-		Phone       func(childComplexity int) int
-		Social      func(childComplexity int) int
-		Tenantaccid func(childComplexity int) int
-		Tenantid    func(childComplexity int) int
-		Tenantimage func(childComplexity int) int
-		Tenanttoken func(childComplexity int) int
+		About          func(childComplexity int) int
+		Address        func(childComplexity int) int
+		Brandname      func(childComplexity int) int
+		Cod            func(childComplexity int) int
+		Countrycode    func(childComplexity int) int
+		Currencycode   func(childComplexity int) int
+		Currencysymbol func(childComplexity int) int
+		Digital        func(childComplexity int) int
+		Email          func(childComplexity int) int
+		Moduleid       func(childComplexity int) int
+		Modulename     func(childComplexity int) int
+		Phone          func(childComplexity int) int
+		Social         func(childComplexity int) int
+		Tenantaccid    func(childComplexity int) int
+		Tenantid       func(childComplexity int) int
+		Tenantimage    func(childComplexity int) int
+		Tenanttoken    func(childComplexity int) int
 	}
 
 	Locationbyiddata struct {
@@ -346,6 +349,7 @@ type ComplexityRoot struct {
 
 	Locationgetall struct {
 		Address         func(childComplexity int) int
+		City            func(childComplexity int) int
 		Closingtime     func(childComplexity int) int
 		Contact         func(childComplexity int) int
 		Countycode      func(childComplexity int) int
@@ -2117,6 +2121,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Info.Cod(childComplexity), true
 
+	case "info.countrycode":
+		if e.complexity.Info.Countrycode == nil {
+			break
+		}
+
+		return e.complexity.Info.Countrycode(childComplexity), true
+
+	case "info.currencycode":
+		if e.complexity.Info.Currencycode == nil {
+			break
+		}
+
+		return e.complexity.Info.Currencycode(childComplexity), true
+
+	case "info.currencysymbol":
+		if e.complexity.Info.Currencysymbol == nil {
+			break
+		}
+
+		return e.complexity.Info.Currencysymbol(childComplexity), true
+
 	case "info.digital":
 		if e.complexity.Info.Digital == nil {
 			break
@@ -2249,6 +2274,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Locationgetall.Address(childComplexity), true
+
+	case "locationgetall.city":
+		if e.complexity.Locationgetall.City == nil {
+			break
+		}
+
+		return e.complexity.Locationgetall.City(childComplexity), true
 
 	case "locationgetall.closingtime":
 		if e.complexity.Locationgetall.Closingtime == nil {
@@ -3655,6 +3687,7 @@ input TenantDetails{
 input TenantAddress{
  Address:String!
  Suburb:String!
+ City:String!
  State:String!
  Zip:String!
  Countrycode:String!
@@ -3779,6 +3812,7 @@ input location{
  Contact:String!
  Address:String!
  Suburb:String!
+  City:String!
  State:String!
  Zip:String!
  Countrycode:String!
@@ -3799,6 +3833,7 @@ Locationid:Int!
  Contact:String!
  Address:String!
  Suburb:String!
+ City:String!
  State:String!
  Zip:String!
  Countrycode:String!
@@ -3916,6 +3951,7 @@ type locationgetall {
  contact:String!
  address:String!
  suburb:String!
+ city:String!
  state:String!
  postcode:String!
  countycode:String!
@@ -4101,6 +4137,9 @@ type info{
  tenantaccid:String
  tenanttoken:String
  tenantimage:String
+ countrycode:String!
+ currencycode:String!
+ currencysymbol:String!
  social:[socialinfo]
 }
 type socialinfo{
@@ -13038,6 +13077,111 @@ func (ec *executionContext) _info_tenantimage(ctx context.Context, field graphql
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _info_countrycode(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Countrycode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_currencycode(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Currencycode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _info_currencysymbol(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "info",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Currencysymbol, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _info_social(ctx context.Context, field graphql.CollectedField, obj *model.Info) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -13576,6 +13720,41 @@ func (ec *executionContext) _locationgetall_suburb(ctx context.Context, field gr
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Suburb, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _locationgetall_city(ctx context.Context, field graphql.CollectedField, obj *model.Locationgetall) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "locationgetall",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.City, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -19680,6 +19859,14 @@ func (ec *executionContext) unmarshalInputTenantAddress(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
+		case "City":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("City"))
+			it.City, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "State":
 			var err error
 
@@ -20472,6 +20659,14 @@ func (ec *executionContext) unmarshalInputlocation(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "City":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("City"))
+			it.City, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "State":
 			var err error
 
@@ -20645,6 +20840,14 @@ func (ec *executionContext) unmarshalInputlocationupdate(ctx context.Context, ob
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Suburb"))
 			it.Suburb, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "City":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("City"))
+			it.City, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23529,6 +23732,21 @@ func (ec *executionContext) _info(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._info_tenanttoken(ctx, field, obj)
 		case "tenantimage":
 			out.Values[i] = ec._info_tenantimage(ctx, field, obj)
+		case "countrycode":
+			out.Values[i] = ec._info_countrycode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "currencycode":
+			out.Values[i] = ec._info_currencycode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "currencysymbol":
+			out.Values[i] = ec._info_currencysymbol(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "social":
 			out.Values[i] = ec._info_social(ctx, field, obj)
 		default:
@@ -23666,6 +23884,11 @@ func (ec *executionContext) _locationgetall(ctx context.Context, sel ast.Selecti
 			}
 		case "suburb":
 			out.Values[i] = ec._locationgetall_suburb(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "city":
+			out.Values[i] = ec._locationgetall_city(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

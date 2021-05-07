@@ -23,14 +23,14 @@ const (
 	getAllCategoryQuery            = "SELECT categoryid,categoryname,categorytype,sortorder,status FROM app_category WHERE STATUS='Active'"
 	getAllSubCategoryQuery         = "SELECT  subcategoryid,categorytypeid,categoryid,subcategoryname,status,icon FROM app_subcategory WHERE statuscode=1"
 	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(c.promocodeid,0) AS promocodeid,IFNULL(c.promoname ,'') AS promoname,IFNULL(c.promodescription,'') AS promodescription,IFNULL(c.packageexpiry,0) AS packageexpiry,IFNULL(c.promotype ,'') AS promotype,IFNULL(c.promovalue,0) AS promovalue,IFNULL(c.validity,'') AS validity,IF(c.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid LEFT OUTER JOIN  app_promocodes c ON a.packageid=c.packageid WHERE a.`status`='Active' "
-	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,latitude,longitude,postcode,countrycode,timezone,currencyid,currencycode,currencysymbol,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	insertTenantLocationQuery      = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,suburb,latitude,longitude,postcode,countrycode,timezone,currencyid,currencycode,currencysymbol,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	insertTenantLocationQuery      = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,suburb,latitude,longitude,postcode,countrycode,opentime,closetime,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,partnerid,moduleid,categoryid,subcategoryid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid,promoid,promoprice,promostatus,validitydate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname,IFNULL(a.tenantaccid,'') AS tenantaccid, b.moduleid,b.subscriptionid,b.categoryid,b.subcategoryid, b.taxamount,b.totalamount, c.modulename ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND  a.tenantid=?"
-	createLocationQuery            = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	updatelocation                 = "UPDATE tenantlocations SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
-	getLocationbyid                = "SELECT  locationid,locationname,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocations WHERE status='Active' AND locationid=? "
-	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocations WHERE status='Active' AND tenantid=? "
+	createLocationQuery            = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,suburb,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	updatelocation                 = "UPDATE tenantlocations SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,suburb=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
+	getLocationbyid                = "SELECT  locationid,locationname,address,IFNULL(suburb,'') AS suburb,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocations WHERE status='Active' AND locationid=? "
+	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,IFNULL(suburb,'') AS suburb,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocations WHERE status='Active' AND tenantid=? "
 	createTenantUserQuery          = "INSERT INTO app_users (authname,password,hashsalt,contactno,roleid,referenceid) VALUES(?,?,?,?,?,?)"
 	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofiles (userid,firstname,lastname,email,contactno,profileimage,userlocationid) VALUES(?,?,?,?,?,?,?)"
 	insertTenantstaff              = "INSERT INTO tenantstaffs (tenantid,moduleid,userid) VALUES(?,?,?)"
@@ -46,7 +46,7 @@ const (
 	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,dailcode,sociallink,socialicon) VALUES"
 	updatesocialinfo               = "UPDATE tenantsocial SET socialprofile=?,dailcode=?, sociallink=?,socialicon=? WHERE tenantid=? AND socialid=? "
 	updateauthuser                 = "UPDATE  app_users a,app_userprofiles b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
-	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid,IFNULL(address,'') AS address,IFNULL(primaryemail,'') AS primaryemail,IFNULL(primarycontact,'') AS  primarycontact,IFNULL(tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage FROM tenants WHERE tenantid=?"
+	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid,IFNULL(address,'') AS address,IFNULL(primaryemail,'') AS primaryemail,IFNULL(primarycontact,'') AS  primarycontact,IFNULL(tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage, IFNULL(countrycode,'') AS countrycode,IFNULL(currencycode,'') AS currencycode,IFNULL(currencysymbol,'') AS currencysymbol FROM tenants WHERE tenantid=?"
 	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile ,IFNULL(dailcode,'') AS dailcode, IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
 	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
 	Getpromotions                  = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,IFNULL(a.broadcaststatus,0) as broadcaststatus,IFNULL(a.success,0) as success,IFNULL(a.failure,0) as failure,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
@@ -64,7 +64,7 @@ const (
 	getsubscription                = "SELECT a.subscriptionid,a.packageid,a.moduleid,a.tenantid,a.categoryid,a.subcategoryid,a.totalamount,a.taxamount,ifnull(a.subscriptionaccid,'') as subscriptionaccid,ifnull(a.subscriptionmethodid,'') as subscriptionmethodid, a.paymentstatus, b.modulename,b.logourl,b.iconurl,'' as packagename,'0.0' AS packageamount,'' as packageicon,IFNULL(c.tenantaccid,'') AS tenantaccid, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,tenants c WHERE a.moduleid=b.moduleid AND a.tenantid=c.tenantid AND   a.tenantid=?"
 	nonsubscribed                  = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(d.promocodeid,0) AS promocodeid,IFNULL(d.promoname ,'') AS promoname,IFNULL(d.promodescription,'') AS promodescription,IFNULL(d.promotype ,'') AS promotype,IFNULL(d.promovalue,0) AS promovalue,IFNULL(d.packageexpiry,0) AS packageexpiry,IFNULL(d.validity,'') AS validity,IF(d.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid INNER JOIN  app_promocodes d ON a.packageid=d.packageid WHERE a.`status`='Active' AND  a.packageid  NOT IN (SELECT packageid FROM tenantsubscription WHERE tenantid= ? )"
 	getpayments                    = "SELECT a.paymentid,a.packageid,IFNULL(a.paymentref,'') AS paymentref,IFNULL(a.locationid,0) AS locationid,a.paymenttypeid,a.tenantid,IFNULL(a.customerid,0) AS customerid,a.transactiondate,IFNULL(a.orderid,0) AS orderid,a.chargeid,a.amount,a.refundamt,a.paymentstatus,a.created,IFNULL(b.packagename,'') AS  packagename,IFNULL(c.firstname,'') AS firstname,IFNULL(c.lastname,'')AS lastname,IFNULL(c.contactno,'')AS contactno,IFNULL(c.email,'')AS email FROM payments a LEFT OUTER JOIN  app_package b ON a.packageid=b.packageid LEFT OUTER JOIN customers c ON  a.customerid=c.customerid WHERE tenantid=? AND paymenttypeid=?"
-	getbusinessforassist           = "SELECT a.tenantid,IFNULL(a.brandname,'') AS brandname,IFNULL(a.tenantinfo,'') AS tenantinfo,IFNULL(a.paymode1,0) AS paymode1,IFNULL(a.paymode2,0) AS paymode2,IFNULL(a.tenantaccid,0) AS tenantaccid,IFNULL(a.address,'') AS address,IFNULL(a.primaryemail,'') AS primaryemail,IFNULL(a.primarycontact,'') AS  primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage,IFNULL(b.moduleid,0) AS moduleid,IFNULL(d.modulename,'') AS modulename FROM tenants a, tenantsubscription b , app_category c, app_module d WHERE a.tenantid=b.tenantid AND b.moduleid=d.moduleid AND c.categoryid=d.categoryid AND a.tenantid=? AND  c.categoryid=?"
+	getbusinessforassist           = "SELECT a.tenantid,IFNULL(a.brandname,'') AS brandname,IFNULL(a.tenantinfo,'') AS tenantinfo,IFNULL(a.paymode1,0) AS paymode1,IFNULL(a.paymode2,0) AS paymode2,IFNULL(a.tenantaccid,0) AS tenantaccid,IFNULL(a.address,'') AS address,IFNULL(a.primaryemail,'') AS primaryemail,IFNULL(a.primarycontact,'') AS  primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken,IFNULL(a.tenantimage,'') AS tenantimage, IFNULL(a.countrycode,'') AS countrycode,IFNULL(a.currencycode,'') AS currencycode,IFNULL(a.currencysymbol,'') AS currencysymbol,IFNULL(b.moduleid,0) AS moduleid,IFNULL(d.modulename,'') AS modulename FROM tenants a, tenantsubscription b , app_category c, app_module d WHERE a.tenantid=b.tenantid AND b.moduleid=d.moduleid AND c.categoryid=d.categoryid AND a.tenantid=? AND  c.categoryid=?"
 	updateinitial1                 = "UPDATE tenants SET brandname=?,tenantinfo=?,tenantimage=? WHERE tenantid=?"
 	updateinitial2                 = "UPDATE tenantlocations SET opentime=?,closetime=? WHERE tenantid=? AND locationid=?"
 	deletesocial                   = "DELETE FROM tenantsocial WHERE socialid=?"
@@ -95,7 +95,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 		defer stmt.Close()
 
 		res, err := stmt.Exec(&s.Userid, &s.Partnerid, &s.Regno, &s.Name, &s.Email, &s.Mobile,
-			&s.Address, &s.State, &s.Suburb, &s.Latitude, &s.Longitude, &s.Zip, &s.Countrycode,
+			&s.Address, &s.State, &s.City,&s.Suburb, &s.Latitude, &s.Longitude, &s.Zip, &s.Countrycode,
 			&s.TimeZone,&s.Currencyid, &s.CurrencyCode,&s.Currencysymbol, &s.Tenanttoken)
 		if err != nil {
 			tx.Rollback() // return an error too, we may want to wrap them
@@ -116,7 +116,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 
 		res, err := stmt.Exec(tenantid, &s.Name, &s.Email,
 			&s.Mobile, &s.Address, &s.State,
-			&s.Suburb, &s.Latitude, &s.Longitude,
+			&s.City, s.Suburb,&s.Latitude, &s.Longitude,
 			&s.Zip, &s.Countrycode, &s.OpenTime,
 			&s.CloseTime, &s.Userid)
 		if err != nil {
@@ -482,7 +482,7 @@ func (loco *Location) CreateLocation(id int64) (int64, error) {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(&loco.TenantID, &loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, id, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins)
+	res, err := statement.Exec(&loco.TenantID, &loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.City,&loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, id, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -503,7 +503,7 @@ func (loco *Location) UpdateLocation() (bool, error) {
 		return false, err
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins, &loco.TenantID, &loco.LocationId)
+	_, err = statement.Exec(&loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State,&loco.City, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins, &loco.TenantID, &loco.LocationId)
 	if err != nil {
 		log.Fatal(err)
 		return false, err
@@ -524,7 +524,7 @@ func (loco *Location) GetLocationById(id int64) (*Location, error) {
 	defer stmt.Close()
 	row := stmt.QueryRow(id)
 	// print(row)
-	err = row.Scan(&data.LocationId, &data.LocationName, &data.Address, &data.Suburb, &data.State, &data.Zip, &data.Latitude, &data.Longitude, &data.Countrycode, &data.OpeningTime, &data.ClosingTime, &data.Createdby, &data.Status, &data.Delivery, &data.Deliverytype, &data.Deliverymins)
+	err = row.Scan(&data.LocationId, &data.LocationName, &data.Address, &data.Suburb,&data.City, &data.State, &data.Zip, &data.Latitude, &data.Longitude, &data.Countrycode, &data.OpeningTime, &data.ClosingTime, &data.Createdby, &data.Status, &data.Delivery, &data.Deliverytype, &data.Deliverymins)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -931,7 +931,8 @@ func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) 
 	defer stmt.Close()
 	row := stmt.QueryRow(id)
 	// print(row)
-	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone, &data.Tenanttoken, &data.Tenantimage)
+	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone, &data.Tenanttoken, &data.Tenantimage,
+	&data.Countrycode,&data.Currencycode,&data.Currencysymbol)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -959,7 +960,7 @@ func (business *BusinessUpdate) GetBusinessforassist(id, catid int) (*BusinessUp
 	// print(row)
 	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1,
 		&data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone,
-		&data.Tenanttoken, &data.Tenantimage, &data.Moduleid, &data.Modulename)
+		&data.Tenanttoken, &data.Tenantimage,&data.Countrycode,&data.Currencycode,&data.Currencysymbol, &data.Moduleid, &data.Modulename)
 	print(err)
 	fmt.Println("2")
 	if err != nil {

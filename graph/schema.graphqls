@@ -72,6 +72,7 @@ input TenantDetails{
 input TenantAddress{
  Address:String!
  Suburb:String!
+ City:String!
  State:String!
  Zip:String!
  Countrycode:String!
@@ -196,6 +197,7 @@ input location{
  Contact:String!
  Address:String!
  Suburb:String!
+  City:String!
  State:String!
  Zip:String!
  Countrycode:String!
@@ -216,6 +218,7 @@ Locationid:Int!
  Contact:String!
  Address:String!
  Suburb:String!
+ City:String!
  State:String!
  Zip:String!
  Countrycode:String!
@@ -333,6 +336,7 @@ type locationgetall {
  contact:String!
  address:String!
  suburb:String!
+ city:String!
  state:String!
  postcode:String!
  countycode:String!
@@ -518,6 +522,9 @@ type info{
  tenantaccid:String
  tenanttoken:String
  tenantimage:String
+ countrycode:String!
+ currencycode:String!
+ currencysymbol:String!
  social:[socialinfo]
 }
 type socialinfo{

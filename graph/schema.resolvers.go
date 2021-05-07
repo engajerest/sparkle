@@ -38,6 +38,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	d.Address = input.Tenantlocation.Address
 	d.State = input.Tenantlocation.State
 	d.Suburb = input.Tenantlocation.Suburb
+	d.City = input.Tenantlocation.City
 	d.Zip = input.Tenantlocation.Zip
 	d.Countrycode = input.Tenantlocation.Countrycode
 	d.Latitude = input.Tenantlocation.Latitude
@@ -45,16 +46,16 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	d.TimeZone = input.Tenantlocation.TimeZone
 	d.OpenTime = input.Tenantlocation.Opentime
 	d.CloseTime = input.Tenantlocation.Closetime
-	d.Currencyid=input.Tenantlocation.Currencyid
-	d.CurrencyCode=input.Tenantlocation.Currencycode
-	d.Currencysymbol=input.Tenantlocation.Currencysymbol
+	d.Currencyid = input.Tenantlocation.Currencyid
+	d.CurrencyCode = input.Tenantlocation.Currencycode
+	d.Currencysymbol = input.Tenantlocation.Currencysymbol
 
 	d.Partnerid = input.Subscriptiondetails[0].Partnerid
 	if len(Subscribelist) != 0 {
 		for _, k := range Subscribelist {
 			slist = append(slist, subscription.TenantSubscription{
 				Date: k.TransactionDate, Packageid: k.Packageid, Partnerid: k.Partnerid, Moduleid: k.Moduleid,
-				 Currencyid: k.Currencyid, Categoryid: k.Categoryid, SubCategoryid: k.SubCategoryid, Subcategoryname: k.Subcategoryname,
+				Currencyid: k.Currencyid, Categoryid: k.Categoryid, SubCategoryid: k.SubCategoryid, Subcategoryname: k.Subcategoryname,
 				Price: k.Price, TaxId: k.TaxID, TaxAmount: k.TaxAmount, TotalAmount: k.TotalAmount, PaymentStatus: k.PaymentStatus,
 				PaymentId: *k.Paymentid, Quantity: k.Quantity, Promoid: k.Promoid, Promovalue: k.Promovalue, Validitydate: k.Validitydate, Promostatus: true,
 			})
@@ -400,6 +401,7 @@ func (r *mutationResolver) Createlocation(ctx context.Context, input *model.Loca
 	loco.Mobile = input.Contact
 	loco.Address = input.Address
 	loco.Suburb = input.Suburb
+	loco.City = input.City
 	loco.State = input.State
 	loco.Zip = input.Zip
 	loco.Countrycode = input.Countrycode
@@ -634,6 +636,7 @@ func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Loca
 	loco.Mobile = input.Contact
 	loco.Address = input.Address
 	loco.Suburb = input.Suburb
+	loco.City=input.City
 	loco.State = input.State
 	loco.Zip = input.Zip
 	loco.Countrycode = input.Countrycode
@@ -863,7 +866,8 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 			Email:           loco.Email,
 			Contact:         loco.Contactno,
 			Address:         loco.Address,
-			Suburb:          loco.City,
+			Suburb:          loco.Suburb,
+			City: loco.City,
 			State:           loco.State,
 			Countycode:      loco.Countrycode,
 			Postcode:        loco.Postcode,
@@ -982,6 +986,9 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 			Modulename:  businessinfo.Modulename,
 			Tenanttoken: &businessinfo.Tenanttoken,
 			Tenantimage: &businessinfo.Tenantimage,
+			Countrycode: businessinfo.Countrycode,
+			Currencycode: businessinfo.Currencycode,
+			Currencysymbol: businessinfo.Currencysymbol,
 			Social:      Result,
 		},
 	}, nil
@@ -1081,10 +1088,10 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 		Status: true,
 		Code:   http.StatusOK, Message: "Success", Locationdata: &model.Locationgetall{
 			Locationid: loco.Locationid, LocationName: loco.Locationname, Tenantid: loco.Tenantid, Email: loco.Email, Contact: loco.Contactno,
-			Address: loco.Address, Suburb: loco.City, State: loco.State, Postcode: loco.Postcode, Countycode: loco.Countrycode, Latitude: loco.Latitude,
+			Address: loco.Address, Suburb: loco.Suburb, State: loco.State, Postcode: loco.Postcode, Countycode: loco.Countrycode, Latitude: loco.Latitude,
 			Delivery: loco.Delivery, Deliverytype: loco.Deliverytype, Deliverymins: loco.Deliverymins,
 			Longitude: loco.Longitude, Openingtime: loco.Opentime, Closingtime: loco.Closetime, Status: loco.Status, Tenantusers: userresult, Createdby: loco.Createdby,
-			Othercharges: otherchargeresult, Deliverycharges: deliverychargeresult,
+	City: loco.City,		Othercharges: otherchargeresult, Deliverycharges: deliverychargeresult,
 		},
 	}, nil
 }
