@@ -192,23 +192,23 @@ type Location struct {
 	Status       string `json:"status"`
 }
 type BusinessUpdate struct {
-	TenantID    int      `json:"tenantid"`
-	Moduleid    int      `json:"moduleid"`
-	Modulename  string   `json:"modulename"`
-	Brandname   string   `json:"brandname"`
-	TenantaccId string   `json:"tenantaccid"`
-	About       string   `json:"about"`
-	Email       string   `json:"email"`
-	Phone       string   `json:"phone"`
-	Address     string   `json:"address"`
-	Paymode1    int      `json:"paymode1"`
-	Paymode2    int      `json:"paymode2"`
-	Tenanttoken string   `json:"tenanttoken"`
-	Tenantimage string   `json:"tenantimage"`
-	Countrycode string `json:"countrycode"`
-	Currencycode string `json:"currencycode"`
-	Currencysymbol string `json:"currencysymbol"`
-	SocialData  []Social `json:"social"`
+	TenantID       int      `json:"tenantid"`
+	Moduleid       int      `json:"moduleid"`
+	Modulename     string   `json:"modulename"`
+	Brandname      string   `json:"brandname"`
+	TenantaccId    string   `json:"tenantaccid"`
+	About          string   `json:"about"`
+	Email          string   `json:"email"`
+	Phone          string   `json:"phone"`
+	Address        string   `json:"address"`
+	Paymode1       int      `json:"paymode1"`
+	Paymode2       int      `json:"paymode2"`
+	Tenanttoken    string   `json:"tenanttoken"`
+	Tenantimage    string   `json:"tenantimage"`
+	Countrycode    string   `json:"countrycode"`
+	Currencycode   string   `json:"currencycode"`
+	Currencysymbol string   `json:"currencysymbol"`
+	SocialData     []Social `json:"social"`
 	// SociaProfile string `json:"socialprofile"`
 	// SocialLink string `json:"sociallink"`
 	// SocialIcon string `json:"socialicon"`
@@ -352,28 +352,38 @@ type Updatestatus struct {
 	Deliverystatus bool   `json:"deliverystatus"`
 }
 type Payment struct {
-	Paymentid       int     `json:"paymentid" gorm:"primary_key"`
-	Packageid       int     `json:"packageid"`
-	Packagename     string  `json:"packagename"`
-	Locationid      int     `json:"locationid"`
-	Paymenttypeid   int     `json:"paymenttypeid"`
-	Paymentref      string  `json:"paymentref"`
-	Tenantid        int     `json:"tenantid"`
-	Customerid      int     `gorm:"ForeignKey"`
-	Transactiondate string  `json:"transactiondate"`
-	Chargeid        string  `json:"chargeid"`
-	Amount          float64 `json:"amount"`
-	Paymentstatus   string  `json:"paymentstatus"`
-	Refundamt       float64 `json:"refundamount"`
-	Orderid         int     `json:"orderid"`
-	Created         string  `json:"created"`
-
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Contactno string `json:"contactno"`
-	Email     string `json:"email"`
-	Address   string `json:"address"`
+	Paymentid       int             `json:"paymentid" gorm:"primary_key"`
+	Moduleid        int             `json:"moduleid"`
+	Locationid      int             `json:"locationid"`
+	Paymentref      string          `json:"paymentref"`
+	Paymenttypeid   int             `json:"paymenttypeid"`
+	Tenantid        int             `json:"tenantid"`
+	Customerid      int             `gorm:"ForeignKey"`
+	Transactiondate string          `json:"transactiondate"`
+	Orderid         int             `json:"orderid"`
+	Chargeid        string          `json:"chargeid"`
+	Refundid        string          `json:"chargeid"`
+	Amount          float64         `json:"amount"`
+	Refundamt       float64         `json:"refundamount"`
+	Paymentstatus   string          `json:"paymentstatus"`
+	Paymentdetails  []Paymentdetail `json:"paymentdetails" gorm:"ForeignKey:paymentid"`
 }
+type Paymentdetail struct {
+	Paymentdetailid int      `json:"paymentdetailid"`
+	Paymentid       int      `json:"paymentid"`
+	Tenantid        int      `json:"tenantid"`
+	Subscriptionid  int      `json:"subscriptionid"`
+	Moduleid        int      `json:"moduleid"`
+	Locationid      int      `json:"locationid"`
+	Orderid         int      `json:"orderid"`
+	Customerid      int      `json:"customerid" `
+	Amount          float64  `json:"amount"`
+	Taxpercent      int      `json:"taxpercent"`
+	Taxamount       float64  `json"taxamount"`
+	Payamount       float64  `json:"payamount"`
+	Customers       Customer `json:"customers" gorm:"ForeignKey:customerid;references:customerid"  `
+}
+
 type Customer struct {
 	Customerid int    `gorm:"primary_key"`
 	Firstname  string `json:"firstname"`

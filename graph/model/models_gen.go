@@ -488,24 +488,35 @@ type Othercharge struct {
 }
 
 type Paymentdata struct {
-	Paymentid       int      `json:"Paymentid"`
-	Packageid       int      `json:"Packageid"`
-	Tenantid        int      `json:"Tenantid"`
-	Packagename     string   `json:"Packagename"`
-	Paymenttypeid   int      `json:"Paymenttypeid"`
-	Customerid      int      `json:"Customerid"`
-	Transactiondate string   `json:"Transactiondate"`
-	Orderid         *int     `json:"Orderid"`
-	Chargeid        string   `json:"Chargeid"`
-	Amount          float64  `json:"Amount"`
-	Refundamt       *float64 `json:"Refundamt"`
-	Paymentstatus   *string  `json:"Paymentstatus"`
-	Created         *string  `json:"Created"`
-	Firstname       string   `json:"Firstname"`
-	Lastname        string   `json:"Lastname"`
-	Email           string   `json:"Email"`
-	Contact         string   `json:"Contact"`
-	Paymentref      string   `json:"Paymentref"`
+	Paymentid       int                  `json:"Paymentid"`
+	Moduleid        int                  `json:"Moduleid"`
+	Locationid      int                  `json:"Locationid"`
+	Tenantid        int                  `json:"Tenantid"`
+	Paymentref      string               `json:"Paymentref"`
+	Paymenttypeid   int                  `json:"Paymenttypeid"`
+	Customerid      int                  `json:"Customerid"`
+	Transactiondate string               `json:"Transactiondate"`
+	Orderid         int                  `json:"Orderid"`
+	Chargeid        string               `json:"Chargeid"`
+	Amount          float64              `json:"Amount"`
+	Refundamt       float64              `json:"Refundamt"`
+	Paymentstatus   string               `json:"Paymentstatus"`
+	Paymentdetails  []*Paymentdetaildata `json:"Paymentdetails"`
+}
+
+type Paymentdetaildata struct {
+	Paymentdetailid int       `json:"Paymentdetailid"`
+	Paymentid       int       `json:"Paymentid"`
+	Moduleid        int       `json:"Moduleid"`
+	Locationid      int       `json:"Locationid"`
+	Tenantid        int       `json:"Tenantid"`
+	Orderid         int       `json:"Orderid"`
+	Subscriptionid  int       `json:"Subscriptionid"`
+	Amount          float64   `json:"Amount"`
+	Taxpercent      int       `json:"Taxpercent"`
+	Taxamount       float64   `json:"Taxamount"`
+	Payamount       float64   `json:"Payamount"`
+	Customerinfo    *Custinfo `json:"Customerinfo"`
 }
 
 type Promo struct {

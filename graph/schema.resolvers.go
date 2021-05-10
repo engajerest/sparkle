@@ -636,7 +636,7 @@ func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Loca
 	loco.Mobile = input.Contact
 	loco.Address = input.Address
 	loco.Suburb = input.Suburb
-	loco.City=input.City
+	loco.City = input.City
 	loco.State = input.State
 	loco.Zip = input.Zip
 	loco.Countrycode = input.Countrycode
@@ -867,7 +867,7 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 			Contact:         loco.Contactno,
 			Address:         loco.Address,
 			Suburb:          loco.Suburb,
-			City: loco.City,
+			City:            loco.City,
 			State:           loco.State,
 			Countycode:      loco.Countrycode,
 			Postcode:        loco.Postcode,
@@ -973,23 +973,23 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 		Code:    http.StatusOK,
 		Message: "Success",
 		Businessinfo: &model.Info{
-			Tenantid:    businessinfo.TenantID,
-			Brandname:   &businessinfo.Brandname,
-			About:       &businessinfo.About,
-			Cod:         &businessinfo.Paymode1,
-			Digital:     &businessinfo.Paymode2,
-			Tenantaccid: &businessinfo.TenantaccId,
-			Email:       &businessinfo.Email,
-			Phone:       &businessinfo.Phone,
-			Address:     &businessinfo.Address,
-			Moduleid:    businessinfo.Moduleid,
-			Modulename:  businessinfo.Modulename,
-			Tenanttoken: &businessinfo.Tenanttoken,
-			Tenantimage: &businessinfo.Tenantimage,
-			Countrycode: businessinfo.Countrycode,
-			Currencycode: businessinfo.Currencycode,
+			Tenantid:       businessinfo.TenantID,
+			Brandname:      &businessinfo.Brandname,
+			About:          &businessinfo.About,
+			Cod:            &businessinfo.Paymode1,
+			Digital:        &businessinfo.Paymode2,
+			Tenantaccid:    &businessinfo.TenantaccId,
+			Email:          &businessinfo.Email,
+			Phone:          &businessinfo.Phone,
+			Address:        &businessinfo.Address,
+			Moduleid:       businessinfo.Moduleid,
+			Modulename:     businessinfo.Modulename,
+			Tenanttoken:    &businessinfo.Tenanttoken,
+			Tenantimage:    &businessinfo.Tenantimage,
+			Countrycode:    businessinfo.Countrycode,
+			Currencycode:   businessinfo.Currencycode,
 			Currencysymbol: businessinfo.Currencysymbol,
-			Social:      Result,
+			Social:         Result,
 		},
 	}, nil
 }
@@ -1091,7 +1091,7 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 			Address: loco.Address, Suburb: loco.Suburb, State: loco.State, Postcode: loco.Postcode, Countycode: loco.Countrycode, Latitude: loco.Latitude,
 			Delivery: loco.Delivery, Deliverytype: loco.Deliverytype, Deliverymins: loco.Deliverymins,
 			Longitude: loco.Longitude, Openingtime: loco.Opentime, Closingtime: loco.Closetime, Status: loco.Status, Tenantusers: userresult, Createdby: loco.Createdby,
-	City: loco.City,		Othercharges: otherchargeresult, Deliverycharges: deliverychargeresult,
+			City: loco.City, Othercharges: otherchargeresult, Deliverycharges: deliverychargeresult,
 		},
 	}, nil
 }
@@ -1108,14 +1108,17 @@ func (r *queryResolver) Getpayments(ctx context.Context, tenantid int, typeid in
 	var data []*model.Paymentdata
 	var d []subscription.Payment
 	d = subscription.Payments(tenantid, typeid)
-	if len(d) != 0 {
-		for _, k := range d {
-			data = append(data, &model.Paymentdata{Paymentid: k.Paymentid, Packageid: k.Packageid, Tenantid: k.Tenantid,
-				Paymenttypeid: k.Paymenttypeid, Customerid: k.Customerid, Transactiondate: k.Transactiondate, Orderid: &k.Orderid,
-				Chargeid: k.Chargeid, Amount: k.Amount, Refundamt: &k.Refundamt, Paymentstatus: &k.Paymentstatus,
-				Created: &k.Created, Packagename: k.Packagename, Firstname: k.Firstname, Lastname: k.Lastname,
-				Email: k.Email, Contact: k.Contactno, Paymentref: k.Paymentref})
+	for _, k := range d {
+		detaillist := make([]*model.Paymentdetaildata, len(k.Paymentdetails))
+		for i, j := range k.Paymentdetails {
+			detaillist[i] = &model.Paymentdetaildata{Paymentdetailid: j.Paymentdetailid, Paymentid: j.Paymentid, Moduleid: j.Moduleid, Locationid: j.Locationid, Tenantid: j.Tenantid,
+				Orderid: j.Orderid, Subscriptionid: j.Subscriptionid, Amount: j.Amount, Taxpercent: j.Taxpercent, Taxamount: j.Taxamount, Payamount: j.Payamount,
+				Customerinfo: &model.Custinfo{Customerid: j.Customers.Customerid, Firstname: j.Customers.Firstname, Lastname: j.Customers.Lastname, Email: j.Customers.Email, Contact: j.Customers.Contactno,
+					Address: j.Customers.Address}}
 		}
+		data = append(data, &model.Paymentdata{Paymentid: k.Paymentid, Moduleid: k.Moduleid, Locationid: k.Locationid, Tenantid: k.Tenantid, Paymentref: k.Paymentref,
+			Paymenttypeid: k.Paymenttypeid, Customerid: k.Customerid, Transactiondate: k.Transactiondate,
+			Orderid: k.Orderid, Chargeid: k.Chargeid, Amount: k.Amount, Refundamt: k.Refundamt, Paymentstatus: k.Paymentstatus, Paymentdetails: detaillist})
 	}
 	return &model.Getpaymentdata{Status: true, Code: http.StatusOK, Message: "Success", Payments: data}, nil
 }

@@ -445,33 +445,25 @@ func (info *SubscribedData) GetInitialSubscribedData(tenantid int64) *Subscribed
 
 func Payments(tenantid, typeid int) []Payment {
 	print("st1c")
-	stmt, err := database.Db.Prepare(getpayments)
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer stmt.Close()
-	rows, err := stmt.Query(tenantid, typeid)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	var paylist []Payment
+		log.Println("Connection Failed to Open")
 
-	for rows.Next() {
-		var p Payment
-		err := rows.Scan(&p.Paymentid, &p.Packageid, &p.Paymentref, &p.Locationid, &p.Paymenttypeid, &p.Tenantid, &p.Customerid,
-			&p.Transactiondate, &p.Orderid, &p.Chargeid, &p.Amount, &p.Refundamt, &p.Paymentstatus, &p.Created, &p.Packagename, &p.Firstname,
-			&p.Lastname, &p.Contactno, &p.Email)
-		if err != nil {
-			log.Fatal(err)
-		}
-		paylist = append(paylist, p)
-	}
-	if err = rows.Err(); err != nil {
-		log.Fatal(err)
+	} else {
+		log.Println("Connection Established")
 	}
 
-	return paylist
+	var data []Payment
+
+	DB.Table("payments").
+		Preload("Paymentdetails").Preload("Paymentdetails.Customers").Where("paymenttypeid=? AND tenantid=?", typeid,tenantid).Find(&data)
+	for index, value := range data {
+		fmt.Println(index, " = ", value)
+	}
+
+	return data
+
+
 
 }
 func (loco *Location) CreateLocation(id int64) (int64, error) {
