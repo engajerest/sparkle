@@ -366,6 +366,7 @@ type Payment struct {
 	Amount          float64         `json:"amount"`
 	Refundamt       float64         `json:"refundamount"`
 	Paymentstatus   string          `json:"paymentstatus"`
+	Created string `json:"created"`
 	Paymentdetails  []Paymentdetail `json:"paymentdetails" gorm:"ForeignKey:paymentid"`
 }
 type Paymentdetail struct {

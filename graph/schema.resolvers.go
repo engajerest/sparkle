@@ -1117,7 +1117,7 @@ func (r *queryResolver) Getpayments(ctx context.Context, tenantid int, typeid in
 					Address: j.Customers.Address}}
 		}
 		data = append(data, &model.Paymentdata{Paymentid: k.Paymentid, Moduleid: k.Moduleid, Locationid: k.Locationid, Tenantid: k.Tenantid, Paymentref: k.Paymentref,
-			Paymenttypeid: k.Paymenttypeid, Customerid: k.Customerid, Transactiondate: k.Transactiondate,
+			Created: k.Created, Paymenttypeid: k.Paymenttypeid, Customerid: k.Customerid, Transactiondate: k.Transactiondate,
 			Orderid: k.Orderid, Chargeid: k.Chargeid, Amount: k.Amount, Refundamt: k.Refundamt, Paymentstatus: k.Paymentstatus, Paymentdetails: detaillist})
 	}
 	return &model.Getpaymentdata{Status: true, Code: http.StatusOK, Message: "Success", Payments: data}, nil
