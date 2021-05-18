@@ -541,6 +541,7 @@ type ComplexityRoot struct {
 
 	Tenantsubcat struct {
 		Categoryid      func(childComplexity int) int
+		Categoryname    func(childComplexity int) int
 		Icon            func(childComplexity int) int
 		Selected        func(childComplexity int) int
 		Subcategoryid   func(childComplexity int) int
@@ -3295,6 +3296,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tenantsubcat.Categoryid(childComplexity), true
 
+	case "tenantsubcat.Categoryname":
+		if e.complexity.Tenantsubcat.Categoryname == nil {
+			break
+		}
+
+		return e.complexity.Tenantsubcat.Categoryname(childComplexity), true
+
 	case "tenantsubcat.Icon":
 		if e.complexity.Tenantsubcat.Icon == nil {
 			break
@@ -4442,6 +4450,7 @@ type tenantsubcat{
   Subcategoryname:String!
   Icon:String!
   Selected:Int!
+  Categoryname:String!
 }
 type getnonsubscribedcategorydata {
 status:Boolean!
@@ -18749,6 +18758,41 @@ func (ec *executionContext) _tenantsubcat_Selected(ctx context.Context, field gr
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _tenantsubcat_Categoryname(ctx context.Context, field graphql.CollectedField, obj *model.Tenantsubcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "tenantsubcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Categoryname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _tenantupdatedata_status(ctx context.Context, field graphql.CollectedField, obj *model.Tenantupdatedata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -25310,6 +25354,11 @@ func (ec *executionContext) _tenantsubcat(ctx context.Context, sel ast.Selection
 			}
 		case "Selected":
 			out.Values[i] = ec._tenantsubcat_Selected(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Categoryname":
+			out.Values[i] = ec._tenantsubcat_Categoryname(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

@@ -709,6 +709,7 @@ type Tenantsubcat struct {
 	Subcategoryname string `json:"Subcategoryname"`
 	Icon            string `json:"Icon"`
 	Selected        int    `json:"Selected"`
+	Categoryname    string `json:"Categoryname"`
 }
 
 type Tenantupdatedata struct {

@@ -1281,9 +1281,9 @@ func Gettenantsubcat(moduleid, tenantid, categoryid int) []*model.Tenantsubcat {
 	tent := strconv.FormatInt(n2, 10)
 	cat := strconv.FormatInt(n3, 10)
 
-	q1 = "SELECT categoryid,subcategoryid,subcategoryname,icon,0 AS selected FROM app_subcategory WHERE categoryid=" + cat + "  AND STATUS='Active' AND subcategoryid NOT IN"
+	q1 = "SELECT a.categoryid,a.subcategoryid,a.subcategoryname,a.icon,0 AS selected ,b.categoryname FROM app_subcategory a , app_category b WHERE a.categoryid=b.categoryid AND  a.categoryid= "+ cat +"  AND a.STATUS='Active' AND a.subcategoryid NOT IN"
 	q2 = "(SELECT subcategoryid FROM tenantsubcategories WHERE tenantid=" + tent + "  AND moduleid=" + mod + " ) UNION"
-	q3 = "  SELECT a.categoryid,a.subcategoryid,a.subcategoryname,IFNULL(b.icon,'') AS icon,1 AS selected FROM tenantsubcategories a, app_subcategory b WHERE a.subcategoryid=b.subcategoryid AND a.tenantid=" + tent + "  AND a.moduleid=" + mod + "  AND a.STATUS='Active'"
+	q3 = "  SELECT a.categoryid,a.subcategoryid,a.subcategoryname,IFNULL(b.icon,'') AS icon,1 AS selected,c.categoryname  FROM tenantsubcategories a, app_subcategory b,app_category c WHERE a.subcategoryid=b.subcategoryid AND a.categoryid=c.categoryid AND a.tenantid=" + tent + "  AND a.moduleid=" + mod + "  AND a.STATUS='Active'"
 	var data []*model.Tenantsubcat
 
 	DB.Raw(q1 + q2 + q3).Find(&data)

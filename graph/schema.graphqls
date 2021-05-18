@@ -752,6 +752,7 @@ type tenantsubcat{
   Subcategoryname:String!
   Icon:String!
   Selected:Int!
+  Categoryname:String!
 }
 type getnonsubscribedcategorydata {
 status:Boolean!
