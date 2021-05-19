@@ -777,6 +777,58 @@ func (r *mutationResolver) Insertsubcategory(ctx context.Context, input []*model
 	}, nil
 }
 
+func (r *mutationResolver) Subscribemore(ctx context.Context, input []*model.Subscribemoreinput) (*model.SubscribedData, error) {
+	id, usererr := datacontext.ForAuthContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("update sunscription")
+	print(id.ID)
+
+	var data2 subscription.SubscribedData
+	var data1 subscription.TenantSubscription
+	var list []*model.TenantData
+	var list1 []subscription.SubscribedData
+	intlist := input
+	if len(intlist) != 0 {
+		for i := 0; i < len(intlist); i++ {
+			data1.Subscriptionid = intlist[i].Subscriptionid
+			data1.Tenantid = intlist[i].Tenantid
+			data1.Currencyid = intlist[i].Currencyid
+			data1.Date = intlist[i].TransactionDate
+			data1.Partnerid = intlist[i].Partnerid
+			data1.PaymentId = *intlist[i].Paymentid
+			data1.PaymentStatus = intlist[i].PaymentStatus
+			data1.Price = intlist[i].Price
+			data1.Quantity = intlist[i].Quantity
+			data1.TaxId = intlist[i].TaxID
+			data1.TaxAmount = intlist[i].TaxAmount
+			data1.TotalAmount = intlist[i].TotalAmount
+			data1.Promoid = intlist[i].Promoid
+			data1.Promovalue = intlist[i].Promovalue
+			data1.Validitydate = intlist[i].Validitydate
+			data1.Promostatus = true
+			stat, err := data1.Updatesubscription()
+			if err != nil {
+				print(err)
+			}
+			print(stat)
+		}
+	}
+
+	list1 = data2.GetSubscribedData(int64(intlist[0].Tenantid))
+	if len(list1) != 0 {
+		for _, k := range list1 {
+			list = append(list, &model.TenantData{Tenantid: k.TenantID, Tenantname: k.TenantName, Moduleid: k.ModuleID,
+				Taxamount: k.Taxamount, Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+		}
+	}
+
+	return &model.SubscribedData{Status: true, Code: http.StatusCreated, Message: "Success",
+		Info: list,
+	}, nil
+}
+
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	// id, usererr := controller.ForContext(ctx)
 	id, usererr := datacontext.ForAuthContext(ctx)
@@ -1138,7 +1190,7 @@ func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*mo
 		for _, k := range d {
 			data = append(data, &model.Subscriptionsdata{Packageid: &k.Packageid, Moduleid: k.Moduleid, Tenantid: k.Tenantid, Modulename: k.Modulename, Packagename: &k.Packagename,
 				Subscriptionid: k.Subscriptionid, Subscriptionaccid: k.Subscriptionaccid, Subscriptionmethodid: k.Subscriptionmethodid,
-				Taxamount: k.Taxamount, Tenantaccid: k.Tenantaccid, Paymentstatus: k.Paymentstatus, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
+			Validitydate: k.Validitydate,Validity: k.Validity,	Taxamount: k.Taxamount, Tenantaccid: k.Tenantaccid, Paymentstatus: k.Paymentstatus, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
 		}
 	}
 

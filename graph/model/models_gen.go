@@ -639,6 +639,24 @@ type SubscribedDataResponse struct {
 	Info    *TenantData `json:"info"`
 }
 
+type Subscribemoreinput struct {
+	Subscriptionid  int    `json:"Subscriptionid"`
+	Tenantid        int    `json:"Tenantid"`
+	TransactionDate string `json:"TransactionDate"`
+	Partnerid       int    `json:"Partnerid"`
+	Currencyid      int    `json:"Currencyid"`
+	Price           string `json:"Price"`
+	TaxID           int    `json:"TaxId"`
+	Quantity        int    `json:"Quantity"`
+	Promoid         int    `json:"Promoid"`
+	Promovalue      string `json:"Promovalue"`
+	TaxAmount       string `json:"TaxAmount"`
+	TotalAmount     string `json:"TotalAmount"`
+	PaymentStatus   int    `json:"PaymentStatus"`
+	Paymentid       *int   `json:"Paymentid"`
+	Validitydate    string `json:"Validitydate"`
+}
+
 type Subscription struct {
 	TransactionDate string `json:"TransactionDate"`
 	PackageID       int    `json:"PackageId"`
@@ -687,6 +705,8 @@ type Subscriptionsdata struct {
 	Tenantid             int      `json:"Tenantid"`
 	Categoryid           int      `json:"Categoryid"`
 	Subcategoryid        int      `json:"Subcategoryid"`
+	Validitydate         string   `json:"Validitydate"`
+	Validity             bool     `json:"Validity"`
 	Modulename           string   `json:"Modulename"`
 	Subscriptionaccid    string   `json:"Subscriptionaccid"`
 	Subscriptionmethodid string   `json:"Subscriptionmethodid"`

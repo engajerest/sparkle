@@ -127,6 +127,7 @@ type TenantSubscription struct {
 	Promovalue      string `json:"promovalue"`
 	Promostatus     bool   `json:"promostatus"`
 	Validitydate    string `json:"validitydate"`
+	Subscriptionid int `json:"subscriptionid"`
 }
 
 type SubscriptionData struct {
@@ -414,6 +415,8 @@ type Subscribe struct {
 	Subcategoryid        int     `json:"subcategoryid"`
 	Categoryid           int     `json:"categoryid"`
 	Paymentstatus        bool    `json:"paymentstatus"`
+	Validity bool `json:"validity"`
+	Validitydate string `json:"validitydate"`
 }
 type User struct {
 	ID          int    `json:"id"`

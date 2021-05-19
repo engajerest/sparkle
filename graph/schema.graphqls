@@ -210,6 +210,23 @@ input location{
  Deliverymins:Int!
 
 }
+input subscribemoreinput{
+Subscriptionid:Int!
+ Tenantid:Int!
+TransactionDate:String!
+ Partnerid:Int!
+ Currencyid:Int!
+ Price:String!
+ TaxId:Int!
+ Quantity:Int!
+ Promoid:Int!
+ Promovalue:String!
+ TaxAmount:String!
+ TotalAmount:String!
+ PaymentStatus:Int!
+ Paymentid:Int
+ Validitydate:String!
+}
 input locationupdate{
 Locationid:Int!
  TenantId:Int!
@@ -662,6 +679,8 @@ Moduleid:Int!
 Tenantid:Int!
 Categoryid:Int!
 Subcategoryid:Int!
+Validitydate:String!
+Validity:Boolean!
 Modulename:String!
 Subscriptionaccid:String!
 Subscriptionmethodid:String!
@@ -816,4 +835,5 @@ type Mutation {
  subscription(input:[subscriptionnew]):subscribedData
  initialupdate(input:updateinfo):promotioncreateddata
  insertsubcategory(input:[subcatinsertdata]):promotioncreateddata
+ subscribemore(input:[subscribemoreinput]):subscribedData
 }
