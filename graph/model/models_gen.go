@@ -64,7 +64,7 @@ type Package struct {
 }
 
 type Promotion struct {
-	Promotionid     int     `json:"Promotionid"`
+	PromotionID     int     `json:"PromotionId"`
 	Promotiontypeid int     `json:"Promotiontypeid"`
 	Promotionname   string  `json:"Promotionname"`
 	Tenantid        int     `json:"Tenantid"`

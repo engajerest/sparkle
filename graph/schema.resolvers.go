@@ -1059,7 +1059,7 @@ func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int) (*model
 	promotionGetAll = subscription.GetAllPromotions(tenantid)
 	for _, p := range promotionGetAll {
 		promo = append(promo, &model.Promotion{
-			Promotionid: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: p.Promoname, Tenantid: p.Tenantid, Tenantame: p.Tenantname, Promocode: p.Promocode,
+			PromotionID: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: p.Promoname, Tenantid: p.Tenantid, Tenantame: p.Tenantname, Promocode: p.Promocode,
 			Broadstatus: p.Broadcaststatus, Success: p.Success, Failure: p.Failure, Promoterms: p.Promoterms, Promovalue: p.Promovalue, Promotag: p.Promotag, Promotype: p.Promotype, Startdate: p.Startdate, Enddate: p.Enddate, Status: &p.Status,
 		})
 	}
@@ -1190,7 +1190,7 @@ func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*mo
 		for _, k := range d {
 			data = append(data, &model.Subscriptionsdata{Packageid: &k.Packageid, Moduleid: k.Moduleid, Tenantid: k.Tenantid, Modulename: k.Modulename, Packagename: &k.Packagename,
 				Subscriptionid: k.Subscriptionid, Subscriptionaccid: k.Subscriptionaccid, Subscriptionmethodid: k.Subscriptionmethodid,
-			Validitydate: k.Validitydate,Validity: k.Validity,	Taxamount: k.Taxamount, Tenantaccid: k.Tenantaccid, Paymentstatus: k.Paymentstatus, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
+				Validitydate: k.Validitydate, Validity: k.Validity, Taxamount: k.Taxamount, Tenantaccid: k.Tenantaccid, Paymentstatus: k.Paymentstatus, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
 		}
 	}
 

@@ -128,7 +128,7 @@ type ComplexityRoot struct {
 		Promocode       func(childComplexity int) int
 		Promotag        func(childComplexity int) int
 		Promoterms      func(childComplexity int) int
-		Promotionid     func(childComplexity int) int
+		PromotionID     func(childComplexity int) int
 		Promotionname   func(childComplexity int) int
 		Promotiontypeid func(childComplexity int) int
 		Promotype       func(childComplexity int) int
@@ -1184,12 +1184,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Promotion.Promoterms(childComplexity), true
 
-	case "Promotion.Promotionid":
-		if e.complexity.Promotion.Promotionid == nil {
+	case "Promotion.PromotionId":
+		if e.complexity.Promotion.PromotionID == nil {
 			break
 		}
 
-		return e.complexity.Promotion.Promotionid(childComplexity), true
+		return e.complexity.Promotion.PromotionID(childComplexity), true
 
 	case "Promotion.Promotionname":
 		if e.complexity.Promotion.Promotionname == nil {
@@ -4280,7 +4280,7 @@ socialid:Int!
  socialicon:String!
 }
 type Promotion {
- Promotionid: Int!
+ PromotionId: Int!
  Promotiontypeid:Int!
  Promotionname: String!
  Tenantid:Int!
@@ -7168,7 +7168,7 @@ func (ec *executionContext) _Package_Validity(ctx context.Context, field graphql
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Promotion_Promotionid(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+func (ec *executionContext) _Promotion_PromotionId(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -7186,7 +7186,7 @@ func (ec *executionContext) _Promotion_Promotionid(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Promotionid, nil
+		return obj.PromotionID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -23061,8 +23061,8 @@ func (ec *executionContext) _Promotion(ctx context.Context, sel ast.SelectionSet
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Promotion")
-		case "Promotionid":
-			out.Values[i] = ec._Promotion_Promotionid(ctx, field, obj)
+		case "PromotionId":
+			out.Values[i] = ec._Promotion_PromotionId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

@@ -552,7 +552,7 @@ socialid:Int!
  socialicon:String!
 }
 type Promotion {
- Promotionid: Int!
+ PromotionId: Int!
  Promotiontypeid:Int!
  Promotionname: String!
  Tenantid:Int!
