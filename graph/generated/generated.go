@@ -178,6 +178,7 @@ type ComplexityRoot struct {
 
 	TenantData struct {
 		Categoryid     func(childComplexity int) int
+		Featureid      func(childComplexity int) int
 		Locationid     func(childComplexity int) int
 		Locationname   func(childComplexity int) int
 		Moduleid       func(childComplexity int) int
@@ -520,6 +521,7 @@ type ComplexityRoot struct {
 	Subscriptionsdata struct {
 		Categoryid           func(childComplexity int) int
 		Customercount        func(childComplexity int) int
+		Featureid            func(childComplexity int) int
 		Iconurl              func(childComplexity int) int
 		Locationcount        func(childComplexity int) int
 		LogoURL              func(childComplexity int) int
@@ -1519,6 +1521,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TenantData.Categoryid(childComplexity), true
+
+	case "TenantData.Featureid":
+		if e.complexity.TenantData.Featureid == nil {
+			break
+		}
+
+		return e.complexity.TenantData.Featureid(childComplexity), true
 
 	case "TenantData.Locationid":
 		if e.complexity.TenantData.Locationid == nil {
@@ -3179,6 +3188,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscriptionsdata.Customercount(childComplexity), true
 
+	case "subscriptionsdata.Featureid":
+		if e.complexity.Subscriptionsdata.Featureid == nil {
+			break
+		}
+
+		return e.complexity.Subscriptionsdata.Featureid(childComplexity), true
+
 	case "subscriptionsdata.Iconurl":
 		if e.complexity.Subscriptionsdata.Iconurl == nil {
 			break
@@ -3817,6 +3833,7 @@ type TenantData{
  Tenantid:Int!
  Tenantname:String!
  Moduleid:Int! 
+ Featureid:Int!
  Modulename:String!
  Subscriptionid:Int!
  Tenantaccid:String!
@@ -3843,6 +3860,7 @@ input subscription{
  TransactionDate:String!
  PackageId:Int!
  ModuleId:Int!
+ Featureid:Int!
  CurrencyId:Int!
  CurrencyCode:String!
  Price:String!
@@ -3862,6 +3880,7 @@ TransactionDate:String!
  Packageid:Int!
  Partnerid:Int!
  Moduleid:Int!
+ Featureid:Int!
  Categoryid: Int!
  SubCategoryid: Int!
  Subcategoryname:String!
@@ -3884,6 +3903,7 @@ TransactionDate:String!
  Packageid:Int!
  Partnerid:Int!
  Moduleid:Int!
+ Featureid:Int!
   CategoryId: Int!
  SubCategoryId: Int!
  Subcategoryname:String!
@@ -3941,6 +3961,7 @@ input location{
 input subscribemoreinput{
 Subscriptionid:Int!
  Tenantid:Int!
+ Featureid:Int!
 TransactionDate:String!
  Partnerid:Int!
  Currencyid:Int!
@@ -4404,6 +4425,7 @@ type subscriptionsdata{
 Subscriptionid:Int!
 Packageid:Int
 Moduleid:Int!
+Featureid:Int!
 Tenantid:Int!
 Categoryid:Int!
 Subcategoryid:Int!
@@ -8880,6 +8902,41 @@ func (ec *executionContext) _TenantData_Moduleid(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Moduleid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TenantData_Featureid(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TenantData",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Featureid, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -18107,6 +18164,41 @@ func (ec *executionContext) _subscriptionsdata_Moduleid(ctx context.Context, fie
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _subscriptionsdata_Featureid(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscriptionsdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Featureid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _subscriptionsdata_Tenantid(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -21103,6 +21195,14 @@ func (ec *executionContext) unmarshalInputinitialsubscribe(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "Featureid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Featureid"))
+			it.Featureid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "Categoryid":
 			var err error
 
@@ -21843,6 +21943,14 @@ func (ec *executionContext) unmarshalInputsubscribemoreinput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "Featureid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Featureid"))
+			it.Featureid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "TransactionDate":
 			var err error
 
@@ -21980,6 +22088,14 @@ func (ec *executionContext) unmarshalInputsubscription(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ModuleId"))
 			it.ModuleID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Featureid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Featureid"))
+			it.Featureid, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22128,6 +22244,14 @@ func (ec *executionContext) unmarshalInputsubscriptionnew(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Moduleid"))
 			it.Moduleid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Featureid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Featureid"))
+			it.Featureid, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23486,6 +23610,11 @@ func (ec *executionContext) _TenantData(ctx context.Context, sel ast.SelectionSe
 			}
 		case "Moduleid":
 			out.Values[i] = ec._TenantData_Moduleid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Featureid":
+			out.Values[i] = ec._TenantData_Featureid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -25545,6 +25674,11 @@ func (ec *executionContext) _subscriptionsdata(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._subscriptionsdata_Packageid(ctx, field, obj)
 		case "Moduleid":
 			out.Values[i] = ec._subscriptionsdata_Moduleid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Featureid":
+			out.Values[i] = ec._subscriptionsdata_Featureid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

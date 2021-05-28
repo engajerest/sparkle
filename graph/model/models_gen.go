@@ -119,6 +119,7 @@ type TenantData struct {
 	Tenantid       int     `json:"Tenantid"`
 	Tenantname     string  `json:"Tenantname"`
 	Moduleid       int     `json:"Moduleid"`
+	Featureid      int     `json:"Featureid"`
 	Modulename     string  `json:"Modulename"`
 	Subscriptionid int     `json:"Subscriptionid"`
 	Tenantaccid    string  `json:"Tenantaccid"`
@@ -353,6 +354,7 @@ type Initialsubscribe struct {
 	Packageid       int    `json:"Packageid"`
 	Partnerid       int    `json:"Partnerid"`
 	Moduleid        int    `json:"Moduleid"`
+	Featureid       int    `json:"Featureid"`
 	Categoryid      int    `json:"Categoryid"`
 	SubCategoryid   int    `json:"SubCategoryid"`
 	Subcategoryname string `json:"Subcategoryname"`
@@ -642,6 +644,7 @@ type SubscribedDataResponse struct {
 type Subscribemoreinput struct {
 	Subscriptionid  int    `json:"Subscriptionid"`
 	Tenantid        int    `json:"Tenantid"`
+	Featureid       int    `json:"Featureid"`
 	TransactionDate string `json:"TransactionDate"`
 	Partnerid       int    `json:"Partnerid"`
 	Currencyid      int    `json:"Currencyid"`
@@ -661,6 +664,7 @@ type Subscription struct {
 	TransactionDate string `json:"TransactionDate"`
 	PackageID       int    `json:"PackageId"`
 	ModuleID        int    `json:"ModuleId"`
+	Featureid       int    `json:"Featureid"`
 	CurrencyID      int    `json:"CurrencyId"`
 	CurrencyCode    string `json:"CurrencyCode"`
 	Price           string `json:"Price"`
@@ -681,6 +685,7 @@ type Subscriptionnew struct {
 	Packageid       int    `json:"Packageid"`
 	Partnerid       int    `json:"Partnerid"`
 	Moduleid        int    `json:"Moduleid"`
+	Featureid       int    `json:"Featureid"`
 	CategoryID      int    `json:"CategoryId"`
 	SubCategoryID   int    `json:"SubCategoryId"`
 	Subcategoryname string `json:"Subcategoryname"`
@@ -702,6 +707,7 @@ type Subscriptionsdata struct {
 	Subscriptionid       int      `json:"Subscriptionid"`
 	Packageid            *int     `json:"Packageid"`
 	Moduleid             int      `json:"Moduleid"`
+	Featureid            int      `json:"Featureid"`
 	Tenantid             int      `json:"Tenantid"`
 	Categoryid           int      `json:"Categoryid"`
 	Subcategoryid        int      `json:"Subcategoryid"`

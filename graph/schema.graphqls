@@ -89,6 +89,7 @@ type TenantData{
  Tenantid:Int!
  Tenantname:String!
  Moduleid:Int! 
+ Featureid:Int!
  Modulename:String!
  Subscriptionid:Int!
  Tenantaccid:String!
@@ -115,6 +116,7 @@ input subscription{
  TransactionDate:String!
  PackageId:Int!
  ModuleId:Int!
+ Featureid:Int!
  CurrencyId:Int!
  CurrencyCode:String!
  Price:String!
@@ -134,6 +136,7 @@ TransactionDate:String!
  Packageid:Int!
  Partnerid:Int!
  Moduleid:Int!
+ Featureid:Int!
  Categoryid: Int!
  SubCategoryid: Int!
  Subcategoryname:String!
@@ -156,6 +159,7 @@ TransactionDate:String!
  Packageid:Int!
  Partnerid:Int!
  Moduleid:Int!
+ Featureid:Int!
   CategoryId: Int!
  SubCategoryId: Int!
  Subcategoryname:String!
@@ -213,6 +217,7 @@ input location{
 input subscribemoreinput{
 Subscriptionid:Int!
  Tenantid:Int!
+ Featureid:Int!
 TransactionDate:String!
  Partnerid:Int!
  Currencyid:Int!
@@ -676,6 +681,7 @@ type subscriptionsdata{
 Subscriptionid:Int!
 Packageid:Int
 Moduleid:Int!
+Featureid:Int!
 Tenantid:Int!
 Categoryid:Int!
 Subcategoryid:Int!

@@ -110,6 +110,7 @@ type TenantSubscription struct {
 	Packageid  int    `json:"packageid"`
 	Partnerid  int    `json:"partnerid"`
 	Moduleid   int    `json:"moduleId"`
+	Featureid int `json:"featureid"`
 	Currencyid int    `json:"currencyid"`
 
 	Categoryid      int    `json:"categoryid"`
@@ -140,6 +141,7 @@ type SubscribedData struct {
 	TenantName     string  `json:"tenantname"`
 	ModuleName     string  `json:"modulename"`
 	ModuleID       int     `json:"moduleId"`
+	Featureid int `json:"featureid"`
 	Subscriptionid int     `json:"subscriptionid"`
 	Locationid     int     `json:"locationid"`
 	Locationname   string  `json:"locationname"`
@@ -401,6 +403,7 @@ type Subscribe struct {
 	Subscriptionmethodid string  `json:"subscriptionmethodid"`
 	Tenantid             int     `json:"tenantid"`
 	Moduleid             int     `json:"moduleId"`
+	Featureid int `json:"featureid"`
 	Modulename           string  `json:"modulename"`
 	Packagename          string  `json:"packagename"`
 	PackageAmount        float64 `json:"packageamount"`
