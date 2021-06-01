@@ -57,7 +57,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 				Date: k.TransactionDate, Packageid: k.Packageid, Partnerid: k.Partnerid, Moduleid: k.Moduleid,
 				Currencyid: k.Currencyid, Categoryid: k.Categoryid, SubCategoryid: k.SubCategoryid, Subcategoryname: k.Subcategoryname,
 				Price: k.Price, TaxId: k.TaxID, TaxAmount: k.TaxAmount, TotalAmount: k.TotalAmount, PaymentStatus: k.PaymentStatus,
-			Featureid: k.Featureid,	PaymentId: *k.Paymentid, Quantity: k.Quantity, Promoid: k.Promoid, Promovalue: k.Promovalue, Validitydate: k.Validitydate, Promostatus: true,
+				Featureid: k.Featureid, PaymentId: *k.Paymentid, Quantity: k.Quantity, Promoid: k.Promoid, Promovalue: k.Promovalue, Validitydate: k.Validitydate, Promostatus: true,
 			})
 		}
 	}
@@ -106,7 +106,10 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		if status != true {
 			return nil, errors.New("tenant not subscribed")
 		}
-
+		storeerr := d.Firestoreinsertenant(int64(tenantdata.TenantID), int64(tenantdata.Locationid), slist[0].Moduleid)
+		if storeerr != nil {
+			print(storeerr)
+		}
 	} else {
 		return nil, errors.New("Tenant not Created")
 	}
@@ -115,7 +118,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 	if len(response) != 0 {
 		for _, k := range response {
 			list = append(list, &model.TenantData{Tenantid: k.TenantID, Tenantname: k.TenantName, Moduleid: k.ModuleID,
-			Featureid: k.Featureid,	Taxamount: k.Taxamount, Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+				Status: k.Status, Featureid: k.Featureid, Taxamount: k.Taxamount, Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 	return &model.SubscribedData{
@@ -416,6 +419,10 @@ func (r *mutationResolver) Createlocation(ctx context.Context, input *model.Loca
 	if er != nil {
 		return nil, errors.New("location not created")
 	}
+	firestor := loco.Firestorecreatelocation(locationid)
+	if firestor != nil {
+		print(firestor)
+	}
 
 	location, errr := loco.GetLocationById(locationid)
 	if errr != nil {
@@ -592,6 +599,7 @@ func (r *mutationResolver) Updatelocationstatus(ctx context.Context, input *mode
 	loc := *&input.Locationstatus
 	del := input.Deliverystatus
 	var s subscription.Updatestatus
+
 	if len(loc) != 0 {
 
 		for i := 0; i < len(loc); i++ {
@@ -603,6 +611,11 @@ func (r *mutationResolver) Updatelocationstatus(ctx context.Context, input *mode
 			if stat == false {
 				return nil, errors.New("location status not updated")
 			}
+			fireerr := s.Firestoreupdatelocationstatus(*&loc[i].Locationid)
+			if fireerr != nil {
+				print(fireerr)
+			}
+
 		}
 	}
 	if len(del) != 0 {
@@ -617,6 +630,7 @@ func (r *mutationResolver) Updatelocationstatus(ctx context.Context, input *mode
 
 		}
 	}
+
 	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "status updated"}, nil
 }
 
@@ -651,6 +665,10 @@ func (r *mutationResolver) Updatelocation(ctx context.Context, input *model.Loca
 	if er != nil || status == false {
 		return nil, errors.New("location not created")
 	}
+	fireerr := loco.Firestorelocationupdate(input.Locationid)
+	if fireerr != nil {
+		print(fireerr)
+	}
 
 	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Location updated"}, nil
 }
@@ -676,7 +694,7 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 			data1.Categoryid = intlist[i].CategoryID
 			data1.SubCategoryid = intlist[i].SubCategoryID
 			data1.Moduleid = intlist[i].Moduleid
-			data1.Featureid= intlist[i].Featureid
+			data1.Featureid = intlist[i].Featureid
 			data1.PaymentId = *intlist[i].Paymentid
 			data1.PaymentStatus = intlist[i].PaymentStatus
 			data1.Price = intlist[i].Price
@@ -714,7 +732,7 @@ func (r *mutationResolver) Subscription(ctx context.Context, input []*model.Subs
 	if len(list1) != 0 {
 		for _, k := range list1 {
 			list = append(list, &model.TenantData{Tenantid: k.TenantID, Tenantname: k.TenantName, Moduleid: k.ModuleID,
-			Featureid: k.Featureid,	Taxamount: k.Taxamount, Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+				Status: k.Status, Featureid: k.Featureid, Taxamount: k.Taxamount, Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 
@@ -795,7 +813,7 @@ func (r *mutationResolver) Subscribemore(ctx context.Context, input []*model.Sub
 		for i := 0; i < len(intlist); i++ {
 			data1.Subscriptionid = intlist[i].Subscriptionid
 			data1.Tenantid = intlist[i].Tenantid
-			data1.Featureid=intlist[i].Featureid
+			data1.Featureid = intlist[i].Featureid
 			data1.Currencyid = intlist[i].Currencyid
 			data1.Date = intlist[i].TransactionDate
 			data1.Partnerid = intlist[i].Partnerid
@@ -822,13 +840,33 @@ func (r *mutationResolver) Subscribemore(ctx context.Context, input []*model.Sub
 	if len(list1) != 0 {
 		for _, k := range list1 {
 			list = append(list, &model.TenantData{Tenantid: k.TenantID, Tenantname: k.TenantName, Moduleid: k.ModuleID,
-			Featureid: k.Featureid,	Taxamount: k.Taxamount, Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
+				Status: k.Status, Featureid: k.Featureid, Taxamount: k.Taxamount, Totalamount: k.Totalamount, Tenantaccid: k.Tenantaccid, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Locationid: k.Locationid, Locationname: k.Locationname, Modulename: k.ModuleName, Subscriptionid: k.Subscriptionid})
 		}
 	}
 
 	return &model.SubscribedData{Status: true, Code: http.StatusCreated, Message: "Success",
 		Info: list,
 	}, nil
+}
+
+func (r *mutationResolver) Unsubscribe(ctx context.Context, input *model.Unsubscribeinput) (*model.Promotioncreateddata, error) {
+	id, usererr := datacontext.ForAuthContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("raju")
+	print(id.ID)
+	stat, err := subscription.Unsubscribe(input.Subscriptionid)
+	if err != nil || stat == false {
+		print(err)
+		return nil, errors.New("Unsubscribe Failed")
+	}
+stat1,er := subscription.Deletesubcat(input.Tenantid,input.Moduleid)
+if er != nil || stat1 == false {
+	print(err)
+	return nil, errors.New("Unsubscribe Failed")
+}
+	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Module Unsubscribed"}, nil
 }
 
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
@@ -1192,7 +1230,7 @@ func (r *queryResolver) Getsubscriptions(ctx context.Context, tenantid int) (*mo
 		for _, k := range d {
 			data = append(data, &model.Subscriptionsdata{Packageid: &k.Packageid, Moduleid: k.Moduleid, Tenantid: k.Tenantid, Modulename: k.Modulename, Packagename: &k.Packagename,
 				Subscriptionid: k.Subscriptionid, Subscriptionaccid: k.Subscriptionaccid, Subscriptionmethodid: k.Subscriptionmethodid,
-		Featureid: k.Featureid,		Validitydate: k.Validitydate, Validity: k.Validity, Taxamount: k.Taxamount, Tenantaccid: k.Tenantaccid, Paymentstatus: k.Paymentstatus, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
+				Status: k.Status, Featureid: k.Featureid, Validitydate: k.Validitydate, Validity: k.Validity, Taxamount: k.Taxamount, Tenantaccid: k.Tenantaccid, Paymentstatus: k.Paymentstatus, Categoryid: k.Categoryid, Subcategoryid: k.Subcategoryid, Iconurl: k.Iconurl, LogoURL: k.Logourl, PackageIcon: &k.PackageIcon, PackageAmount: &k.PackageAmount, TotalAmount: k.Totalamount, Customercount: &k.Customercount, Locationcount: &k.Locationcount})
 		}
 	}
 

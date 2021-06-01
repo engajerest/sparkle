@@ -129,6 +129,7 @@ type TenantData struct {
 	Subcategoryid  int     `json:"Subcategoryid"`
 	Taxamount      float64 `json:"Taxamount"`
 	Totalamount    float64 `json:"Totalamount"`
+	Status         string  `json:"Status"`
 }
 
 type TenantDetails struct {
@@ -717,6 +718,7 @@ type Subscriptionsdata struct {
 	Subscriptionaccid    string   `json:"Subscriptionaccid"`
 	Subscriptionmethodid string   `json:"Subscriptionmethodid"`
 	Paymentstatus        bool     `json:"Paymentstatus"`
+	Status               string   `json:"Status"`
 	Packagename          *string  `json:"Packagename"`
 	LogoURL              string   `json:"LogoUrl"`
 	Iconurl              string   `json:"Iconurl"`
@@ -769,6 +771,12 @@ type Typedata struct {
 	Promotiontypeid int     `json:"Promotiontypeid"`
 	Typename        *string `json:"Typename"`
 	Tag             *string `json:"Tag"`
+}
+
+type Unsubscribeinput struct {
+	Subscriptionid int `json:"Subscriptionid"`
+	Moduleid       int `json:"Moduleid"`
+	Tenantid       int `json:"Tenantid"`
 }
 
 type Updatedelivery struct {

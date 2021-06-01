@@ -9,12 +9,15 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/firestore"
+	firebase "firebase.google.com/go"
 	"github.com/engajerest/auth/Models/users"
 	"github.com/engajerest/auth/utils/Errors"
 	"github.com/engajerest/auth/utils/dbconfig"
 	database "github.com/engajerest/auth/utils/dbconfig"
 	"github.com/engajerest/sparkle/graph/model"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/api/option"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -26,8 +29,8 @@ const (
 	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,suburb,latitude,longitude,postcode,countrycode,timezone,currencyid,currencycode,currencysymbol,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,suburb,latitude,longitude,postcode,countrycode,opentime,closetime,deliverymins,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,partnerid,moduleid,featureid,categoryid,subcategoryid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid,promoid,promoprice,promostatus,validitydate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	Updatesubscriptionpay = "UPDATE  tenantsubscription SET transactiondate=?,featureid=?,partnerid=?,currencyid=?,subscriptionprice=?,quantity=?,taxid=?,taxamount=?,totalamount=?,paymentstatus=?,paymentid=?,promoid=?,promoprice=?,promostatus=?,validitydate=?  WHERE subscriptionid=? "
-	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname,IFNULL(a.tenantaccid,'') AS tenantaccid, b.moduleid,b.featureid,b.subscriptionid,b.categoryid,b.subcategoryid, b.taxamount,b.totalamount, c.modulename ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND  a.tenantid=?"
+	Updatesubscriptionpay          = "UPDATE  tenantsubscription SET transactiondate=?,featureid=?,partnerid=?,currencyid=?,subscriptionprice=?,quantity=?,taxid=?,taxamount=?,totalamount=?,paymentstatus=?,paymentid=?,promoid=?,promoprice=?,promostatus=?,validitydate=?  WHERE subscriptionid=? "
+	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname,IFNULL(a.tenantaccid,'') AS tenantaccid, b.moduleid,b.featureid,b.subscriptionid,b.categoryid,b.subcategoryid, b.taxamount,b.totalamount,b.status, c.modulename ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND b.status='Active' AND  a.tenantid=?"
 	createLocationQuery            = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,suburb,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	updatelocation                 = "UPDATE tenantlocations SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,suburb=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
 	getLocationbyid                = "SELECT  locationid,locationname,address,IFNULL(suburb,'') AS suburb,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocations WHERE status='Active' AND locationid=? "
@@ -62,7 +65,7 @@ const (
 	updatelocationstatus           = "UPDATE tenantlocations SET status=? WHERE tenantid= ? AND locationid=?"
 	updatedeliverystatus           = "UPDATE tenantlocations SET delivery=? WHERE tenantid= ? AND locationid=?"
 	getCustomerByid                = "SELECT customerid,firstname,lastname,contactno,email,IFNULL(configid,0) AS configid  FROM customers WHERE customerid=?"
-	getsubscription                = "SELECT a.subscriptionid,a.packageid,a.moduleid,a.featureid,a.tenantid,a.categoryid,a.subcategoryid,IFNULL(a.validitydate,'') AS validitydate,IF(a.validitydate>= DATE(NOW()), TRUE, FALSE) AS validity,a.totalamount,a.taxamount,ifnull(a.subscriptionaccid,'') as subscriptionaccid,ifnull(a.subscriptionmethodid,'') as subscriptionmethodid, a.paymentstatus, b.modulename,b.logourl,b.iconurl,'' as packagename,'0.0' AS packageamount,'' as packageicon,IFNULL(c.tenantaccid,'') AS tenantaccid, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,tenants c WHERE a.moduleid=b.moduleid AND a.tenantid=c.tenantid AND   a.tenantid=?"
+	getsubscription                = "SELECT a.subscriptionid,a.packageid,a.moduleid,a.featureid,a.tenantid,a.categoryid,a.subcategoryid,IFNULL(a.validitydate,'') AS validitydate,IF(a.validitydate>= DATE(NOW()), TRUE, FALSE) AS validity,a.totalamount,a.taxamount,ifnull(a.subscriptionaccid,'') as subscriptionaccid,ifnull(a.subscriptionmethodid,'') as subscriptionmethodid, a.paymentstatus,a.status, b.modulename,b.logourl,b.iconurl,'' as packagename,'0.0' AS packageamount,'' as packageicon,IFNULL(c.tenantaccid,'') AS tenantaccid, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,tenants c WHERE a.moduleid=b.moduleid AND a.tenantid=c.tenantid AND a.status='Active' AND a.tenantid=?"
 	nonsubscribed                  = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(d.promocodeid,0) AS promocodeid,IFNULL(d.promoname ,'') AS promoname,IFNULL(d.promodescription,'') AS promodescription,IFNULL(d.promotype ,'') AS promotype,IFNULL(d.promovalue,0) AS promovalue,IFNULL(d.packageexpiry,0) AS packageexpiry,IFNULL(d.validity,'') AS validity,IF(d.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid INNER JOIN  app_promocodes d ON a.packageid=d.packageid WHERE a.`status`='Active' AND  a.packageid  NOT IN (SELECT packageid FROM tenantsubscription WHERE tenantid= ? )"
 	getpayments                    = "SELECT a.paymentid,a.packageid,IFNULL(a.paymentref,'') AS paymentref,IFNULL(a.locationid,0) AS locationid,a.paymenttypeid,a.tenantid,IFNULL(a.customerid,0) AS customerid,a.transactiondate,IFNULL(a.orderid,0) AS orderid,a.chargeid,a.amount,a.refundamt,a.paymentstatus,a.created,IFNULL(b.packagename,'') AS  packagename,IFNULL(c.firstname,'') AS firstname,IFNULL(c.lastname,'')AS lastname,IFNULL(c.contactno,'')AS contactno,IFNULL(c.email,'')AS email FROM payments a LEFT OUTER JOIN  app_package b ON a.packageid=b.packageid LEFT OUTER JOIN customers c ON  a.customerid=c.customerid WHERE tenantid=? AND paymenttypeid=?"
 	getbusinessforassist           = "SELECT a.tenantid,IFNULL(a.brandname,'') AS brandname,IFNULL(a.tenantinfo,'') AS tenantinfo,IFNULL(a.paymode1,0) AS paymode1,IFNULL(a.paymode2,0) AS paymode2,IFNULL(a.tenantaccid,0) AS tenantaccid,IFNULL(a.address,'') AS address,IFNULL(a.primaryemail,'') AS primaryemail,IFNULL(a.primarycontact,'') AS  primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken,IFNULL(a.tenantimage,'') AS tenantimage, IFNULL(a.countrycode,'') AS countrycode,IFNULL(a.currencycode,'') AS currencycode,IFNULL(a.currencysymbol,'') AS currencysymbol,IFNULL(b.moduleid,0) AS moduleid,IFNULL(d.modulename,'') AS modulename FROM tenants a, tenantsubscription b , app_category c, app_module d WHERE a.tenantid=b.tenantid AND b.moduleid=d.moduleid AND c.categoryid=d.categoryid AND a.tenantid=? AND  c.categoryid=?"
@@ -73,12 +76,17 @@ const (
 	getpromo                       = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active' AND moduleid=?"
 	insertsubcategory              = "INSERT INTO tenantsubcategories (tenantid,moduleid,categoryid,subcategoryid,subcategoryname) VALUES(?,?,?,?,?)"
 	createUsernopassword           = "INSERT INTO app_users (authname,contactno,roleid,configid,referenceid) VALUES(?,?,?,?,?)"
+    unsubscribe = "UPDATE tenantsubscription SET status='Inactive' WHERE subscriptionid=?"
+	deletecategories = "DELETE  FROM tenantsubcategories WHERE tenantid=? AND moduleid=?"
+	//firestore
+	firestorejsonkey = "./engaje-2021-firebase-adminsdk-7sb61-42247472ad.json"
 )
 
 func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, error) {
 	var tenantid int64
 	var locationid int64
 	var subcatid int64
+
 	var err error
 	var data SubscribedData
 	tx, err := database.Db.Begin()
@@ -96,8 +104,8 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 		defer stmt.Close()
 
 		res, err := stmt.Exec(&s.Userid, &s.Partnerid, &s.Regno, &s.Name, &s.Email, &s.Mobile,
-			&s.Address, &s.State, &s.City,&s.Suburb, &s.Latitude, &s.Longitude, &s.Zip, &s.Countrycode,
-			&s.TimeZone,&s.Currencyid, &s.CurrencyCode,&s.Currencysymbol, &s.Tenanttoken)
+			&s.Address, &s.State, &s.City, &s.Suburb, &s.Latitude, &s.Longitude, &s.Zip, &s.Countrycode,
+			&s.TimeZone, &s.Currencyid, &s.CurrencyCode, &s.Currencysymbol, &s.Tenanttoken)
 		if err != nil {
 			tx.Rollback() // return an error too, we may want to wrap them
 			return false, nil, err
@@ -117,9 +125,9 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 
 		res, err := stmt.Exec(tenantid, &s.Name, &s.Email,
 			&s.Mobile, &s.Address, &s.State,
-			&s.City, s.Suburb,&s.Latitude, &s.Longitude,
+			&s.City, s.Suburb, &s.Latitude, &s.Longitude,
 			&s.Zip, &s.Countrycode, &s.OpenTime,
-			&s.CloseTime,30, &s.Userid)
+			&s.CloseTime, 30, &s.Userid)
 		if err != nil {
 			tx.Rollback() // return an error too, we may want to wrap them
 			return false, nil, err
@@ -138,7 +146,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 			a.Partnerid = datalist[i].Partnerid
 			a.Date = datalist[i].Date
 			a.Moduleid = datalist[i].Moduleid
-			a.Featureid=datalist[i].Featureid
+			a.Featureid = datalist[i].Featureid
 			a.PaymentId = datalist[i].PaymentId
 			a.PaymentStatus = datalist[i].PaymentStatus
 			a.Price = datalist[i].Price
@@ -151,6 +159,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 			a.Promovalue = datalist[i].Promovalue
 			a.Validitydate = datalist[i].Validitydate
 			a.Promostatus = true
+
 			{
 				print("entry in subscription")
 				stmt, err := tx.Prepare(insertTenantSubscription)
@@ -159,7 +168,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 					return false, nil, err
 				}
 				defer stmt.Close()
-				if _, err := stmt.Exec(tenantid, &a.Date, &a.Packageid, &a.Partnerid, &a.Moduleid,&a.Featureid,
+				if _, err := stmt.Exec(tenantid, &a.Date, &a.Packageid, &a.Partnerid, &a.Moduleid, &a.Featureid,
 					&a.Categoryid, &a.SubCategoryid,
 					&a.Currencyid, &a.Price, &a.Quantity, &a.TaxId, &a.TaxAmount,
 					&a.TotalAmount, &a.PaymentStatus, &a.PaymentId, &a.Promoid,
@@ -378,7 +387,7 @@ func (info *TenantSubscription) InsertSubscription(tenantid int64) int64 {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(tenantid, &info.Date, &info.Packageid, &info.Partnerid, &info.Moduleid,&info.Featureid, &info.Categoryid, &info.SubCategoryid, &info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
+	res, err := statement.Exec(tenantid, &info.Date, &info.Packageid, &info.Partnerid, &info.Moduleid, &info.Featureid, &info.Categoryid, &info.SubCategoryid, &info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
 		&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate)
 	if err != nil {
 		log.Fatal(err)
@@ -391,7 +400,7 @@ func (info *TenantSubscription) InsertSubscription(tenantid int64) int64 {
 	return id
 }
 
-func  (info *TenantSubscription) Updatesubscription() (bool, error) {
+func (info *TenantSubscription) Updatesubscription() (bool, error) {
 	statement, err := database.Db.Prepare(Updatesubscriptionpay)
 	print(statement)
 
@@ -401,8 +410,8 @@ func  (info *TenantSubscription) Updatesubscription() (bool, error) {
 		return false, err
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&info.Date,&info.Featureid, &info.Partnerid,&info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
-		&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate,&info.Subscriptionid)
+	_, err = statement.Exec(&info.Date, &info.Featureid, &info.Partnerid, &info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
+		&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate, &info.Subscriptionid)
 	if err != nil {
 		log.Fatal(err)
 		return false, err
@@ -411,7 +420,6 @@ func  (info *TenantSubscription) Updatesubscription() (bool, error) {
 	log.Print("Row updated in subscriptionpayment!")
 	return true, nil
 }
-
 
 func (info *SubscribedData) GetSubscribedData(tenantid int64) []SubscribedData {
 	print("st1c")
@@ -429,7 +437,7 @@ func (info *SubscribedData) GetSubscribedData(tenantid int64) []SubscribedData {
 
 	for rows.Next() {
 		var p SubscribedData
-		err := rows.Scan(&p.TenantID, &p.TenantName, &p.Tenantaccid, &p.ModuleID,&p.Featureid, &p.Subscriptionid, &p.Categoryid, &p.Subcategoryid,&p.Taxamount,&p.Totalamount, &p.ModuleName, &p.Locationid, &p.Locationname)
+		err := rows.Scan(&p.TenantID, &p.TenantName, &p.Tenantaccid, &p.ModuleID, &p.Featureid, &p.Subscriptionid, &p.Categoryid, &p.Subcategoryid, &p.Taxamount, &p.Totalamount,&p.Status, &p.ModuleName, &p.Locationid, &p.Locationname)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -451,7 +459,7 @@ func (info *SubscribedData) GetInitialSubscribedData(tenantid int64) *Subscribed
 	row := stmt.QueryRow(tenantid)
 	// print(row)
 	var p SubscribedData
-	err = row.Scan(&p.TenantID, &p.TenantName, &p.Tenantaccid, &p.ModuleID,&p.Featureid, &p.Subscriptionid, &p.ModuleName, &p.Locationid, &p.Locationname)
+	err = row.Scan(&p.TenantID, &p.TenantName, &p.Tenantaccid, &p.ModuleID, &p.Featureid, &p.Subscriptionid, &p.ModuleName, &p.Locationid, &p.Locationname)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -481,14 +489,12 @@ func Payments(tenantid, typeid int) []Payment {
 	var data []Payment
 
 	DB.Table("payments").
-		Preload("Paymentdetails").Preload("Paymentdetails.Customers").Where("paymenttypeid=? AND tenantid=?", typeid,tenantid).Find(&data)
+		Preload("Paymentdetails").Preload("Paymentdetails.Customers").Where("paymenttypeid=? AND tenantid=?", typeid, tenantid).Find(&data)
 	for index, value := range data {
 		fmt.Println(index, " = ", value)
 	}
 
 	return data
-
-
 
 }
 func (loco *Location) CreateLocation(id int64) (int64, error) {
@@ -499,7 +505,7 @@ func (loco *Location) CreateLocation(id int64) (int64, error) {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(&loco.TenantID, &loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.City,&loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, id, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins)
+	res, err := statement.Exec(&loco.TenantID, &loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.City, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, id, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -520,7 +526,7 @@ func (loco *Location) UpdateLocation() (bool, error) {
 		return false, err
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State,&loco.City, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins, &loco.TenantID, &loco.LocationId)
+	_, err = statement.Exec(&loco.LocationName, &loco.Email, &loco.Mobile, &loco.Address, &loco.State, &loco.City, &loco.Suburb, &loco.Latitude, &loco.Longitude, &loco.Zip, &loco.Countrycode, &loco.OpeningTime, &loco.ClosingTime, &loco.Delivery, &loco.Deliverytype, &loco.Deliverymins, &loco.TenantID, &loco.LocationId)
 	if err != nil {
 		log.Fatal(err)
 		return false, err
@@ -541,7 +547,7 @@ func (loco *Location) GetLocationById(id int64) (*Location, error) {
 	defer stmt.Close()
 	row := stmt.QueryRow(id)
 	// print(row)
-	err = row.Scan(&data.LocationId, &data.LocationName, &data.Address, &data.Suburb,&data.City, &data.State, &data.Zip, &data.Latitude, &data.Longitude, &data.Countrycode, &data.OpeningTime, &data.ClosingTime, &data.Createdby, &data.Status, &data.Delivery, &data.Deliverytype, &data.Deliverymins)
+	err = row.Scan(&data.LocationId, &data.LocationName, &data.Address, &data.Suburb, &data.City, &data.State, &data.Zip, &data.Latitude, &data.Longitude, &data.Countrycode, &data.OpeningTime, &data.ClosingTime, &data.Createdby, &data.Status, &data.Delivery, &data.Deliverytype, &data.Deliverymins)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -949,7 +955,7 @@ func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) 
 	row := stmt.QueryRow(id)
 	// print(row)
 	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone, &data.Tenanttoken, &data.Tenantimage,
-	&data.Countrycode,&data.Currencycode,&data.Currencysymbol)
+		&data.Countrycode, &data.Currencycode, &data.Currencysymbol)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -977,7 +983,7 @@ func (business *BusinessUpdate) GetBusinessforassist(id, catid int) (*BusinessUp
 	// print(row)
 	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1,
 		&data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone,
-		&data.Tenanttoken, &data.Tenantimage,&data.Countrycode,&data.Currencycode,&data.Currencysymbol, &data.Moduleid, &data.Modulename)
+		&data.Tenanttoken, &data.Tenantimage, &data.Countrycode, &data.Currencycode, &data.Currencysymbol, &data.Moduleid, &data.Modulename)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -1306,7 +1312,7 @@ func Gettenantsubcat(moduleid, tenantid, categoryid int) []*model.Tenantsubcat {
 	tent := strconv.FormatInt(n2, 10)
 	cat := strconv.FormatInt(n3, 10)
 
-	q1 = "SELECT a.categoryid,a.subcategoryid,a.subcategoryname,a.icon,0 AS selected ,b.categoryname FROM app_subcategory a , app_category b WHERE a.categoryid=b.categoryid AND  a.categoryid= "+ cat +"  AND a.STATUS='Active' AND a.subcategoryid NOT IN"
+	q1 = "SELECT a.categoryid,a.subcategoryid,a.subcategoryname,a.icon,0 AS selected ,b.categoryname FROM app_subcategory a , app_category b WHERE a.categoryid=b.categoryid AND  a.categoryid= " + cat + "  AND a.STATUS='Active' AND a.subcategoryid NOT IN"
 	q2 = "(SELECT subcategoryid FROM tenantsubcategories WHERE tenantid=" + tent + "  AND moduleid=" + mod + " ) UNION"
 	q3 = "  SELECT a.categoryid,a.subcategoryid,a.subcategoryname,IFNULL(b.icon,'') AS icon,1 AS selected,c.categoryname  FROM tenantsubcategories a, app_subcategory b,app_category c WHERE a.subcategoryid=b.subcategoryid AND a.categoryid=c.categoryid AND a.tenantid=" + tent + "  AND a.moduleid=" + mod + "  AND a.STATUS='Active'"
 	var data []*model.Tenantsubcat
@@ -1588,6 +1594,27 @@ func (u *Updatestatus) Updatelocationstatus() bool {
 	log.Print("Row updated in tenant location!")
 	return true
 }
+func  Unsubscribe(id int) (bool,error) {
+
+	statement, err := database.Db.Prepare(unsubscribe)
+	print(statement)
+
+	if err != nil {
+	
+		return false,err
+		
+	}
+	defer statement.Close()
+	_, err1 := statement.Exec(id)
+	if err1 != nil {
+		
+		return false,err1
+		
+	}
+
+	log.Print("Row updated in tenant subscription!")
+	return true,nil
+}
 func (u *Updatestatus) Updatedeliverystatus() bool {
 	statement, err := database.Db.Prepare(updatedeliverystatus)
 	print(statement)
@@ -1620,7 +1647,7 @@ func GetAllSubscription(tenantid int) []Subscribe {
 
 	for rows.Next() {
 		var s Subscribe
-		err := rows.Scan(&s.Subscriptionid, &s.Packageid, &s.Moduleid,&s.Featureid, &s.Tenantid, &s.Categoryid, &s.Subcategoryid,&s.Validitydate,&s.Validity, &s.Totalamount, &s.Taxamount, &s.Subscriptionaccid, &s.Subscriptionmethodid, &s.Paymentstatus, &s.Modulename, &s.Logourl, &s.Iconurl, &s.Packagename,
+		err := rows.Scan(&s.Subscriptionid, &s.Packageid, &s.Moduleid, &s.Featureid, &s.Tenantid, &s.Categoryid, &s.Subcategoryid, &s.Validitydate, &s.Validity, &s.Totalamount, &s.Taxamount, &s.Subscriptionaccid, &s.Subscriptionmethodid, &s.Paymentstatus,&s.Status, &s.Modulename, &s.Logourl, &s.Iconurl, &s.Packagename,
 			&s.PackageAmount, &s.PackageIcon, &s.Tenantaccid, &s.Locationcount, &s.Customercount)
 		if err != nil {
 			log.Fatal(err)
@@ -1717,6 +1744,26 @@ func (d *TenantSubscription) Insertsubcategory() (int64, error) {
 	}
 	log.Print("Row inserted in subcat!")
 	return id, nil
+}
+func  Deletesubcat(tenantid,moduleid int) (bool,error) {
+
+	statement, err := database.Db.Prepare(deletecategories)
+	
+
+	if err != nil {
+	
+		return false,err
+	}
+
+	_, err1 := statement.Exec(tenantid,moduleid)
+	if err1 != nil {
+		
+		return false,err1
+	}
+
+	log.Print("Row deleted in subcategories!")
+	return true,nil
+
 }
 func Gettenantinfo(tenantid int) Tenants {
 	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
@@ -1880,4 +1927,233 @@ func (s *TenantUser) TenantstaffCreation(data []int) (bool, error) {
 	}
 	tx.Commit()
 	return true, nil
+}
+
+//firestore
+func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int64, moduleid int) error {
+	print("st1 firestore")
+	n1 := int64(tenantid)
+	id := strconv.FormatInt(n1, 10)
+	n2 := int64(locationid)
+	loc := strconv.FormatInt(n2, 10)
+	ctx := context.Background()
+	sa := option.WithCredentialsFile(firestorejsonkey)
+
+	app, err := firebase.NewApp(ctx, nil, sa)
+
+	if err != nil {
+		log.Fatal("failed to create 1 firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	client, err := app.Firestore(ctx)
+
+	if err != nil {
+
+		log.Fatal("failed to create  firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	defer client.Close()
+
+	_, err1 := client.Collection("tenants").Doc(id).Set(ctx, map[string]interface{}{
+		"tenantid":   tenantid,
+		"moduleid":   moduleid,
+		"locationid": locationid,
+		"tenantname": &t.Name,
+		"email":      &t.Email,
+		"contactno":  &t.Mobile,
+		"address":    &t.Address,
+		"suburb":     &t.Suburb,
+		"city":       &t.City,
+		"state":      &t.State,
+		"postcode":   &t.Zip,
+		"latitude":   &t.Latitude,
+		"longitude":  &t.Longitude,
+		"status":     "Active",
+	})
+	if err1 != nil {
+
+		log.Fatal("failed to insert in  firestore %v", err1)
+		return err1
+	}
+	_, err2 := client.Collection("locations").Doc(loc).Set(ctx, map[string]interface{}{
+		"locationid":   locationid,
+		"tenantid":     tenantid,
+		"locationname": &t.Name,
+		"email":        &t.Email,
+		"contactno":    &t.Mobile,
+		"address":      &t.Address,
+		"suburb":       &t.Suburb,
+		"city":         &t.City,
+		"state":        &t.State,
+		"postcode":     &t.Zip,
+		"latitude":     &t.Latitude,
+		"longitude":    &t.Longitude,
+		"status":       "Active",
+	})
+	if err2 != nil {
+
+		log.Fatal("failed to insert in  firestore %v", err2)
+		return err2
+	}
+	return nil
+}
+func (l *Location) Firestorecreatelocation(locationid int64) error {
+	print("st1 firestore")
+
+	n2 := int64(locationid)
+	loc := strconv.FormatInt(n2, 10)
+	ctx := context.Background()
+	sa := option.WithCredentialsFile(firestorejsonkey)
+
+	app, err := firebase.NewApp(ctx, nil, sa)
+
+	if err != nil {
+		log.Fatal("failed to create 1 firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	client, err := app.Firestore(ctx)
+
+	if err != nil {
+
+		log.Fatal("failed to create  firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	defer client.Close()
+	_, err2 := client.Collection("locations").Doc(loc).Set(ctx, map[string]interface{}{
+		"locationid":   locationid,
+		"tenantid":     &l.TenantID,
+		"locationname": &l.LocationName,
+		"email":        &l.Email,
+		"contactno":    &l.Mobile,
+		"address":      &l.Address,
+		"suburb":       &l.Suburb,
+		"city":         &l.City,
+		"state":        &l.State,
+		"postcode":     &l.Zip,
+		"latitude":     &l.Latitude,
+		"longitude":    &l.Longitude,
+		"status":       "Active",
+	})
+	if err2 != nil {
+
+		log.Fatal("failed to insert in  firestore %v", err2)
+		return err2
+	}
+
+	return nil
+}
+
+func (p *Location) Firestorelocationupdate(locationid int) error {
+	print("st1 firestore")
+	n1 := int64(locationid)
+	id := strconv.FormatInt(n1, 10)
+	ctx := context.Background()
+	sa := option.WithCredentialsFile(firestorejsonkey)
+
+	app, err := firebase.NewApp(ctx, nil, sa)
+
+	if err != nil {
+		log.Fatal("failed to create 1 firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	client, err := app.Firestore(ctx)
+
+	if err != nil {
+
+		log.Fatal("failed to create  firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	defer client.Close()
+
+	ca := client.Collection("locations").Doc(id)
+
+	_, err = ca.Update(context.Background(), []firestore.Update{
+		{
+			Path: "locationname", Value: &p.LocationName,
+		},
+		{
+			Path: "email", Value: &p.Email,
+		},
+		{
+			Path: "contactno", Value: &p.Mobile,
+		},
+		{
+			Path: "address", Value: &p.Address,
+		},
+		{
+			Path: "suburb", Value: &p.Suburb,
+		},
+		{
+			Path: "city", Value: &p.City,
+		},
+		{
+			Path: "state", Value: &p.State,
+		},
+		{
+			Path: "postcode", Value: &p.Zip,
+		},
+		{
+			Path: "latitude", Value: &p.Latitude,
+		},
+		{
+			Path: "longitude", Value: &p.Longitude,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+func (p *Updatestatus) Firestoreupdatelocationstatus(locationid int) error {
+	print("st1 firestore")
+	n1 := int64(locationid)
+	id := strconv.FormatInt(n1, 10)
+	ctx := context.Background()
+	sa := option.WithCredentialsFile(firestorejsonkey)
+
+	app, err := firebase.NewApp(ctx, nil, sa)
+
+	if err != nil {
+		log.Fatal("failed to create 1 firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	client, err := app.Firestore(ctx)
+
+	if err != nil {
+
+		log.Fatal("failed to create  firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	defer client.Close()
+
+	ca := client.Collection("locations").Doc(id)
+
+	_, err = ca.Update(context.Background(), []firestore.Update{
+		{
+			Path: "status", Value: &p.Locationstatus,
+		},
+
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

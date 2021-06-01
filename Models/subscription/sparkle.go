@@ -150,6 +150,7 @@ type SubscribedData struct {
 	Tenantaccid    string  `json:"tenantaccid"`
 	Taxamount      float64 `json:"taxamount"`
 	Totalamount    float64 `json:"totalamount"`
+	Status string `json:"status"`
 }
 
 type TenantUser struct {
@@ -418,6 +419,7 @@ type Subscribe struct {
 	Subcategoryid        int     `json:"subcategoryid"`
 	Categoryid           int     `json:"categoryid"`
 	Paymentstatus        bool    `json:"paymentstatus"`
+	Status string `json:"status"`
 	Validity bool `json:"validity"`
 	Validitydate string `json:"validitydate"`
 }

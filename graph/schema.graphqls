@@ -99,6 +99,7 @@ type TenantData{
  Subcategoryid:Int!
  Taxamount:Float!
  Totalamount:Float!
+ Status:String!
 }
 type subscribedData{
  status:Boolean!
@@ -518,6 +519,12 @@ input business{
  socialupdate:[socialupdatedata]
  socialdelete:[Int]
 }
+input unsubscribeinput{
+Subscriptionid:Int!
+Moduleid:Int!
+Tenantid:Int!
+
+}
 type businessdata{
  status:Boolean!
  code:Int!
@@ -691,6 +698,7 @@ Modulename:String!
 Subscriptionaccid:String!
 Subscriptionmethodid:String!
 Paymentstatus:Boolean!
+Status:String!
 Packagename:String
 LogoUrl:String!
 Iconurl:String!
@@ -842,4 +850,5 @@ type Mutation {
  initialupdate(input:updateinfo):promotioncreateddata
  insertsubcategory(input:[subcatinsertdata]):promotioncreateddata
  subscribemore(input:[subscribemoreinput]):subscribedData
+ unsubscribe(input:unsubscribeinput):promotioncreateddata
 }

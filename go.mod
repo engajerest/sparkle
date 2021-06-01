@@ -3,6 +3,8 @@ module github.com/engajerest/sparkle
 go 1.15
 
 require (
+	cloud.google.com/go/firestore v1.1.0
+	firebase.google.com/go v3.13.0+incompatible
 	github.com/99designs/gqlgen v0.13.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/engajerest/auth v1.0.7
@@ -12,6 +14,7 @@ require (
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/sys v0.0.0-20210309074719-68d13333faf2 // indirect
+	google.golang.org/api v0.13.0
 	gorm.io/driver/mysql v1.0.5
 	gorm.io/gorm v1.21.3
 	honnef.co/go/tools v0.1.3 // indirect
