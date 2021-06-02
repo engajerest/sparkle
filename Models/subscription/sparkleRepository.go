@@ -76,7 +76,7 @@ const (
 	getpromo                       = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active' AND moduleid=?"
 	insertsubcategory              = "INSERT INTO tenantsubcategories (tenantid,moduleid,categoryid,subcategoryid,subcategoryname) VALUES(?,?,?,?,?)"
 	createUsernopassword           = "INSERT INTO app_users (authname,contactno,roleid,configid,referenceid) VALUES(?,?,?,?,?)"
-    unsubscribe = "UPDATE tenantsubscription SET status='Inactive' WHERE subscriptionid=?"
+    unsubscribe = "UPDATE tenantsubscription SET categoryid=0, status='Inactive' WHERE subscriptionid=?"
 	deletecategories = "DELETE  FROM tenantsubcategories WHERE tenantid=? AND moduleid=?"
 	//firestore
 	firestorejsonkey = "./engaje-2021-firebase-adminsdk-7sb61-42247472ad.json"
