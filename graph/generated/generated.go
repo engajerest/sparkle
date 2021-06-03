@@ -90,7 +90,7 @@ type ComplexityRoot struct {
 		Createpromotion      func(childComplexity int, input *model.Promoinput) int
 		Createtenantuser     func(childComplexity int, create *model.Tenantuser) int
 		Initialupdate        func(childComplexity int, input *model.Updateinfo) int
-		Insertsubcategory    func(childComplexity int, input []*model.Subcatinsertdata) int
+		Insertsubcategory    func(childComplexity int, input *model.Subcatinput) int
 		Subscribe            func(childComplexity int, input model.Data) int
 		Subscribemore        func(childComplexity int, input []*model.Subscribemoreinput) int
 		Subscription         func(childComplexity int, input []*model.Subscriptionnew) int
@@ -554,6 +554,7 @@ type ComplexityRoot struct {
 		Selected        func(childComplexity int) int
 		Subcategoryid   func(childComplexity int) int
 		Subcategoryname func(childComplexity int) int
+		Tenantsubcatid  func(childComplexity int) int
 	}
 
 	Tenantupdatedata struct {
@@ -640,7 +641,7 @@ type MutationResolver interface {
 	Updatelocation(ctx context.Context, input *model.Locationupdate) (*model.Promotioncreateddata, error)
 	Subscription(ctx context.Context, input []*model.Subscriptionnew) (*model.SubscribedData, error)
 	Initialupdate(ctx context.Context, input *model.Updateinfo) (*model.Promotioncreateddata, error)
-	Insertsubcategory(ctx context.Context, input []*model.Subcatinsertdata) (*model.Promotioncreateddata, error)
+	Insertsubcategory(ctx context.Context, input *model.Subcatinput) (*model.Promotioncreateddata, error)
 	Subscribemore(ctx context.Context, input []*model.Subscribemoreinput) (*model.SubscribedData, error)
 	Unsubscribe(ctx context.Context, input *model.Unsubscribeinput) (*model.Promotioncreateddata, error)
 }
@@ -931,7 +932,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Insertsubcategory(childComplexity, args["input"].([]*model.Subcatinsertdata)), true
+		return e.complexity.Mutation.Insertsubcategory(childComplexity, args["input"].(*model.Subcatinput)), true
 
 	case "Mutation.subscribe":
 		if e.complexity.Mutation.Subscribe == nil {
@@ -3407,6 +3408,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tenantsubcat.Subcategoryname(childComplexity), true
 
+	case "tenantsubcat.Tenantsubcatid":
+		if e.complexity.Tenantsubcat.Tenantsubcatid == nil {
+			break
+		}
+
+		return e.complexity.Tenantsubcat.Tenantsubcatid(childComplexity), true
+
 	case "tenantupdatedata.code":
 		if e.complexity.Tenantupdatedata.Code == nil {
 			break
@@ -4103,6 +4111,10 @@ Categoryid:Int!
 Subcategoryid:Int! 
 Subcategoryname:String! 
 }
+input subcatinput{
+ create:[subcatinsertdata]
+ delete:[Int]
+}
 input updateinfo{
 Tenantid:Int!
 Locationid:Int!
@@ -4554,6 +4566,7 @@ message:String!
 tenantsubcategories:[tenantsubcat]
 }
 type tenantsubcat{
+   Tenantsubcatid:Int!
    Categoryid:Int!
    Subcategoryid:Int!
   Subcategoryname:String!
@@ -4622,7 +4635,7 @@ type Mutation {
  updatelocation(input:locationupdate):promotioncreateddata
  subscription(input:[subscriptionnew]):subscribedData
  initialupdate(input:updateinfo):promotioncreateddata
- insertsubcategory(input:[subcatinsertdata]):promotioncreateddata
+ insertsubcategory(input:subcatinput):promotioncreateddata
  subscribemore(input:[subscribemoreinput]):subscribedData
  unsubscribe(input:unsubscribeinput):promotioncreateddata
 }`, BuiltIn: false},
@@ -4711,10 +4724,10 @@ func (ec *executionContext) field_Mutation_initialupdate_args(ctx context.Contex
 func (ec *executionContext) field_Mutation_insertsubcategory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []*model.Subcatinsertdata
+	var arg0 *model.Subcatinput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOsubcatinsertdata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcatinsertdata(ctx, tmp)
+		arg0, err = ec.unmarshalOsubcatinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcatinput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6596,7 +6609,7 @@ func (ec *executionContext) _Mutation_insertsubcategory(ctx context.Context, fie
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Insertsubcategory(rctx, args["input"].([]*model.Subcatinsertdata))
+		return ec.resolvers.Mutation().Insertsubcategory(rctx, args["input"].(*model.Subcatinput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -19012,6 +19025,41 @@ func (ec *executionContext) _subscriptionsdata_Locationcount(ctx context.Context
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _tenantsubcat_Tenantsubcatid(ctx context.Context, field graphql.CollectedField, obj *model.Tenantsubcat) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "tenantsubcat",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantsubcatid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _tenantsubcat_Categoryid(ctx context.Context, field graphql.CollectedField, obj *model.Tenantsubcat) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -22023,6 +22071,34 @@ func (ec *executionContext) unmarshalInputsocialupdatedata(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialicon"))
 			it.Socialicon, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputsubcatinput(ctx context.Context, obj interface{}) (model.Subcatinput, error) {
+	var it model.Subcatinput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "create":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("create"))
+			it.Create, err = ec.unmarshalOsubcatinsertdata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcatinsertdata(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "delete":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
+			it.Delete, err = ec.unmarshalOInt2ᚕᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25995,6 +26071,11 @@ func (ec *executionContext) _tenantsubcat(ctx context.Context, sel ast.Selection
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("tenantsubcat")
+		case "Tenantsubcatid":
+			out.Values[i] = ec._tenantsubcat_Tenantsubcatid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Categoryid":
 			out.Values[i] = ec._tenantsubcat_Categoryid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -28301,6 +28382,14 @@ func (ec *executionContext) marshalOsubcat2ᚖgithubᚗcomᚋengajerestᚋsparkl
 		return graphql.Null
 	}
 	return ec._subcat(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOsubcatinput2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcatinput(ctx context.Context, v interface{}) (*model.Subcatinput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputsubcatinput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOsubcatinsertdata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSubcatinsertdata(ctx context.Context, v interface{}) ([]*model.Subcatinsertdata, error) {

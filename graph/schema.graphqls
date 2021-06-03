@@ -329,6 +329,10 @@ Categoryid:Int!
 Subcategoryid:Int! 
 Subcategoryname:String! 
 }
+input subcatinput{
+ create:[subcatinsertdata]
+ delete:[Int]
+}
 input updateinfo{
 Tenantid:Int!
 Locationid:Int!
@@ -780,6 +784,7 @@ message:String!
 tenantsubcategories:[tenantsubcat]
 }
 type tenantsubcat{
+   Tenantsubcatid:Int!
    Categoryid:Int!
    Subcategoryid:Int!
   Subcategoryname:String!
@@ -848,7 +853,7 @@ type Mutation {
  updatelocation(input:locationupdate):promotioncreateddata
  subscription(input:[subscriptionnew]):subscribedData
  initialupdate(input:updateinfo):promotioncreateddata
- insertsubcategory(input:[subcatinsertdata]):promotioncreateddata
+ insertsubcategory(input:subcatinput):promotioncreateddata
  subscribemore(input:[subscribemoreinput]):subscribedData
  unsubscribe(input:unsubscribeinput):promotioncreateddata
 }

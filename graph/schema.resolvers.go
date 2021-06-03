@@ -106,7 +106,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		if status != true {
 			return nil, errors.New("tenant not subscribed")
 		}
-		storeerr := d.Firestoreinsertenant(int64(tenantdata.TenantID), int64(tenantdata.Locationid), slist[0].Moduleid)
+		storeerr := d.Firestoreinsertenant(int64(tenantdata.TenantID), int64(tenantdata.Locationid), slist[0].Moduleid, slist[0].Categoryid)
 		if storeerr != nil {
 			print(storeerr)
 		}
@@ -372,6 +372,12 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 			print(stat)
 		}
 	}
+
+	err := data.Firestoreupdatetenant(businessinfo.Businessupdate.Tenantid)
+	if err != nil {
+		print(err)
+	}
+
 	if data1 != false {
 		return &model.Businessdata{
 			Status:  true,
@@ -767,7 +773,7 @@ func (r *mutationResolver) Initialupdate(ctx context.Context, input *model.Updat
 	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "BusinessInfo Updated"}, nil
 }
 
-func (r *mutationResolver) Insertsubcategory(ctx context.Context, input []*model.Subcatinsertdata) (*model.Promotioncreateddata, error) {
+func (r *mutationResolver) Insertsubcategory(ctx context.Context, input *model.Subcatinput) (*model.Promotioncreateddata, error) {
 	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
@@ -775,7 +781,16 @@ func (r *mutationResolver) Insertsubcategory(ctx context.Context, input []*model
 	print("raju")
 	print(id.ID)
 	var d subscription.TenantSubscription
-	sublist := input
+	sublist := input.Create
+	deletelist := input.Delete
+	if len(deletelist) != 0 {
+		for i := 0; i < len(deletelist); i++ {
+			stat, err := subscription.Deletesubcatbyid(*deletelist[i])
+			if err != nil || stat == false {
+				print(err, stat)
+			}
+		}
+	}
 	if len(sublist) != 0 {
 		for i := 0; i < len(sublist); i++ {
 			d.Categoryid = sublist[i].Categoryid
@@ -790,6 +805,7 @@ func (r *mutationResolver) Insertsubcategory(ctx context.Context, input []*model
 
 		}
 	}
+
 
 	return &model.Promotioncreateddata{
 		Status: true, Code: http.StatusCreated, Message: "Subcategories Added to Tenants",
@@ -861,11 +877,11 @@ func (r *mutationResolver) Unsubscribe(ctx context.Context, input *model.Unsubsc
 		print(err)
 		return nil, errors.New("Unsubscribe Failed")
 	}
-stat1,er := subscription.Deletesubcat(input.Tenantid,input.Moduleid)
-if er != nil || stat1 == false {
-	print(err)
-	return nil, errors.New("Unsubscribe Failed")
-}
+	stat1, er := subscription.Deletesubcat(input.Tenantid, input.Moduleid)
+	if er != nil || stat1 == false {
+		print(err)
+		return nil, errors.New("Unsubscribe Failed")
+	}
 	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Module Unsubscribed"}, nil
 }
 

@@ -78,6 +78,7 @@ const (
 	createUsernopassword           = "INSERT INTO app_users (authname,contactno,roleid,configid,referenceid) VALUES(?,?,?,?,?)"
     unsubscribe = "UPDATE tenantsubscription SET categoryid=0, status='Inactive' WHERE subscriptionid=?"
 	deletecategories = "DELETE  FROM tenantsubcategories WHERE tenantid=? AND moduleid=?"
+	deletesubcatbyid = "DELETE  FROM tenantsubcategories WHERE tenantsubcatid=?"
 	//firestore
 	firestorejsonkey = "./engaje-2021-firebase-adminsdk-7sb61-42247472ad.json"
 )
@@ -1312,14 +1313,14 @@ func Gettenantsubcat(moduleid, tenantid, categoryid int) []*model.Tenantsubcat {
 	tent := strconv.FormatInt(n2, 10)
 	cat := strconv.FormatInt(n3, 10)
 
-	q1 = "SELECT a.categoryid,a.subcategoryid,a.subcategoryname,a.icon,0 AS selected ,b.categoryname FROM app_subcategory a , app_category b WHERE a.categoryid=b.categoryid AND  a.categoryid= " + cat + "  AND a.STATUS='Active' AND a.subcategoryid NOT IN"
+	q1 = "SELECT 0 AS tenantsubcatid,a.categoryid,a.subcategoryid,a.subcategoryname,a.icon,0 AS selected ,b.categoryname FROM app_subcategory a , app_category b WHERE a.categoryid=b.categoryid AND  a.categoryid= " + cat + "  AND a.STATUS='Active' AND a.subcategoryid NOT IN"
 	q2 = "(SELECT subcategoryid FROM tenantsubcategories WHERE tenantid=" + tent + "  AND moduleid=" + mod + " ) UNION"
-	q3 = "  SELECT a.categoryid,a.subcategoryid,a.subcategoryname,IFNULL(b.icon,'') AS icon,1 AS selected,c.categoryname  FROM tenantsubcategories a, app_subcategory b,app_category c WHERE a.subcategoryid=b.subcategoryid AND a.categoryid=c.categoryid AND a.tenantid=" + tent + "  AND a.moduleid=" + mod + "  AND a.STATUS='Active'"
+	q3 = "  SELECT a.tenantsubcatid,a.categoryid,a.subcategoryid,a.subcategoryname,IFNULL(b.icon,'') AS icon,1 AS selected,c.categoryname  FROM tenantsubcategories a, app_subcategory b,app_category c WHERE a.subcategoryid=b.subcategoryid AND a.categoryid=c.categoryid AND a.tenantid=" + tent + "  AND a.moduleid=" + mod + "  AND a.STATUS='Active'"
 	var data []*model.Tenantsubcat
 
 	DB.Raw(q1 + q2 + q3).Find(&data)
+print(q1+q2+q3)
 
-	fmt.Println(data)
 
 	return data
 
@@ -1765,6 +1766,26 @@ func  Deletesubcat(tenantid,moduleid int) (bool,error) {
 	return true,nil
 
 }
+func  Deletesubcatbyid(tenantsubcatid int) (bool,error) {
+
+	statement, err := database.Db.Prepare(deletesubcatbyid)
+	
+
+	if err != nil {
+	
+		return false,err
+	}
+
+	_, err1 := statement.Exec(tenantsubcatid)
+	if err1 != nil {
+		
+		return false,err1
+	}
+
+	log.Print("Row deleted in subcategories by id!")
+	return true,nil
+
+}
 func Gettenantinfo(tenantid int) Tenants {
 	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
 	if err != nil {
@@ -1930,7 +1951,7 @@ func (s *TenantUser) TenantstaffCreation(data []int) (bool, error) {
 }
 
 //firestore
-func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int64, moduleid int) error {
+func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int64, moduleid,catid int) error {
 	print("st1 firestore")
 	n1 := int64(tenantid)
 	id := strconv.FormatInt(n1, 10)
@@ -1973,6 +1994,8 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 		"latitude":   &t.Latitude,
 		"longitude":  &t.Longitude,
 		"status":     "Active",
+		"categoryid":catid,
+		"tenantimage":"",
 	})
 	if err1 != nil {
 
@@ -1993,6 +2016,10 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 		"latitude":     &t.Latitude,
 		"longitude":    &t.Longitude,
 		"status":       "Active",
+		"opentime":&t.OpenTime,
+		"closetime":&t.CloseTime,
+		"delivery":false,
+		
 	})
 	if err2 != nil {
 
@@ -2041,6 +2068,9 @@ func (l *Location) Firestorecreatelocation(locationid int64) error {
 		"latitude":     &l.Latitude,
 		"longitude":    &l.Longitude,
 		"status":       "Active",
+		"opentime":&l.OpeningTime,
+		"closetime":&l.ClosingTime,
+		"delivery":&l.Delivery,
 	})
 	if err2 != nil {
 
@@ -2110,6 +2140,15 @@ func (p *Location) Firestorelocationupdate(locationid int) error {
 		{
 			Path: "longitude", Value: &p.Longitude,
 		},
+		{
+			Path: "opentime", Value: &p.OpeningTime,
+		},
+		{
+			Path: "closetime", Value: &p.ClosingTime,
+		},
+		{
+			Path: "delivery", Value: &p.Delivery,
+		},
 	})
 	if err != nil {
 		return err
@@ -2148,6 +2187,47 @@ func (p *Updatestatus) Firestoreupdatelocationstatus(locationid int) error {
 	_, err = ca.Update(context.Background(), []firestore.Update{
 		{
 			Path: "status", Value: &p.Locationstatus,
+		},
+
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *BusinessUpdate) Firestoreupdatetenant(tenantid int) error {
+	print("st1 firestore")
+	n1 := int64(tenantid)
+	id := strconv.FormatInt(n1, 10)
+	ctx := context.Background()
+	sa := option.WithCredentialsFile(firestorejsonkey)
+
+	app, err := firebase.NewApp(ctx, nil, sa)
+
+	if err != nil {
+		log.Fatal("failed to create 1 firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	client, err := app.Firestore(ctx)
+
+	if err != nil {
+
+		log.Fatal("failed to create  firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	defer client.Close()
+
+	ca := client.Collection("tenants").Doc(id)
+
+	_, err = ca.Update(context.Background(), []firestore.Update{
+		{
+			Path: "tenantimage", Value: &p.Tenantimage,
 		},
 
 	})

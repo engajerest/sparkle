@@ -620,6 +620,11 @@ type Subcat struct {
 	Icon            string `json:"Icon"`
 }
 
+type Subcatinput struct {
+	Create []*Subcatinsertdata `json:"create"`
+	Delete []*int              `json:"delete"`
+}
+
 type Subcatinsertdata struct {
 	Tenantid        int    `json:"Tenantid"`
 	Moduleid        int    `json:"Moduleid"`
@@ -732,6 +737,7 @@ type Subscriptionsdata struct {
 }
 
 type Tenantsubcat struct {
+	Tenantsubcatid  int    `json:"Tenantsubcatid"`
 	Categoryid      int    `json:"Categoryid"`
 	Subcategoryid   int    `json:"Subcategoryid"`
 	Subcategoryname string `json:"Subcategoryname"`
