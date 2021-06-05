@@ -35,6 +35,7 @@ func PlaygroundHandlers() gin.HandlerFunc {
 func GraphHandler() gin.HandlerFunc {
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 	return func(c *gin.Context) {
+	
 		srv.ServeHTTP(c.Writer, c.Request)
 	}
 }

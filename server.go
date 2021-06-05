@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	
 
 	"github.com/engajerest/auth/controller"
 	"github.com/engajerest/auth/logger"
@@ -13,7 +14,13 @@ import (
 )
 
 func main() {
+	router := gin.Default()
 
+	// v2 := router.Group("/live")
+	
+    // Split after an empty string to get all letters.
+    
+	
 	// Config
 	viper.SetConfigName("config") // config file name without extension
 	viper.SetConfigType("yaml")
@@ -32,19 +39,14 @@ func main() {
 	_ = viper.GetString("APP.DATABASE_PORT")
 	host := viper.GetString("APP.DATABASE_SERVER_HOST")
 	UserContextKey := viper.GetString("APP.USER_CONTEXT_KEY")
-
 	fmt.Println("PORT :", defaultPort)
-
-	router := gin.Default()
-	// router.GET("/locations", controllers.Location)
 	router.Use(controller.TokenNoAuthMiddleware(UserContextKey))
-
 	dbconfig.InitDB(dbName, userName, password, host)
-	logger.Info("sparkle application started")
-
-	router.GET("/", controllers.PlaygroundHandlers())
+	logger.Info("sparkle application started ")
+	router.GET("/", controller.PlaygroundHandlers())
 	router.POST("/sparkle", controllers.GraphHandler())
 	router.Run(defaultPort)
+
 	// srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 	//  http.Handle("/", playground.Handler("Engaje", "/query"))
 	// // router.Handle("/middle", middleware(http.HandlerFunc(pong)))

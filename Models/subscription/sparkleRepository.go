@@ -1978,6 +1978,20 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 	}
 
 	defer client.Close()
+	result := strings.Split(t.Name, "")
+	output := make([]string, len(result))
+	
+	var lastitem string
+    for i := range(result) {
+        // Get letter and display it.
+        letter := lastitem+result[i]
+		
+		output = append(output, letter)
+        fmt.Println(letter)
+		lastitem = output[len(output)-1]
+		fmt.Printf("lastitem: %v\n", lastitem)
+    }
+	fmt.Println(output)
 
 	_, err1 := client.Collection("tenants").Doc(id).Set(ctx, map[string]interface{}{
 		"tenantid":   tenantid,
@@ -1996,12 +2010,27 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 		"status":     "Active",
 		"categoryid":catid,
 		"tenantimage":"",
+		"searchindex":output,
 	})
 	if err1 != nil {
 
 		log.Fatal("failed to insert in  firestore %v", err1)
 		return err1
 	}
+	result1 := strings.Split(t.Name, "")
+	output1 := make([]string, len(result))
+	
+	var lastitem1 string
+    for i := range(result1) {
+        // Get letter and display it.
+        letter1 := lastitem1+result[i]
+		
+		output1 = append(output1, letter1)
+        fmt.Println(letter1)
+		lastitem1 = output1[len(output1)-1]
+		fmt.Printf("lastitem: %v\n", lastitem1)
+    }
+	fmt.Println(output1)
 	_, err2 := client.Collection("locations").Doc(loc).Set(ctx, map[string]interface{}{
 		"locationid":   locationid,
 		"tenantid":     tenantid,
@@ -2019,6 +2048,8 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 		"opentime":&t.OpenTime,
 		"closetime":&t.CloseTime,
 		"delivery":false,
+		"deliverymins":30,
+		"searchindex":output1,
 		
 	})
 	if err2 != nil {
@@ -2054,6 +2085,23 @@ func (l *Location) Firestorecreatelocation(locationid int64) error {
 	}
 
 	defer client.Close()
+
+	result := strings.Split(l.LocationName, "")
+	output := make([]string, len(result))
+	
+	var lastitem string
+    for i := range(result) {
+        // Get letter and display it.
+        letter := lastitem+result[i]
+		
+		output = append(output, letter)
+        fmt.Println(letter)
+		lastitem = output[len(output)-1]
+		fmt.Printf("lastitem: %v\n", lastitem)
+    }
+	fmt.Println(output)
+
+	
 	_, err2 := client.Collection("locations").Doc(loc).Set(ctx, map[string]interface{}{
 		"locationid":   locationid,
 		"tenantid":     &l.TenantID,
@@ -2071,6 +2119,9 @@ func (l *Location) Firestorecreatelocation(locationid int64) error {
 		"opentime":&l.OpeningTime,
 		"closetime":&l.ClosingTime,
 		"delivery":&l.Delivery,
+		"deliverymins":&l.Deliverymins,
+		"searchindex":output,
+		
 	})
 	if err2 != nil {
 
@@ -2106,7 +2157,20 @@ func (p *Location) Firestorelocationupdate(locationid int) error {
 	}
 
 	defer client.Close()
-
+	result := strings.Split(p.LocationName, "")
+	output := make([]string, len(result))
+	
+	var lastitem string
+    for i := range(result) {
+        // Get letter and display it.
+        letter := lastitem+result[i]
+		
+		output = append(output, letter)
+        fmt.Println(letter)
+		lastitem = output[len(output)-1]
+		fmt.Printf("lastitem: %v\n", lastitem)
+    }
+	fmt.Println(output)
 	ca := client.Collection("locations").Doc(id)
 
 	_, err = ca.Update(context.Background(), []firestore.Update{
@@ -2148,6 +2212,12 @@ func (p *Location) Firestorelocationupdate(locationid int) error {
 		},
 		{
 			Path: "delivery", Value: &p.Delivery,
+		},
+		{
+			Path: "deliverymins", Value: &p.Deliverymins,
+		},
+		{
+			Path: "searchindex", Value: output,
 		},
 	})
 	if err != nil {

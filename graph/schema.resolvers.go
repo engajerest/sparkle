@@ -399,6 +399,7 @@ func (r *mutationResolver) Createlocation(ctx context.Context, input *model.Loca
 	// id, usererr := controller.ForContext(ctx)
 	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
+		print("error---",usererr.Message)
 		return nil, errors.New("user not detected")
 	}
 	print("userid=")
