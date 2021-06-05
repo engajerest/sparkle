@@ -2018,12 +2018,12 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 		return err1
 	}
 	result1 := strings.Split(t.Name, "")
-	output1 := make([]string, len(result))
+	output1 := make([]string, len(result1))
 	
 	var lastitem1 string
     for i := range(result1) {
         // Get letter and display it.
-        letter1 := lastitem1+result[i]
+        letter1 := lastitem1+result1[i]
 		
 		output1 = append(output1, letter1)
         fmt.Println(letter1)
