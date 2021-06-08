@@ -120,6 +120,7 @@ type TenantSubscription struct {
 	Price           string `json:"price"`
 	TaxId           int    `json:"taxId"`
 	TaxAmount       string `json:"taxamount"`
+	Taxpercent string `json:"taxpercent"`
 	TotalAmount     string `json:"totalamount"`
 	PaymentStatus   int    `json:"paymentstatus"`
 	PaymentId       int    `json:"paymentId"`
@@ -149,6 +150,7 @@ type SubscribedData struct {
 	Categoryid     int     `json:"categoryid"`
 	Tenantaccid    string  `json:"tenantaccid"`
 	Taxamount      float64 `json:"taxamount"`
+	Taxpercent string `json:"taxpercent"`
 	Totalamount    float64 `json:"totalamount"`
 	Status string `json:"status"`
 }
@@ -409,6 +411,7 @@ type Subscribe struct {
 	Packagename          string  `json:"packagename"`
 	PackageAmount        float64 `json:"packageamount"`
 	Totalamount          float64 `json:"totalamount"`
+	Taxpercent string `json:"taxpercent"`
 	Taxamount            float64 `json:"taxamount"`
 	Logourl              string  `json:"logourl"`
 	Iconurl              string  `json:"iconurl"`

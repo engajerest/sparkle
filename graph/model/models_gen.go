@@ -128,6 +128,7 @@ type TenantData struct {
 	Categoryid     int     `json:"Categoryid"`
 	Subcategoryid  int     `json:"Subcategoryid"`
 	Taxamount      float64 `json:"Taxamount"`
+	Taxpercent     string  `json:"Taxpercent"`
 	Totalamount    float64 `json:"Totalamount"`
 	Status         string  `json:"Status"`
 }
@@ -367,6 +368,7 @@ type Initialsubscribe struct {
 	Promoid         int    `json:"Promoid"`
 	Promovalue      string `json:"Promovalue"`
 	TaxAmount       string `json:"TaxAmount"`
+	Taxpercent      string `json:"Taxpercent"`
 	TotalAmount     string `json:"TotalAmount"`
 	PaymentStatus   int    `json:"PaymentStatus"`
 	Paymentid       *int   `json:"Paymentid"`
@@ -660,6 +662,7 @@ type Subscribemoreinput struct {
 	Promoid         int    `json:"Promoid"`
 	Promovalue      string `json:"Promovalue"`
 	TaxAmount       string `json:"TaxAmount"`
+	Taxpercent      string `json:"Taxpercent"`
 	TotalAmount     string `json:"TotalAmount"`
 	PaymentStatus   int    `json:"PaymentStatus"`
 	Paymentid       *int   `json:"Paymentid"`
@@ -679,6 +682,7 @@ type Subscription struct {
 	Promoid         int    `json:"Promoid"`
 	Promovalue      string `json:"Promovalue"`
 	TaxAmount       string `json:"TaxAmount"`
+	Taxpercent      string `json:"Taxpercent"`
 	TotalAmount     string `json:"TotalAmount"`
 	PaymentStatus   int    `json:"PaymentStatus"`
 	PaymentID       *int   `json:"PaymentId"`
@@ -703,6 +707,7 @@ type Subscriptionnew struct {
 	Promoid         int    `json:"Promoid"`
 	Promovalue      string `json:"Promovalue"`
 	TaxAmount       string `json:"TaxAmount"`
+	Taxpercent      string `json:"Taxpercent"`
 	TotalAmount     string `json:"TotalAmount"`
 	PaymentStatus   int    `json:"PaymentStatus"`
 	Paymentid       *int   `json:"Paymentid"`
@@ -730,6 +735,7 @@ type Subscriptionsdata struct {
 	PackageIcon          *string  `json:"PackageIcon"`
 	PackageAmount        *float64 `json:"PackageAmount"`
 	TotalAmount          float64  `json:"TotalAmount"`
+	Taxpercent           string   `json:"Taxpercent"`
 	Taxamount            float64  `json:"Taxamount"`
 	Tenantaccid          string   `json:"Tenantaccid"`
 	Customercount        *int     `json:"Customercount"`

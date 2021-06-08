@@ -28,9 +28,9 @@ const (
 	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(c.promocodeid,0) AS promocodeid,IFNULL(c.promoname ,'') AS promoname,IFNULL(c.promodescription,'') AS promodescription,IFNULL(c.packageexpiry,0) AS packageexpiry,IFNULL(c.promotype ,'') AS promotype,IFNULL(c.promovalue,0) AS promovalue,IFNULL(c.validity,'') AS validity,IF(c.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid LEFT OUTER JOIN  app_promocodes c ON a.packageid=c.packageid WHERE a.`status`='Active' "
 	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,suburb,latitude,longitude,postcode,countrycode,timezone,currencyid,currencycode,currencysymbol,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,suburb,latitude,longitude,postcode,countrycode,opentime,closetime,deliverymins,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,partnerid,moduleid,featureid,categoryid,subcategoryid,currencyid,subscriptionprice,quantity,taxid,taxamount,totalamount,paymentstatus,paymentid,promoid,promoprice,promostatus,validitydate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	Updatesubscriptionpay          = "UPDATE  tenantsubscription SET transactiondate=?,featureid=?,partnerid=?,currencyid=?,subscriptionprice=?,quantity=?,taxid=?,taxamount=?,totalamount=?,paymentstatus=?,paymentid=?,promoid=?,promoprice=?,promostatus=?,validitydate=?  WHERE subscriptionid=? "
-	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname,IFNULL(a.tenantaccid,'') AS tenantaccid, b.moduleid,b.featureid,b.subscriptionid,b.categoryid,b.subcategoryid, b.taxamount,b.totalamount,b.status, c.modulename ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND b.status='Active' AND  a.tenantid=?"
+	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,partnerid,moduleid,featureid,categoryid,subcategoryid,currencyid,subscriptionprice,quantity,taxid,taxamount,taxpercent,totalamount,paymentstatus,paymentid,promoid,promoprice,promostatus,validitydate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	Updatesubscriptionpay          = "UPDATE  tenantsubscription SET transactiondate=?,featureid=?,partnerid=?,currencyid=?,subscriptionprice=?,quantity=?,taxid=?,taxamount=?,taxpercent=?,totalamount=?,paymentstatus=?,paymentid=?,promoid=?,promoprice=?,promostatus=?,validitydate=?  WHERE subscriptionid=? "
+	getSubscribedDataQuery         = "SELECT a.tenantid, a.tenantname,IFNULL(a.tenantaccid,'') AS tenantaccid, b.moduleid,b.featureid,b.subscriptionid,b.categoryid,b.subcategoryid, b.taxamount,b.taxpercent,b.totalamount,b.status, c.modulename ,d.locationid,d.locationname FROM tenants a,tenantsubscription b,app_module c ,tenantlocations d WHERE a.tenantid=b.tenantid AND b.moduleid=c.moduleid AND a.tenantid = d.tenantid AND b.status='Active' AND  a.tenantid=?"
 	createLocationQuery            = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,suburb,latitude,longitude,postcode,countrycode,opentime,closetime,createdby,delivery,deliverytype,deliverymins) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	updatelocation                 = "UPDATE tenantlocations SET locationname=?,email=?,contactno=?,address=?,state=?,city=?,suburb=?,latitude=?,longitude=?,postcode=?,countrycode=?,opentime=?,closetime=?,delivery=?,deliverytype=?,deliverymins=? WHERE tenantid=? AND locationid=?"
 	getLocationbyid                = "SELECT  locationid,locationname,address,IFNULL(suburb,'') AS suburb,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocations WHERE status='Active' AND locationid=? "
@@ -65,7 +65,7 @@ const (
 	updatelocationstatus           = "UPDATE tenantlocations SET status=? WHERE tenantid= ? AND locationid=?"
 	updatedeliverystatus           = "UPDATE tenantlocations SET delivery=? WHERE tenantid= ? AND locationid=?"
 	getCustomerByid                = "SELECT customerid,firstname,lastname,contactno,email,IFNULL(configid,0) AS configid  FROM customers WHERE customerid=?"
-	getsubscription                = "SELECT a.subscriptionid,a.packageid,a.moduleid,a.featureid,a.tenantid,a.categoryid,a.subcategoryid,IFNULL(a.validitydate,'') AS validitydate,IF(a.validitydate>= DATE(NOW()), TRUE, FALSE) AS validity,a.totalamount,a.taxamount,ifnull(a.subscriptionaccid,'') as subscriptionaccid,ifnull(a.subscriptionmethodid,'') as subscriptionmethodid, a.paymentstatus,a.status, b.modulename,b.logourl,b.iconurl,'' as packagename,'0.0' AS packageamount,'' as packageicon,IFNULL(c.tenantaccid,'') AS tenantaccid, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,tenants c WHERE a.moduleid=b.moduleid AND a.tenantid=c.tenantid AND a.status='Active' AND a.tenantid=?"
+	getsubscription                = "SELECT a.subscriptionid,a.packageid,a.moduleid,a.featureid,a.tenantid,a.categoryid,a.subcategoryid,IFNULL(a.validitydate,'') AS validitydate,IF(a.validitydate>= DATE(NOW()), TRUE, FALSE) AS validity,a.totalamount,a.taxpercent,a.taxamount,ifnull(a.subscriptionaccid,'') as subscriptionaccid,ifnull(a.subscriptionmethodid,'') as subscriptionmethodid, a.paymentstatus,a.status, b.modulename,b.logourl,b.iconurl,'' as packagename,'0.0' AS packageamount,'' as packageicon,IFNULL(c.tenantaccid,'') AS tenantaccid, (SELECT COUNT(locationid)  FROM tenantlocations where  tenantid =?) AS location, (SELECT COUNT(tenantcustomerid)  FROM tenantcustomers WHERE tenantid =?) AS customer FROM tenantsubscription a , app_module b,tenants c WHERE a.moduleid=b.moduleid AND a.tenantid=c.tenantid AND a.status='Active' AND a.tenantid=?"
 	nonsubscribed                  = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(d.promocodeid,0) AS promocodeid,IFNULL(d.promoname ,'') AS promoname,IFNULL(d.promodescription,'') AS promodescription,IFNULL(d.promotype ,'') AS promotype,IFNULL(d.promovalue,0) AS promovalue,IFNULL(d.packageexpiry,0) AS packageexpiry,IFNULL(d.validity,'') AS validity,IF(d.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid INNER JOIN  app_promocodes d ON a.packageid=d.packageid WHERE a.`status`='Active' AND  a.packageid  NOT IN (SELECT packageid FROM tenantsubscription WHERE tenantid= ? )"
 	getpayments                    = "SELECT a.paymentid,a.packageid,IFNULL(a.paymentref,'') AS paymentref,IFNULL(a.locationid,0) AS locationid,a.paymenttypeid,a.tenantid,IFNULL(a.customerid,0) AS customerid,a.transactiondate,IFNULL(a.orderid,0) AS orderid,a.chargeid,a.amount,a.refundamt,a.paymentstatus,a.created,IFNULL(b.packagename,'') AS  packagename,IFNULL(c.firstname,'') AS firstname,IFNULL(c.lastname,'')AS lastname,IFNULL(c.contactno,'')AS contactno,IFNULL(c.email,'')AS email FROM payments a LEFT OUTER JOIN  app_package b ON a.packageid=b.packageid LEFT OUTER JOIN customers c ON  a.customerid=c.customerid WHERE tenantid=? AND paymenttypeid=?"
 	getbusinessforassist           = "SELECT a.tenantid,IFNULL(a.brandname,'') AS brandname,IFNULL(a.tenantinfo,'') AS tenantinfo,IFNULL(a.paymode1,0) AS paymode1,IFNULL(a.paymode2,0) AS paymode2,IFNULL(a.tenantaccid,0) AS tenantaccid,IFNULL(a.address,'') AS address,IFNULL(a.primaryemail,'') AS primaryemail,IFNULL(a.primarycontact,'') AS  primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken,IFNULL(a.tenantimage,'') AS tenantimage, IFNULL(a.countrycode,'') AS countrycode,IFNULL(a.currencycode,'') AS currencycode,IFNULL(a.currencysymbol,'') AS currencysymbol,IFNULL(b.moduleid,0) AS moduleid,IFNULL(d.modulename,'') AS modulename FROM tenants a, tenantsubscription b , app_category c, app_module d WHERE a.tenantid=b.tenantid AND b.moduleid=d.moduleid AND c.categoryid=d.categoryid AND a.tenantid=? AND  c.categoryid=?"
@@ -160,6 +160,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 			a.Promovalue = datalist[i].Promovalue
 			a.Validitydate = datalist[i].Validitydate
 			a.Promostatus = true
+			a.Taxpercent=datalist[i].Taxpercent
 
 			{
 				print("entry in subscription")
@@ -172,7 +173,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 				if _, err := stmt.Exec(tenantid, &a.Date, &a.Packageid, &a.Partnerid, &a.Moduleid, &a.Featureid,
 					&a.Categoryid, &a.SubCategoryid,
 					&a.Currencyid, &a.Price, &a.Quantity, &a.TaxId, &a.TaxAmount,
-					&a.TotalAmount, &a.PaymentStatus, &a.PaymentId, &a.Promoid,
+					&a.Taxpercent,	&a.TotalAmount, &a.PaymentStatus, &a.PaymentId, &a.Promoid,
 					&a.Promovalue, &a.Promostatus, &a.Validitydate); err != nil {
 					tx.Rollback() // return an error too, we may want to wrap them
 					return false, nil, err
@@ -389,7 +390,7 @@ func (info *TenantSubscription) InsertSubscription(tenantid int64) int64 {
 	}
 	defer statement.Close()
 	res, err := statement.Exec(tenantid, &info.Date, &info.Packageid, &info.Partnerid, &info.Moduleid, &info.Featureid, &info.Categoryid, &info.SubCategoryid, &info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
-		&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate)
+	&info.Taxpercent,	&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -412,7 +413,7 @@ func (info *TenantSubscription) Updatesubscription() (bool, error) {
 	}
 	defer statement.Close()
 	_, err = statement.Exec(&info.Date, &info.Featureid, &info.Partnerid, &info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
-		&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate, &info.Subscriptionid)
+	&info.Taxpercent,	&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate, &info.Subscriptionid)
 	if err != nil {
 		log.Fatal(err)
 		return false, err
@@ -438,7 +439,7 @@ func (info *SubscribedData) GetSubscribedData(tenantid int64) []SubscribedData {
 
 	for rows.Next() {
 		var p SubscribedData
-		err := rows.Scan(&p.TenantID, &p.TenantName, &p.Tenantaccid, &p.ModuleID, &p.Featureid, &p.Subscriptionid, &p.Categoryid, &p.Subcategoryid, &p.Taxamount, &p.Totalamount,&p.Status, &p.ModuleName, &p.Locationid, &p.Locationname)
+		err := rows.Scan(&p.TenantID, &p.TenantName, &p.Tenantaccid, &p.ModuleID, &p.Featureid, &p.Subscriptionid, &p.Categoryid, &p.Subcategoryid, &p.Taxamount,&p.Taxpercent, &p.Totalamount,&p.Status, &p.ModuleName, &p.Locationid, &p.Locationname)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -1648,7 +1649,7 @@ func GetAllSubscription(tenantid int) []Subscribe {
 
 	for rows.Next() {
 		var s Subscribe
-		err := rows.Scan(&s.Subscriptionid, &s.Packageid, &s.Moduleid, &s.Featureid, &s.Tenantid, &s.Categoryid, &s.Subcategoryid, &s.Validitydate, &s.Validity, &s.Totalamount, &s.Taxamount, &s.Subscriptionaccid, &s.Subscriptionmethodid, &s.Paymentstatus,&s.Status, &s.Modulename, &s.Logourl, &s.Iconurl, &s.Packagename,
+		err := rows.Scan(&s.Subscriptionid, &s.Packageid, &s.Moduleid, &s.Featureid, &s.Tenantid, &s.Categoryid, &s.Subcategoryid, &s.Validitydate, &s.Validity, &s.Totalamount,&s.Taxpercent, &s.Taxamount, &s.Subscriptionaccid, &s.Subscriptionmethodid, &s.Paymentstatus,&s.Status, &s.Modulename, &s.Logourl, &s.Iconurl, &s.Packagename,
 			&s.PackageAmount, &s.PackageIcon, &s.Tenantaccid, &s.Locationcount, &s.Customercount)
 		if err != nil {
 			log.Fatal(err)

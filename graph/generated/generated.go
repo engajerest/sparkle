@@ -188,6 +188,7 @@ type ComplexityRoot struct {
 		Subcategoryid  func(childComplexity int) int
 		Subscriptionid func(childComplexity int) int
 		Taxamount      func(childComplexity int) int
+		Taxpercent     func(childComplexity int) int
 		Tenantaccid    func(childComplexity int) int
 		Tenantid       func(childComplexity int) int
 		Tenantname     func(childComplexity int) int
@@ -540,6 +541,7 @@ type ComplexityRoot struct {
 		Subscriptionid       func(childComplexity int) int
 		Subscriptionmethodid func(childComplexity int) int
 		Taxamount            func(childComplexity int) int
+		Taxpercent           func(childComplexity int) int
 		Tenantaccid          func(childComplexity int) int
 		Tenantid             func(childComplexity int) int
 		TotalAmount          func(childComplexity int) int
@@ -1601,6 +1603,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TenantData.Taxamount(childComplexity), true
+
+	case "TenantData.Taxpercent":
+		if e.complexity.TenantData.Taxpercent == nil {
+			break
+		}
+
+		return e.complexity.TenantData.Taxpercent(childComplexity), true
 
 	case "TenantData.Tenantaccid":
 		if e.complexity.TenantData.Tenantaccid == nil {
@@ -3331,6 +3340,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscriptionsdata.Taxamount(childComplexity), true
 
+	case "subscriptionsdata.Taxpercent":
+		if e.complexity.Subscriptionsdata.Taxpercent == nil {
+			break
+		}
+
+		return e.complexity.Subscriptionsdata.Taxpercent(childComplexity), true
+
 	case "subscriptionsdata.Tenantaccid":
 		if e.complexity.Subscriptionsdata.Tenantaccid == nil {
 			break
@@ -3880,6 +3896,8 @@ type TenantData{
  Categoryid:Int!
  Subcategoryid:Int!
  Taxamount:Float!
+  Taxpercent:String!
+
  Totalamount:Float!
  Status:String!
 }
@@ -3908,6 +3926,7 @@ input subscription{
  Promoid:Int!
  Promovalue:String!
  TaxAmount:String!
+  Taxpercent:String!
  TotalAmount:String!
  PaymentStatus:Int!
  PaymentId:Int
@@ -3931,6 +3950,7 @@ TransactionDate:String!
  Promoid:Int!
  Promovalue:String!
  TaxAmount:String!
+  Taxpercent:String!
  TotalAmount:String!
  PaymentStatus:Int!
  Paymentid:Int
@@ -3954,6 +3974,7 @@ TransactionDate:String!
  Promoid:Int!
  Promovalue:String!
  TaxAmount:String!
+  Taxpercent:String!
  TotalAmount:String!
  PaymentStatus:Int!
  Paymentid:Int
@@ -4010,6 +4031,7 @@ TransactionDate:String!
  Promoid:Int!
  Promovalue:String!
  TaxAmount:String!
+  Taxpercent:String!
  TotalAmount:String!
  PaymentStatus:Int!
  Paymentid:Int
@@ -4491,6 +4513,7 @@ Iconurl:String!
 PackageIcon:String
 PackageAmount:Float
 TotalAmount:Float!
+ Taxpercent:String!
 Taxamount:Float!
 Tenantaccid:String!
 Customercount:Int
@@ -9337,6 +9360,41 @@ func (ec *executionContext) _TenantData_Taxamount(ctx context.Context, field gra
 	res := resTmp.(float64)
 	fc.Result = res
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TenantData_Taxpercent(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TenantData",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Taxpercent, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TenantData_Totalamount(ctx context.Context, field graphql.CollectedField, obj *model.TenantData) (ret graphql.Marshaler) {
@@ -18891,6 +18949,41 @@ func (ec *executionContext) _subscriptionsdata_TotalAmount(ctx context.Context, 
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _subscriptionsdata_Taxpercent(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "subscriptionsdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Taxpercent, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _subscriptionsdata_Taxamount(ctx context.Context, field graphql.CollectedField, obj *model.Subscriptionsdata) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -21502,6 +21595,14 @@ func (ec *executionContext) unmarshalInputinitialsubscribe(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "Taxpercent":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Taxpercent"))
+			it.Taxpercent, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "TotalAmount":
 			var err error
 
@@ -22262,6 +22363,14 @@ func (ec *executionContext) unmarshalInputsubscribemoreinput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "Taxpercent":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Taxpercent"))
+			it.Taxpercent, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "TotalAmount":
 			var err error
 
@@ -22399,6 +22508,14 @@ func (ec *executionContext) unmarshalInputsubscription(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TaxAmount"))
 			it.TaxAmount, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Taxpercent":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Taxpercent"))
+			it.Taxpercent, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22579,6 +22696,14 @@ func (ec *executionContext) unmarshalInputsubscriptionnew(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TaxAmount"))
 			it.TaxAmount, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Taxpercent":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Taxpercent"))
+			it.Taxpercent, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23932,6 +24057,11 @@ func (ec *executionContext) _TenantData(ctx context.Context, sel ast.SelectionSe
 			}
 		case "Taxamount":
 			out.Values[i] = ec._TenantData_Taxamount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Taxpercent":
+			out.Values[i] = ec._TenantData_Taxpercent(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -26032,6 +26162,11 @@ func (ec *executionContext) _subscriptionsdata(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._subscriptionsdata_PackageAmount(ctx, field, obj)
 		case "TotalAmount":
 			out.Values[i] = ec._subscriptionsdata_TotalAmount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Taxpercent":
+			out.Values[i] = ec._subscriptionsdata_Taxpercent(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

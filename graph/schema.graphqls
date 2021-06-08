@@ -98,6 +98,8 @@ type TenantData{
  Categoryid:Int!
  Subcategoryid:Int!
  Taxamount:Float!
+  Taxpercent:String!
+
  Totalamount:Float!
  Status:String!
 }
@@ -126,6 +128,7 @@ input subscription{
  Promoid:Int!
  Promovalue:String!
  TaxAmount:String!
+  Taxpercent:String!
  TotalAmount:String!
  PaymentStatus:Int!
  PaymentId:Int
@@ -149,6 +152,7 @@ TransactionDate:String!
  Promoid:Int!
  Promovalue:String!
  TaxAmount:String!
+  Taxpercent:String!
  TotalAmount:String!
  PaymentStatus:Int!
  Paymentid:Int
@@ -172,6 +176,7 @@ TransactionDate:String!
  Promoid:Int!
  Promovalue:String!
  TaxAmount:String!
+  Taxpercent:String!
  TotalAmount:String!
  PaymentStatus:Int!
  Paymentid:Int
@@ -228,6 +233,7 @@ TransactionDate:String!
  Promoid:Int!
  Promovalue:String!
  TaxAmount:String!
+  Taxpercent:String!
  TotalAmount:String!
  PaymentStatus:Int!
  Paymentid:Int
@@ -709,6 +715,7 @@ Iconurl:String!
 PackageIcon:String
 PackageAmount:Float
 TotalAmount:Float!
+ Taxpercent:String!
 Taxamount:Float!
 Tenantaccid:String!
 Customercount:Int
