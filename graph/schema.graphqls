@@ -564,6 +564,7 @@ type info{
  countrycode:String!
  currencycode:String!
  currencysymbol:String!
+ Tenantpaymentid:String!
  social:[socialinfo]
 }
 type socialinfo{

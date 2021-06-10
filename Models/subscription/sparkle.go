@@ -214,6 +214,7 @@ type BusinessUpdate struct {
 	Countrycode    string   `json:"countrycode"`
 	Currencycode   string   `json:"currencycode"`
 	Currencysymbol string   `json:"currencysymbol"`
+	Tenantpaymentid string `json:"tenantpaymentid"`
 	SocialData     []Social `json:"social"`
 	// SociaProfile string `json:"socialprofile"`
 	// SocialLink string `json:"sociallink"`

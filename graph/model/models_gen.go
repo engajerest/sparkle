@@ -332,23 +332,24 @@ type Gettenantsubcategorydata struct {
 }
 
 type Info struct {
-	Tenantid       int           `json:"tenantid"`
-	Moduleid       int           `json:"moduleid"`
-	Modulename     string        `json:"modulename"`
-	Brandname      *string       `json:"brandname"`
-	About          *string       `json:"about"`
-	Email          *string       `json:"email"`
-	Phone          *string       `json:"phone"`
-	Address        *string       `json:"address"`
-	Cod            *int          `json:"cod"`
-	Digital        *int          `json:"digital"`
-	Tenantaccid    *string       `json:"tenantaccid"`
-	Tenanttoken    *string       `json:"tenanttoken"`
-	Tenantimage    *string       `json:"tenantimage"`
-	Countrycode    string        `json:"countrycode"`
-	Currencycode   string        `json:"currencycode"`
-	Currencysymbol string        `json:"currencysymbol"`
-	Social         []*Socialinfo `json:"social"`
+	Tenantid        int           `json:"tenantid"`
+	Moduleid        int           `json:"moduleid"`
+	Modulename      string        `json:"modulename"`
+	Brandname       *string       `json:"brandname"`
+	About           *string       `json:"about"`
+	Email           *string       `json:"email"`
+	Phone           *string       `json:"phone"`
+	Address         *string       `json:"address"`
+	Cod             *int          `json:"cod"`
+	Digital         *int          `json:"digital"`
+	Tenantaccid     *string       `json:"tenantaccid"`
+	Tenanttoken     *string       `json:"tenanttoken"`
+	Tenantimage     *string       `json:"tenantimage"`
+	Countrycode     string        `json:"countrycode"`
+	Currencycode    string        `json:"currencycode"`
+	Currencysymbol  string        `json:"currencysymbol"`
+	Tenantpaymentid string        `json:"Tenantpaymentid"`
+	Social          []*Socialinfo `json:"social"`
 }
 
 type Initialsubscribe struct {
