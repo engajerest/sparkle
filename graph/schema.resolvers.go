@@ -465,6 +465,7 @@ func (r *mutationResolver) Createpromotion(ctx context.Context, input *model.Pro
 	p.Promovalue = *input.Promovalue
 	p.Startdate = *input.Startdate
 	p.Enddate = *input.Enddate
+	p.Moduleid = input.Moduleid
 
 	promoid := p.Createpromotion(id.ID)
 	if promoid == 0 {
@@ -1083,29 +1084,29 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 		Code:    http.StatusOK,
 		Message: "Success",
 		Businessinfo: &model.Info{
-			Tenantid:       businessinfo.TenantID,
-			Brandname:      &businessinfo.Brandname,
-			About:          &businessinfo.About,
-			Cod:            &businessinfo.Paymode1,
-			Digital:        &businessinfo.Paymode2,
-			Tenantaccid:    &businessinfo.TenantaccId,
-			Email:          &businessinfo.Email,
-			Phone:          &businessinfo.Phone,
-			Address:        &businessinfo.Address,
-			Moduleid:       businessinfo.Moduleid,
-			Modulename:     businessinfo.Modulename,
-			Tenanttoken:    &businessinfo.Tenanttoken,
-			Tenantimage:    &businessinfo.Tenantimage,
-			Countrycode:    businessinfo.Countrycode,
-			Currencycode:   businessinfo.Currencycode,
-			Currencysymbol: businessinfo.Currencysymbol,
-Tenantpaymentid: businessinfo.Tenantpaymentid,
-			Social: Result,
+			Tenantid:        businessinfo.TenantID,
+			Brandname:       &businessinfo.Brandname,
+			About:           &businessinfo.About,
+			Cod:             &businessinfo.Paymode1,
+			Digital:         &businessinfo.Paymode2,
+			Tenantaccid:     &businessinfo.TenantaccId,
+			Email:           &businessinfo.Email,
+			Phone:           &businessinfo.Phone,
+			Address:         &businessinfo.Address,
+			Moduleid:        businessinfo.Moduleid,
+			Modulename:      businessinfo.Modulename,
+			Tenanttoken:     &businessinfo.Tenanttoken,
+			Tenantimage:     &businessinfo.Tenantimage,
+			Countrycode:     businessinfo.Countrycode,
+			Currencycode:    businessinfo.Currencycode,
+			Currencysymbol:  businessinfo.Currencysymbol,
+			Tenantpaymentid: businessinfo.Tenantpaymentid,
+			Social:          Result,
 		},
 	}, nil
 }
 
-func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int) (*model.Getpromotiondata, error) {
+func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int, moduleid int) (*model.Getpromotiondata, error) {
 	// id, usererr := controller.ForContext(ctx)
 	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
@@ -1115,11 +1116,16 @@ func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int) (*model
 	print(id.ID)
 	var promo []*model.Promotion
 	var promotionGetAll []subscription.Promotion
-	promotionGetAll = subscription.GetAllPromotions(tenantid)
+	if moduleid !=0{
+		promotionGetAll = subscription.GetAllPromotionswithmoduleid(tenantid,moduleid)
+	}else{
+		promotionGetAll = subscription.GetAllPromotions(tenantid)
+	}
+
 	for _, p := range promotionGetAll {
 		promo = append(promo, &model.Promotion{
 			PromotionID: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: p.Promoname, Tenantid: p.Tenantid, Tenantame: p.Tenantname, Promocode: p.Promocode,
-			Broadstatus: p.Broadcaststatus, Success: p.Success, Failure: p.Failure, Promoterms: p.Promoterms, Promovalue: p.Promovalue, Promotag: p.Promotag, Promotype: p.Promotype, Startdate: p.Startdate, Enddate: p.Enddate, Status: &p.Status,
+			Moduleid: p.Moduleid, Broadstatus: p.Broadcaststatus, Success: p.Success, Failure: p.Failure, Promoterms: p.Promoterms, Promovalue: p.Promovalue, Promotag: p.Promotag, Promotype: p.Promotype, Startdate: p.Startdate, Enddate: p.Enddate, Status: &p.Status,
 		})
 	}
 	return &model.Getpromotiondata{

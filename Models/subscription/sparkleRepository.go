@@ -53,8 +53,9 @@ const (
 	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid,IFNULL(address,'') AS address,IFNULL(primaryemail,'') AS primaryemail,IFNULL(primarycontact,'') AS  primarycontact,IFNULL(tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage, IFNULL(countrycode,'') AS countrycode,IFNULL(currencycode,'') AS currencycode,IFNULL(currencysymbol,'') AS currencysymbol,IFNULL(tenantpaymentid,'') AS tenantpaymentid FROM tenants WHERE tenantid=?"
 	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile ,IFNULL(dailcode,'') AS dailcode, IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
 	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
-	Getpromotions                  = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,IFNULL(a.broadcaststatus,0) as broadcaststatus,IFNULL(a.success,0) as success,IFNULL(a.failure,0) as failure,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
-	createpromotion                = "INSERT INTO promotions (promotiontypeid,tenantid,promoname,promocode,promoterms,promovalue,startdate,enddate,createdby) VALUES(?,?,?,?,?,?,?,?,?)"
+	Getpromotions                  = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.moduleid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,IFNULL(a.broadcaststatus,0) as broadcaststatus,IFNULL(a.success,0) as success,IFNULL(a.failure,0) as failure,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
+	Getpromotionwithmodule                 = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.moduleid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,IFNULL(a.broadcaststatus,0) as broadcaststatus,IFNULL(a.success,0) as success,IFNULL(a.failure,0) as failure,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=? AND moduleid=?"
+	createpromotion                = "INSERT INTO promotions (promotiontypeid,tenantid,moduleid,promoname,promocode,promoterms,promovalue,startdate,enddate,createdby) VALUES(?,?,?,?,?,?,?,?,?,?)"
 	insertsequence                 = "INSERT INTO ordersequence (tenantid,sequencename,seqno,prefix,subprefix) VALUES(?,?,?,?,?)"
 	insertcharge                   = "INSERT INTO tenantcharges (tenantid,locationid,chargeid,chargename,chargetype,chargevalue,createdby) VALUES"
 	insertdelivery                 = "INSERT INTO tenantsettings (tenantid,locationid,slabtype,slab,slablimit,slabcharge,createdby) VALUES"
@@ -1115,7 +1116,37 @@ func GetAllPromotions(tenantid int) []Promotion {
 
 	for rows.Next() {
 		var promo Promotion
-		err := rows.Scan(&promo.Promotionid, &promo.Promotiontypeid, &promo.Tenantid, &promo.Promoname, &promo.Promocode, &promo.Promoterms, &promo.Promovalue,
+		err := rows.Scan(&promo.Promotionid, &promo.Promotiontypeid, &promo.Tenantid,&promo.Moduleid, &promo.Promoname, &promo.Promocode, &promo.Promoterms, &promo.Promovalue,
+			&promo.Startdate, &promo.Enddate, &promo.Broadcaststatus, &promo.Success, &promo.Failure, &promo.Status, &promo.Promotype, &promo.Promotag, &promo.Tenantname)
+		if err != nil {
+			log.Fatal(err)
+		}
+		promolist = append(promolist, promo)
+	}
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return promolist
+
+}
+func GetAllPromotionswithmoduleid(tenantid,moduleid int) []Promotion {
+	print("st1")
+	stmt, err := database.Db.Prepare(Getpromotionwithmodule)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(tenantid,moduleid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	var promolist []Promotion
+
+	for rows.Next() {
+		var promo Promotion
+		err := rows.Scan(&promo.Promotionid, &promo.Promotiontypeid, &promo.Tenantid,&promo.Moduleid, &promo.Promoname, &promo.Promocode, &promo.Promoterms, &promo.Promovalue,
 			&promo.Startdate, &promo.Enddate, &promo.Broadcaststatus, &promo.Success, &promo.Failure, &promo.Status, &promo.Promotype, &promo.Promotag, &promo.Tenantname)
 		if err != nil {
 			log.Fatal(err)
@@ -1137,7 +1168,7 @@ func (p *Promotion) Createpromotion(created int) int64 {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(&p.Promotiontypeid, &p.Tenantid, &p.Promoname, &p.Promocode, &p.Promoterms,
+	res, err := statement.Exec(&p.Promotiontypeid, &p.Tenantid,&p.Moduleid, &p.Promoname, &p.Promocode, &p.Promoterms,
 		&p.Promovalue, &p.Startdate, &p.Enddate, created)
 	if err != nil {
 		log.Fatal(err)
@@ -1979,7 +2010,9 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 	}
 
 	defer client.Close()
-	result := strings.Split(t.Name, "")
+	lowercase :=strings.ToLower(t.Name)
+	print("lowercaase==",lowercase)
+	result := strings.Split(lowercase, "")
 	output := make([]string, len(result))
 	
 	var lastitem string
@@ -2018,7 +2051,9 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 		log.Fatal("failed to insert in  firestore %v", err1)
 		return err1
 	}
-	result1 := strings.Split(t.Name, "")
+	lowercase1 :=strings.ToLower(t.Name)
+	print("lowercaase==",lowercase1)
+	result1 := strings.Split(lowercase1, "")
 	output1 := make([]string, len(result1))
 	
 	var lastitem1 string
@@ -2086,8 +2121,9 @@ func (l *Location) Firestorecreatelocation(locationid int64) error {
 	}
 
 	defer client.Close()
-
-	result := strings.Split(l.LocationName, "")
+	lowercase :=strings.ToLower(l.LocationName)
+	print("lowercaase==",lowercase)
+	result := strings.Split(lowercase, "")
 	output := make([]string, len(result))
 	
 	var lastitem string
@@ -2158,7 +2194,9 @@ func (p *Location) Firestorelocationupdate(locationid int) error {
 	}
 
 	defer client.Close()
-	result := strings.Split(p.LocationName, "")
+	lowercase :=strings.ToLower(p.LocationName)
+	print("lowercaase==",lowercase)
+	result := strings.Split(lowercase, "")
 	output := make([]string, len(result))
 	
 	var lastitem string

@@ -68,6 +68,7 @@ type Promotion struct {
 	Promotiontypeid int     `json:"Promotiontypeid"`
 	Promotionname   string  `json:"Promotionname"`
 	Tenantid        int     `json:"Tenantid"`
+	Moduleid        int     `json:"Moduleid"`
 	Tenantame       string  `json:"Tenantame"`
 	Promocode       string  `json:"Promocode"`
 	Promoterms      string  `json:"Promoterms"`
@@ -548,6 +549,7 @@ type Promoinput struct {
 	Promotiontypeid int     `json:"Promotiontypeid"`
 	Promotionname   *string `json:"Promotionname"`
 	Tenantid        int     `json:"Tenantid"`
+	Moduleid        int     `json:"Moduleid"`
 	Promocode       *string `json:"Promocode"`
 	Promoterms      *string `json:"Promoterms"`
 	Promovalue      *string `json:"Promovalue"`

@@ -126,6 +126,7 @@ type ComplexityRoot struct {
 		Broadstatus     func(childComplexity int) int
 		Enddate         func(childComplexity int) int
 		Failure         func(childComplexity int) int
+		Moduleid        func(childComplexity int) int
 		Promocode       func(childComplexity int) int
 		Promotag        func(childComplexity int) int
 		Promoterms      func(childComplexity int) int
@@ -150,7 +151,7 @@ type ComplexityRoot struct {
 		Getnonsubscribed         func(childComplexity int, tenantid int) int
 		Getnonsubscribedcategory func(childComplexity int, tenantid int) int
 		Getpayments              func(childComplexity int, tenantid int, typeid int) int
-		Getpromotions            func(childComplexity int, tenantid int) int
+		Getpromotions            func(childComplexity int, tenantid int, moduleid int) int
 		Getpromotypes            func(childComplexity int) int
 		Getsubcategorybyid       func(childComplexity int, categoryid int) int
 		Getsubscriptions         func(childComplexity int, tenantid int) int
@@ -653,7 +654,7 @@ type QueryResolver interface {
 	Location(ctx context.Context, tenantid int) (*model.Getalllocations, error)
 	Tenantusers(ctx context.Context, tenantid int, userid int) (*model.Usersdata, error)
 	GetBusiness(ctx context.Context, tenantid int, categoryid int) (*model.GetBusinessdata, error)
-	Getpromotions(ctx context.Context, tenantid int) (*model.Getpromotiondata, error)
+	Getpromotions(ctx context.Context, tenantid int, moduleid int) (*model.Getpromotiondata, error)
 	Getpromotypes(ctx context.Context) (*model.Promotypesdata, error)
 	Getchargetypes(ctx context.Context) (*model.Chargetypedata, error)
 	Getlocationbyid(ctx context.Context, tenantid int, locationid int) (*model.Locationbyiddata, error)
@@ -1185,6 +1186,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Promotion.Failure(childComplexity), true
 
+	case "Promotion.Moduleid":
+		if e.complexity.Promotion.Moduleid == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Moduleid(childComplexity), true
+
 	case "Promotion.Promocode":
 		if e.complexity.Promotion.Promocode == nil {
 			break
@@ -1377,7 +1385,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Getpromotions(childComplexity, args["tenantid"].(int)), true
+		return e.complexity.Query.Getpromotions(childComplexity, args["tenantid"].(int), args["moduleid"].(int)), true
 
 	case "Query.getpromotypes":
 		if e.complexity.Query.Getpromotypes == nil {
@@ -4385,6 +4393,7 @@ type Promotion {
  Promotiontypeid:Int!
  Promotionname: String!
  Tenantid:Int!
+  Moduleid:Int!
  Tenantame: String!
  Promocode:String!
  Promoterms:String!
@@ -4414,6 +4423,7 @@ input promoinput{
  Promotiontypeid:Int!
  Promotionname: String
  Tenantid:Int!  
+ Moduleid:Int!
  Promocode:String
  Promoterms:String
  Promovalue:String
@@ -4639,7 +4649,7 @@ type Query {
  location(tenantid:Int!):getalllocations
  tenantusers(tenantid:Int!,userid:Int!):usersdata
  getBusiness(tenantid:Int!,categoryid:Int!):getBusinessdata
- getpromotions(tenantid:Int!):getpromotiondata
+ getpromotions(tenantid:Int!,moduleid:Int!):getpromotiondata
  getpromotypes:promotypesdata
  getchargetypes:chargetypedata
  getlocationbyid(tenantid:Int!,locationid:Int!):locationbyiddata
@@ -5080,6 +5090,15 @@ func (ec *executionContext) field_Query_getpromotions_args(ctx context.Context, 
 		}
 	}
 	args["tenantid"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["moduleid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("moduleid"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["moduleid"] = arg1
 	return args, nil
 }
 
@@ -7468,6 +7487,41 @@ func (ec *executionContext) _Promotion_Tenantid(ctx context.Context, field graph
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Promotion_Moduleid(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Promotion",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Moduleid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Promotion_Tenantame(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8062,7 +8116,7 @@ func (ec *executionContext) _Query_getpromotions(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Getpromotions(rctx, args["tenantid"].(int))
+		return ec.resolvers.Query().Getpromotions(rctx, args["tenantid"].(int), args["moduleid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -22083,6 +22137,14 @@ func (ec *executionContext) unmarshalInputpromoinput(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "Moduleid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Moduleid"))
+			it.Moduleid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "Promocode":
 			var err error
 
@@ -23648,6 +23710,11 @@ func (ec *executionContext) _Promotion(ctx context.Context, sel ast.SelectionSet
 			}
 		case "Tenantid":
 			out.Values[i] = ec._Promotion_Tenantid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Moduleid":
+			out.Values[i] = ec._Promotion_Moduleid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

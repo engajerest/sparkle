@@ -579,6 +579,7 @@ type Promotion {
  Promotiontypeid:Int!
  Promotionname: String!
  Tenantid:Int!
+  Moduleid:Int!
  Tenantame: String!
  Promocode:String!
  Promoterms:String!
@@ -608,6 +609,7 @@ input promoinput{
  Promotiontypeid:Int!
  Promotionname: String
  Tenantid:Int!  
+ Moduleid:Int!
  Promocode:String
  Promoterms:String
  Promovalue:String
@@ -833,7 +835,7 @@ type Query {
  location(tenantid:Int!):getalllocations
  tenantusers(tenantid:Int!,userid:Int!):usersdata
  getBusiness(tenantid:Int!,categoryid:Int!):getBusinessdata
- getpromotions(tenantid:Int!):getpromotiondata
+ getpromotions(tenantid:Int!,moduleid:Int!):getpromotiondata
  getpromotypes:promotypesdata
  getchargetypes:chargetypedata
  getlocationbyid(tenantid:Int!,locationid:Int!):locationbyiddata
