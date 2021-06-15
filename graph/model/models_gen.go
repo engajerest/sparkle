@@ -69,7 +69,7 @@ type Promotion struct {
 	Promotionname   string  `json:"Promotionname"`
 	Tenantid        int     `json:"Tenantid"`
 	Moduleid        int     `json:"Moduleid"`
-	Tenantame       string  `json:"Tenantame"`
+	Tenantname      string  `json:"Tenantname"`
 	Promocode       string  `json:"Promocode"`
 	Promoterms      string  `json:"Promoterms"`
 	Promovalue      string  `json:"Promovalue"`

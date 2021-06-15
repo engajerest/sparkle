@@ -1116,15 +1116,15 @@ func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int, modulei
 	print(id.ID)
 	var promo []*model.Promotion
 	var promotionGetAll []subscription.Promotion
-	if moduleid !=0{
-		promotionGetAll = subscription.GetAllPromotionswithmoduleid(tenantid,moduleid)
-	}else{
+	if moduleid != 0 {
+		promotionGetAll = subscription.GetAllPromotionswithmoduleid(tenantid, moduleid)
+	} else {
 		promotionGetAll = subscription.GetAllPromotions(tenantid)
 	}
 
 	for _, p := range promotionGetAll {
 		promo = append(promo, &model.Promotion{
-			PromotionID: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: p.Promoname, Tenantid: p.Tenantid, Tenantame: p.Tenantname, Promocode: p.Promocode,
+			PromotionID: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: p.Promoname, Tenantid: p.Tenantid, Tenantname:  p.Tenantname, Promocode: p.Promocode,
 			Moduleid: p.Moduleid, Broadstatus: p.Broadcaststatus, Success: p.Success, Failure: p.Failure, Promoterms: p.Promoterms, Promovalue: p.Promovalue, Promotag: p.Promotag, Promotype: p.Promotype, Startdate: p.Startdate, Enddate: p.Enddate, Status: &p.Status,
 		})
 	}

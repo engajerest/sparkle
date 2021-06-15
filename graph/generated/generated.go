@@ -138,8 +138,8 @@ type ComplexityRoot struct {
 		Startdate       func(childComplexity int) int
 		Status          func(childComplexity int) int
 		Success         func(childComplexity int) int
-		Tenantame       func(childComplexity int) int
 		Tenantid        func(childComplexity int) int
+		Tenantname      func(childComplexity int) int
 	}
 
 	Query struct {
@@ -1270,19 +1270,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Promotion.Success(childComplexity), true
 
-	case "Promotion.Tenantame":
-		if e.complexity.Promotion.Tenantame == nil {
-			break
-		}
-
-		return e.complexity.Promotion.Tenantame(childComplexity), true
-
 	case "Promotion.Tenantid":
 		if e.complexity.Promotion.Tenantid == nil {
 			break
 		}
 
 		return e.complexity.Promotion.Tenantid(childComplexity), true
+
+	case "Promotion.Tenantname":
+		if e.complexity.Promotion.Tenantname == nil {
+			break
+		}
+
+		return e.complexity.Promotion.Tenantname(childComplexity), true
 
 	case "Query.getBusiness":
 		if e.complexity.Query.GetBusiness == nil {
@@ -4394,7 +4394,7 @@ type Promotion {
  Promotionname: String!
  Tenantid:Int!
   Moduleid:Int!
- Tenantame: String!
+ Tenantname: String!
  Promocode:String!
  Promoterms:String!
  Promovalue:String!
@@ -7522,7 +7522,7 @@ func (ec *executionContext) _Promotion_Moduleid(ctx context.Context, field graph
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Promotion_Tenantame(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
+func (ec *executionContext) _Promotion_Tenantname(ctx context.Context, field graphql.CollectedField, obj *model.Promotion) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -7540,7 +7540,7 @@ func (ec *executionContext) _Promotion_Tenantame(ctx context.Context, field grap
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Tenantame, nil
+		return obj.Tenantname, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -23718,8 +23718,8 @@ func (ec *executionContext) _Promotion(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Tenantame":
-			out.Values[i] = ec._Promotion_Tenantame(ctx, field, obj)
+		case "Tenantname":
+			out.Values[i] = ec._Promotion_Tenantname(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

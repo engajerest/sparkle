@@ -580,7 +580,7 @@ type Promotion {
  Promotionname: String!
  Tenantid:Int!
   Moduleid:Int!
- Tenantame: String!
+ Tenantname: String!
  Promocode:String!
  Promoterms:String!
  Promovalue:String!
