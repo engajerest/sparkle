@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -54,7 +55,7 @@ const (
 	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile ,IFNULL(dailcode,'') AS dailcode, IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
 	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
 	Getpromotions                  = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.moduleid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,IFNULL(a.broadcaststatus,0) as broadcaststatus,IFNULL(a.success,0) as success,IFNULL(a.failure,0) as failure,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
-	Getpromotionwithmodule                 = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.moduleid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,IFNULL(a.broadcaststatus,0) as broadcaststatus,IFNULL(a.success,0) as success,IFNULL(a.failure,0) as failure,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=? AND moduleid=?"
+	Getpromotionwithmodule         = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.moduleid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,IFNULL(a.broadcaststatus,0) as broadcaststatus,IFNULL(a.success,0) as success,IFNULL(a.failure,0) as failure,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=? AND moduleid=?"
 	createpromotion                = "INSERT INTO promotions (promotiontypeid,tenantid,moduleid,promoname,promocode,promoterms,promovalue,startdate,enddate,createdby) VALUES(?,?,?,?,?,?,?,?,?,?)"
 	insertsequence                 = "INSERT INTO ordersequence (tenantid,sequencename,seqno,prefix,subprefix) VALUES(?,?,?,?,?)"
 	insertcharge                   = "INSERT INTO tenantcharges (tenantid,locationid,chargeid,chargename,chargetype,chargevalue,createdby) VALUES"
@@ -77,9 +78,9 @@ const (
 	getpromo                       = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active' AND moduleid=?"
 	insertsubcategory              = "INSERT INTO tenantsubcategories (tenantid,moduleid,categoryid,subcategoryid,subcategoryname) VALUES(?,?,?,?,?)"
 	createUsernopassword           = "INSERT INTO app_users (authname,contactno,roleid,configid,referenceid) VALUES(?,?,?,?,?)"
-    unsubscribe = "UPDATE tenantsubscription SET categoryid=0, status='Inactive' WHERE subscriptionid=?"
-	deletecategories = "DELETE  FROM tenantsubcategories WHERE tenantid=? AND moduleid=?"
-	deletesubcatbyid = "DELETE  FROM tenantsubcategories WHERE tenantsubcatid=?"
+	unsubscribe                    = "UPDATE tenantsubscription SET categoryid=0, status='Inactive' WHERE subscriptionid=?"
+	deletecategories               = "DELETE  FROM tenantsubcategories WHERE tenantid=? AND moduleid=?"
+	deletesubcatbyid               = "DELETE  FROM tenantsubcategories WHERE tenantsubcatid=?"
 	//firestore
 	firestorejsonkey = "./engaje-2021-firebase-adminsdk-7sb61-42247472ad.json"
 )
@@ -161,7 +162,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 			a.Promovalue = datalist[i].Promovalue
 			a.Validitydate = datalist[i].Validitydate
 			a.Promostatus = true
-			a.Taxpercent=datalist[i].Taxpercent
+			a.Taxpercent = datalist[i].Taxpercent
 
 			{
 				print("entry in subscription")
@@ -174,7 +175,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 				if _, err := stmt.Exec(tenantid, &a.Date, &a.Packageid, &a.Partnerid, &a.Moduleid, &a.Featureid,
 					&a.Categoryid, &a.SubCategoryid,
 					&a.Currencyid, &a.Price, &a.Quantity, &a.TaxId, &a.TaxAmount,
-					&a.Taxpercent,	&a.TotalAmount, &a.PaymentStatus, &a.PaymentId, &a.Promoid,
+					&a.Taxpercent, &a.TotalAmount, &a.PaymentStatus, &a.PaymentId, &a.Promoid,
 					&a.Promovalue, &a.Promostatus, &a.Validitydate); err != nil {
 					tx.Rollback() // return an error too, we may want to wrap them
 					return false, nil, err
@@ -391,7 +392,7 @@ func (info *TenantSubscription) InsertSubscription(tenantid int64) int64 {
 	}
 	defer statement.Close()
 	res, err := statement.Exec(tenantid, &info.Date, &info.Packageid, &info.Partnerid, &info.Moduleid, &info.Featureid, &info.Categoryid, &info.SubCategoryid, &info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
-	&info.Taxpercent,	&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate)
+		&info.Taxpercent, &info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -414,7 +415,7 @@ func (info *TenantSubscription) Updatesubscription() (bool, error) {
 	}
 	defer statement.Close()
 	_, err = statement.Exec(&info.Date, &info.Featureid, &info.Partnerid, &info.Currencyid, &info.Price, &info.Quantity, &info.TaxId, &info.TaxAmount,
-	&info.Taxpercent,	&info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate, &info.Subscriptionid)
+		&info.Taxpercent, &info.TotalAmount, &info.PaymentStatus, &info.PaymentId, &info.Promoid, &info.Promovalue, &info.Promostatus, &info.Validitydate, &info.Subscriptionid)
 	if err != nil {
 		log.Fatal(err)
 		return false, err
@@ -440,7 +441,7 @@ func (info *SubscribedData) GetSubscribedData(tenantid int64) []SubscribedData {
 
 	for rows.Next() {
 		var p SubscribedData
-		err := rows.Scan(&p.TenantID, &p.TenantName, &p.Tenantaccid, &p.ModuleID, &p.Featureid, &p.Subscriptionid, &p.Categoryid, &p.Subcategoryid, &p.Taxamount,&p.Taxpercent, &p.Totalamount,&p.Status, &p.ModuleName, &p.Locationid, &p.Locationname)
+		err := rows.Scan(&p.TenantID, &p.TenantName, &p.Tenantaccid, &p.ModuleID, &p.Featureid, &p.Subscriptionid, &p.Categoryid, &p.Subcategoryid, &p.Taxamount, &p.Taxpercent, &p.Totalamount, &p.Status, &p.ModuleName, &p.Locationid, &p.Locationname)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -950,6 +951,8 @@ func (info *AuthUser) UpdateAuthUser(userid int) bool {
 func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) {
 
 	var data BusinessUpdate
+	
+
 	stmt, err := database.Db.Prepare(getBusinessbyid)
 	if err != nil {
 		log.Fatal(err)
@@ -958,7 +961,7 @@ func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) 
 	row := stmt.QueryRow(id)
 	// print(row)
 	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1, &data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone, &data.Tenanttoken, &data.Tenantimage,
-		&data.Countrycode, &data.Currencycode, &data.Currencysymbol,&data.Tenantpaymentid)
+		&data.Countrycode, &data.Currencycode, &data.Currencysymbol, &data.Tenantpaymentid)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -986,7 +989,7 @@ func (business *BusinessUpdate) GetBusinessforassist(id, catid int) (*BusinessUp
 	// print(row)
 	err = row.Scan(&data.TenantID, &data.Brandname, &data.About, &data.Paymode1,
 		&data.Paymode2, &data.TenantaccId, &data.Address, &data.Email, &data.Phone,
-		&data.Tenanttoken, &data.Tenantimage, &data.Countrycode, &data.Currencycode, &data.Currencysymbol, &data.Tenantpaymentid,&data.Moduleid, &data.Modulename)
+		&data.Tenanttoken, &data.Tenantimage, &data.Countrycode, &data.Currencycode, &data.Currencysymbol, &data.Tenantpaymentid, &data.Moduleid, &data.Modulename)
 	print(err)
 	fmt.Println("2")
 	if err != nil {
@@ -1116,7 +1119,7 @@ func GetAllPromotions(tenantid int) []Promotion {
 
 	for rows.Next() {
 		var promo Promotion
-		err := rows.Scan(&promo.Promotionid, &promo.Promotiontypeid, &promo.Tenantid,&promo.Moduleid, &promo.Promoname, &promo.Promocode, &promo.Promoterms, &promo.Promovalue,
+		err := rows.Scan(&promo.Promotionid, &promo.Promotiontypeid, &promo.Tenantid, &promo.Moduleid, &promo.Promoname, &promo.Promocode, &promo.Promoterms, &promo.Promovalue,
 			&promo.Startdate, &promo.Enddate, &promo.Broadcaststatus, &promo.Success, &promo.Failure, &promo.Status, &promo.Promotype, &promo.Promotag, &promo.Tenantname)
 		if err != nil {
 			log.Fatal(err)
@@ -1130,14 +1133,14 @@ func GetAllPromotions(tenantid int) []Promotion {
 	return promolist
 
 }
-func GetAllPromotionswithmoduleid(tenantid,moduleid int) []Promotion {
+func GetAllPromotionswithmoduleid(tenantid, moduleid int) []Promotion {
 	print("st1")
 	stmt, err := database.Db.Prepare(Getpromotionwithmodule)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer stmt.Close()
-	rows, err := stmt.Query(tenantid,moduleid)
+	rows, err := stmt.Query(tenantid, moduleid)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1146,7 +1149,7 @@ func GetAllPromotionswithmoduleid(tenantid,moduleid int) []Promotion {
 
 	for rows.Next() {
 		var promo Promotion
-		err := rows.Scan(&promo.Promotionid, &promo.Promotiontypeid, &promo.Tenantid,&promo.Moduleid, &promo.Promoname, &promo.Promocode, &promo.Promoterms, &promo.Promovalue,
+		err := rows.Scan(&promo.Promotionid, &promo.Promotiontypeid, &promo.Tenantid, &promo.Moduleid, &promo.Promoname, &promo.Promocode, &promo.Promoterms, &promo.Promovalue,
 			&promo.Startdate, &promo.Enddate, &promo.Broadcaststatus, &promo.Success, &promo.Failure, &promo.Status, &promo.Promotype, &promo.Promotag, &promo.Tenantname)
 		if err != nil {
 			log.Fatal(err)
@@ -1168,7 +1171,7 @@ func (p *Promotion) Createpromotion(created int) int64 {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(&p.Promotiontypeid, &p.Tenantid,&p.Moduleid, &p.Promoname, &p.Promocode, &p.Promoterms,
+	res, err := statement.Exec(&p.Promotiontypeid, &p.Tenantid, &p.Moduleid, &p.Promoname, &p.Promocode, &p.Promoterms,
 		&p.Promovalue, &p.Startdate, &p.Enddate, created)
 	if err != nil {
 		log.Fatal(err)
@@ -1351,8 +1354,7 @@ func Gettenantsubcat(moduleid, tenantid, categoryid int) []*model.Tenantsubcat {
 	var data []*model.Tenantsubcat
 
 	DB.Raw(q1 + q2 + q3).Find(&data)
-print(q1+q2+q3)
-
+	print(q1 + q2 + q3)
 
 	return data
 
@@ -1627,26 +1629,26 @@ func (u *Updatestatus) Updatelocationstatus() bool {
 	log.Print("Row updated in tenant location!")
 	return true
 }
-func  Unsubscribe(id int) (bool,error) {
+func Unsubscribe(id int) (bool, error) {
 
 	statement, err := database.Db.Prepare(unsubscribe)
 	print(statement)
 
 	if err != nil {
-	
-		return false,err
-		
+
+		return false, err
+
 	}
 	defer statement.Close()
 	_, err1 := statement.Exec(id)
 	if err1 != nil {
-		
-		return false,err1
-		
+
+		return false, err1
+
 	}
 
 	log.Print("Row updated in tenant subscription!")
-	return true,nil
+	return true, nil
 }
 func (u *Updatestatus) Updatedeliverystatus() bool {
 	statement, err := database.Db.Prepare(updatedeliverystatus)
@@ -1680,7 +1682,7 @@ func GetAllSubscription(tenantid int) []Subscribe {
 
 	for rows.Next() {
 		var s Subscribe
-		err := rows.Scan(&s.Subscriptionid, &s.Packageid, &s.Moduleid, &s.Featureid, &s.Tenantid, &s.Categoryid, &s.Subcategoryid, &s.Validitydate, &s.Validity, &s.Totalamount,&s.Taxpercent, &s.Taxamount, &s.Subscriptionaccid, &s.Subscriptionmethodid, &s.Paymentstatus,&s.Status, &s.Modulename, &s.Logourl, &s.Iconurl, &s.Packagename,
+		err := rows.Scan(&s.Subscriptionid, &s.Packageid, &s.Moduleid, &s.Featureid, &s.Tenantid, &s.Categoryid, &s.Subcategoryid, &s.Validitydate, &s.Validity, &s.Totalamount, &s.Taxpercent, &s.Taxamount, &s.Subscriptionaccid, &s.Subscriptionmethodid, &s.Paymentstatus, &s.Status, &s.Modulename, &s.Logourl, &s.Iconurl, &s.Packagename,
 			&s.PackageAmount, &s.PackageIcon, &s.Tenantaccid, &s.Locationcount, &s.Customercount)
 		if err != nil {
 			log.Fatal(err)
@@ -1778,44 +1780,42 @@ func (d *TenantSubscription) Insertsubcategory() (int64, error) {
 	log.Print("Row inserted in subcat!")
 	return id, nil
 }
-func  Deletesubcat(tenantid,moduleid int) (bool,error) {
+func Deletesubcat(tenantid, moduleid int) (bool, error) {
 
 	statement, err := database.Db.Prepare(deletecategories)
-	
 
 	if err != nil {
-	
-		return false,err
+
+		return false, err
 	}
 
-	_, err1 := statement.Exec(tenantid,moduleid)
+	_, err1 := statement.Exec(tenantid, moduleid)
 	if err1 != nil {
-		
-		return false,err1
+
+		return false, err1
 	}
 
 	log.Print("Row deleted in subcategories!")
-	return true,nil
+	return true, nil
 
 }
-func  Deletesubcatbyid(tenantsubcatid int) (bool,error) {
+func Deletesubcatbyid(tenantsubcatid int) (bool, error) {
 
 	statement, err := database.Db.Prepare(deletesubcatbyid)
-	
 
 	if err != nil {
-	
-		return false,err
+
+		return false, err
 	}
 
 	_, err1 := statement.Exec(tenantsubcatid)
 	if err1 != nil {
-		
-		return false,err1
+
+		return false, err1
 	}
 
 	log.Print("Row deleted in subcategories by id!")
-	return true,nil
+	return true, nil
 
 }
 func Gettenantinfo(tenantid int) Tenants {
@@ -1902,6 +1902,7 @@ func Checkfordeletestaffdata(tenantstaffid int) (int, error) {
 	fmt.Println("enrty in staffs")
 
 	stmt, err := database.Db.Prepare(checkfordeletestaff)
+	
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1983,7 +1984,7 @@ func (s *TenantUser) TenantstaffCreation(data []int) (bool, error) {
 }
 
 //firestore
-func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int64, moduleid,catid int) error {
+func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int64, moduleid, catid int) error {
 	print("st1 firestore")
 	n1 := int64(tenantid)
 	id := strconv.FormatInt(n1, 10)
@@ -1991,7 +1992,17 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 	loc := strconv.FormatInt(n2, 10)
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
-
+    connection := os.Getenv("firestore")
+	print("connect=",connection)
+	var tenant string
+	var location string
+	if connection=="firestoredev"{
+		tenant="tenantsdev"
+		location="locationsdev"
+	}else{
+		tenant="tenants"
+		location="locations"
+	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
 	if err != nil {
@@ -2010,64 +2021,65 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 	}
 
 	defer client.Close()
-	lowercase :=strings.ToLower(t.Name)
-	print("lowercaase==",lowercase)
+	lowercase := strings.ToLower(t.Name)
+	print("lowercaase==", lowercase)
 	result := strings.Split(lowercase, "")
 	output := make([]string, len(result))
-	
+
 	var lastitem string
-    for i := range(result) {
-        // Get letter and display it.
-        letter := lastitem+result[i]
-		
+	for i := range result {
+		// Get letter and display it.
+		letter := lastitem + result[i]
+
 		output = append(output, letter)
-        fmt.Println(letter)
+		fmt.Println(letter)
 		lastitem = output[len(output)-1]
 		fmt.Printf("lastitem: %v\n", lastitem)
-    }
+	}
 	fmt.Println(output)
+	
 
-	_, err1 := client.Collection("tenants").Doc(id).Set(ctx, map[string]interface{}{
-		"tenantid":   tenantid,
-		"moduleid":   moduleid,
-		"locationid": locationid,
-		"tenantname": &t.Name,
-		"email":      &t.Email,
-		"contactno":  &t.Mobile,
-		"address":    &t.Address,
-		"suburb":     &t.Suburb,
-		"city":       &t.City,
-		"state":      &t.State,
-		"postcode":   &t.Zip,
-		"latitude":   &t.Latitude,
-		"longitude":  &t.Longitude,
-		"status":     "Active",
-		"categoryid":catid,
-		"tenantimage":"",
-		"searchindex":output,
+	_, err1 := client.Collection(tenant).Doc(id).Set(ctx, map[string]interface{}{
+		"tenantid":    tenantid,
+		"moduleid":    moduleid,
+		"locationid":  locationid,
+		"tenantname":  &t.Name,
+		"email":       &t.Email,
+		"contactno":   &t.Mobile,
+		"address":     &t.Address,
+		"suburb":      &t.Suburb,
+		"city":        &t.City,
+		"state":       &t.State,
+		"postcode":    &t.Zip,
+		"latitude":    &t.Latitude,
+		"longitude":   &t.Longitude,
+		"status":      "Active",
+		"categoryid":  catid,
+		"tenantimage": "",
+		"searchindex": output,
 	})
 	if err1 != nil {
 
 		log.Fatal("failed to insert in  firestore %v", err1)
 		return err1
 	}
-	lowercase1 :=strings.ToLower(t.Name)
-	print("lowercaase==",lowercase1)
+	lowercase1 := strings.ToLower(t.Name)
+	print("lowercaase==", lowercase1)
 	result1 := strings.Split(lowercase1, "")
 	output1 := make([]string, len(result1))
-	
+
 	var lastitem1 string
-    for i := range(result1) {
-        // Get letter and display it.
-        letter1 := lastitem1+result1[i]
-		
+	for i := range result1 {
+		// Get letter and display it.
+		letter1 := lastitem1 + result1[i]
+
 		output1 = append(output1, letter1)
-        fmt.Println(letter1)
+		fmt.Println(letter1)
 		lastitem1 = output1[len(output1)-1]
 		fmt.Printf("lastitem: %v\n", lastitem1)
-    }
+	}
 	fmt.Println(output1)
-	_, err2 := client.Collection("locations").Doc(loc).Set(ctx, map[string]interface{}{
+	_, err2 := client.Collection(location).Doc(loc).Set(ctx, map[string]interface{}{
 		"locationid":   locationid,
 		"tenantid":     tenantid,
 		"locationname": &t.Name,
@@ -2081,12 +2093,11 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 		"latitude":     &t.Latitude,
 		"longitude":    &t.Longitude,
 		"status":       "Active",
-		"opentime":&t.OpenTime,
-		"closetime":&t.CloseTime,
-		"delivery":false,
-		"deliverymins":30,
-		"searchindex":output1,
-		
+		"opentime":     &t.OpenTime,
+		"closetime":    &t.CloseTime,
+		"delivery":     false,
+		"deliverymins": 30,
+		"searchindex":  output1,
 	})
 	if err2 != nil {
 
@@ -2102,7 +2113,17 @@ func (l *Location) Firestorecreatelocation(locationid int64) error {
 	loc := strconv.FormatInt(n2, 10)
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
-
+	connection := os.Getenv("firestore")
+	print("connect=",connection)
+	
+	var location string
+	if connection=="firestoredev"{
+		
+		location="locationsdev"
+	}else{
+		
+		location="locations"
+	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
 	if err != nil {
@@ -2121,25 +2142,24 @@ func (l *Location) Firestorecreatelocation(locationid int64) error {
 	}
 
 	defer client.Close()
-	lowercase :=strings.ToLower(l.LocationName)
-	print("lowercaase==",lowercase)
+	lowercase := strings.ToLower(l.LocationName)
+	print("lowercaase==", lowercase)
 	result := strings.Split(lowercase, "")
 	output := make([]string, len(result))
-	
+
 	var lastitem string
-    for i := range(result) {
-        // Get letter and display it.
-        letter := lastitem+result[i]
-		
+	for i := range result {
+		// Get letter and display it.
+		letter := lastitem + result[i]
+
 		output = append(output, letter)
-        fmt.Println(letter)
+		fmt.Println(letter)
 		lastitem = output[len(output)-1]
 		fmt.Printf("lastitem: %v\n", lastitem)
-    }
+	}
 	fmt.Println(output)
 
-	
-	_, err2 := client.Collection("locations").Doc(loc).Set(ctx, map[string]interface{}{
+	_, err2 := client.Collection(location).Doc(loc).Set(ctx, map[string]interface{}{
 		"locationid":   locationid,
 		"tenantid":     &l.TenantID,
 		"locationname": &l.LocationName,
@@ -2153,12 +2173,11 @@ func (l *Location) Firestorecreatelocation(locationid int64) error {
 		"latitude":     &l.Latitude,
 		"longitude":    &l.Longitude,
 		"status":       "Active",
-		"opentime":&l.OpeningTime,
-		"closetime":&l.ClosingTime,
-		"delivery":&l.Delivery,
-		"deliverymins":&l.Deliverymins,
-		"searchindex":output,
-		
+		"opentime":     &l.OpeningTime,
+		"closetime":    &l.ClosingTime,
+		"delivery":     &l.Delivery,
+		"deliverymins": &l.Deliverymins,
+		"searchindex":  output,
 	})
 	if err2 != nil {
 
@@ -2175,7 +2194,17 @@ func (p *Location) Firestorelocationupdate(locationid int) error {
 	id := strconv.FormatInt(n1, 10)
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
+	connection := os.Getenv("firestore")
+	print("connect=",connection)
 
+	var location string
+	if connection=="firestoredev"{
+		
+		location="locationsdev"
+	}else{
+		
+		location="locations"
+	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
 	if err != nil {
@@ -2194,23 +2223,23 @@ func (p *Location) Firestorelocationupdate(locationid int) error {
 	}
 
 	defer client.Close()
-	lowercase :=strings.ToLower(p.LocationName)
-	print("lowercaase==",lowercase)
+	lowercase := strings.ToLower(p.LocationName)
+	print("lowercaase==", lowercase)
 	result := strings.Split(lowercase, "")
 	output := make([]string, len(result))
-	
+
 	var lastitem string
-    for i := range(result) {
-        // Get letter and display it.
-        letter := lastitem+result[i]
-		
+	for i := range result {
+		// Get letter and display it.
+		letter := lastitem + result[i]
+
 		output = append(output, letter)
-        fmt.Println(letter)
+		fmt.Println(letter)
 		lastitem = output[len(output)-1]
 		fmt.Printf("lastitem: %v\n", lastitem)
-    }
+	}
 	fmt.Println(output)
-	ca := client.Collection("locations").Doc(id)
+	ca := client.Collection(location).Doc(id)
 
 	_, err = ca.Update(context.Background(), []firestore.Update{
 		{
@@ -2271,7 +2300,17 @@ func (p *Updatestatus) Firestoreupdatelocationstatus(locationid int) error {
 	id := strconv.FormatInt(n1, 10)
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
-
+	connection := os.Getenv("firestore")
+	print("connect=",connection)
+	
+	var location string
+	if connection=="firestoredev"{
+		
+		location="locationsdev"
+	}else{
+		
+		location="locations"
+	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
 	if err != nil {
@@ -2291,13 +2330,12 @@ func (p *Updatestatus) Firestoreupdatelocationstatus(locationid int) error {
 
 	defer client.Close()
 
-	ca := client.Collection("locations").Doc(id)
+	ca := client.Collection(location).Doc(id)
 
 	_, err = ca.Update(context.Background(), []firestore.Update{
 		{
 			Path: "status", Value: &p.Locationstatus,
 		},
-
 	})
 	if err != nil {
 		return err
@@ -2312,7 +2350,17 @@ func (p *BusinessUpdate) Firestoreupdatetenant(tenantid int) error {
 	id := strconv.FormatInt(n1, 10)
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
+	connection := os.Getenv("firestore")
+	print("connect=",connection)
+	var tenant string
 
+	if connection=="firestoredev"{
+		tenant="tenantsdev"
+		
+	}else{
+		tenant="tenants"
+		
+	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
 	if err != nil {
@@ -2332,13 +2380,12 @@ func (p *BusinessUpdate) Firestoreupdatetenant(tenantid int) error {
 
 	defer client.Close()
 
-	ca := client.Collection("tenants").Doc(id)
+	ca := client.Collection(tenant).Doc(id)
 
 	_, err = ca.Update(context.Background(), []firestore.Update{
 		{
 			Path: "tenantimage", Value: &p.Tenantimage,
 		},
-
 	})
 	if err != nil {
 		return err

@@ -552,3 +552,10 @@ type TenantUsers struct {
 	Locationname   string `json:"locationname"`
 	Referenceid    int    `json:"referenceid"`
 }
+
+type Firestoreconnection struct{
+	Firestoredb string `json:"firestoredb"`
+	Location string `json:"location"`
+	Tenant string `json:"tenant"`
+	Product string `json:"product"`
+}

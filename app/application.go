@@ -8,7 +8,6 @@ import (
 	"github.com/engajerest/auth/controller"
 	"github.com/engajerest/auth/utils/dbconfig"
 
-	// "github.com/engajerest/sparkle/controllers"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -28,11 +27,12 @@ func StartApplication() {
 	}
 	defaultPort := viper.GetString("APP.PORT")
 	key := viper.GetString("APP.USER_CONTEXT_KEY")
-	print("key====",key)
-	router.Use(controller.TokenNoAuthMiddleware(key))
-	router.Use(Datasource())
-	fmt.Print("Heloo world")
+	print("key====", key)
 	
+	router.Use(Datasource())
+	router.Use(controller.TokenNoAuthMiddleware(key))
+	fmt.Print("Heloo world")
+
 	Mapurls()
 	router.Run(defaultPort)
 
@@ -79,7 +79,7 @@ func Datasource() gin.HandlerFunc {
 			UserContextKey := viper.GetString("DEV.USER_CONTEXT_KEY")
 			fmt.Println("PORT :", defaultPort)
 			fmt.Println("userkey :", UserContextKey)
-
+			os.Setenv("firestore", "firestoredev")
 			dbconfig.InitDB(dbName, userName, password, host)
 			print("db configured for Dev")
 		} else if flavour == "v1" {
@@ -104,7 +104,7 @@ func Datasource() gin.HandlerFunc {
 			UserContextKey := viper.GetString("APP.USER_CONTEXT_KEY")
 			fmt.Println("PORT :", defaultPort)
 			fmt.Println("userkey :", UserContextKey)
-
+			os.Setenv("firestore", "firestorev1")
 			dbconfig.InitDB(dbName, userName, password, host)
 			print("db configured for live")
 		}
