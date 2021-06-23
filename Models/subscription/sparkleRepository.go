@@ -48,11 +48,11 @@ const (
 	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.profileimage=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 	getAllTenantUserByLocationId   = ""
 	updateTenantBusiness           = "UPDATE tenants SET brandname=?,tenantinfo=?,paymode1=?,paymode2=?,tenantimage=? WHERE tenantid=?"
-	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,dailcode,sociallink,socialicon) VALUES"
-	updatesocialinfo               = "UPDATE tenantsocial SET socialprofile=?,dailcode=?, sociallink=?,socialicon=? WHERE tenantid=? AND socialid=? "
+	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,dailcode,sociallink,socialicon,accesstype) VALUES"
+	updatesocialinfo               = "UPDATE tenantsocial SET socialprofile=?,dailcode=?, sociallink=?,socialicon=?,accesstype=? WHERE tenantid=? AND socialid=? "
 	updateauthuser                 = "UPDATE  app_users a,app_userprofiles b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid,IFNULL(address,'') AS address,IFNULL(primaryemail,'') AS primaryemail,IFNULL(primarycontact,'') AS  primarycontact,IFNULL(tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage, IFNULL(countrycode,'') AS countrycode,IFNULL(currencycode,'') AS currencycode,IFNULL(currencysymbol,'') AS currencysymbol,IFNULL(tenantpaymentid,'') AS tenantpaymentid FROM tenants WHERE tenantid=?"
-	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile ,IFNULL(dailcode,'') AS dailcode, IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon FROM tenantsocial WHERE tenantid= ?"
+	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile ,IFNULL(dailcode,'') AS dailcode, IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon,IFNULL(accesstype,false) AS accesstype FROM tenantsocial WHERE tenantid= ?"
 	userAuthentication             = "SELECT a.userid,b.firstname,b.lastname,b.email,b.contactno,b.status,b.created FROM app_users a, app_userprofiles b WHERE a.userid=b.userid AND a.status ='Active' AND a.userid=?"
 	Getpromotions                  = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.moduleid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,IFNULL(a.broadcaststatus,0) as broadcaststatus,IFNULL(a.success,0) as success,IFNULL(a.failure,0) as failure,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=?"
 	Getpromotionwithmodule         = "SELECT a.promotionid,a.promotiontypeid,a.tenantid,a.moduleid,IFNULL(a.promoname,'') AS promoname,IFNULL(a.promocode,'') AS promocode,IFNULL(a.promoterms,'') AS promoterms,a.promovalue,a.startdate,a.enddate,IFNULL(a.broadcaststatus,0) as broadcaststatus,IFNULL(a.success,0) as success,IFNULL(a.failure,0) as failure,a.status,b.typename,b.tag, c.tenantname FROM promotions a, promotiontypes b,tenants c WHERE a.promotiontypeid=b.promotiontypeid AND a.tenantid=c.tenantid AND a.`status`='Active' AND a.tenantid=? AND moduleid=?"
@@ -880,8 +880,8 @@ func (info *BusinessUpdate) InsertTenantSocial(soc []Social, id int) error {
 	var inserts []string
 	var params []interface{}
 	for _, v := range soc {
-		inserts = append(inserts, "(?, ?, ?, ?,?)")
-		params = append(params, id, v.SociaProfile, v.Dailcode, v.SocialLink, v.SocialIcon)
+		inserts = append(inserts, "(?, ?, ?, ?,?,?)")
+		params = append(params, id, v.SociaProfile, v.Dailcode, v.SocialLink, v.SocialIcon,v.Accesstype)
 	}
 	queryVals := strings.Join(inserts, ",")
 	query := insertSocialInfo + queryVals
@@ -919,7 +919,7 @@ func (info *Social) UpdateTenantSocial(tenantid int) bool {
 		return false
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&info.SociaProfile, &info.Dailcode, &info.SocialLink, &info.SocialIcon, tenantid, &info.Socialid)
+	_, err = statement.Exec(&info.SociaProfile, &info.Dailcode, &info.SocialLink, &info.SocialIcon,&info.Accesstype, tenantid, &info.Socialid)
 	if err != nil {
 		log.Fatal(err)
 		return false
@@ -1024,7 +1024,7 @@ func GetAllSocial(id int) []Social {
 			&data.Socialid,
 			&data.SociaProfile, &data.Dailcode,
 			&data.SocialLink,
-			&data.SocialIcon,
+			&data.SocialIcon,&data.Accesstype,
 		)
 		if err != nil {
 			log.Fatal(err)

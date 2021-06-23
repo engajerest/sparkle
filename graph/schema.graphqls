@@ -515,6 +515,7 @@ socialid:Int
  dailcode:String
  sociallink:String
  socialicon:String
+ accesstype:Boolean
 }
 input socialadddata{
 
@@ -522,6 +523,8 @@ input socialadddata{
  dailcode:String
  sociallink:String
  socialicon:String
+accesstype:Boolean
+
 }
 input business{
  businessupdate:businessupdatedata
@@ -573,6 +576,7 @@ socialid:Int!
  dailcode:String!
  sociallink:String!
  socialicon:String!
+ accesstype:Boolean!
 }
 type Promotion {
  PromotionId: Int!

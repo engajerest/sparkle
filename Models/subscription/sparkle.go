@@ -252,6 +252,7 @@ type Social struct {
 	Dailcode     string `json:"dailcode"`
 	SocialLink   string `json:"sociallink"`
 	SocialIcon   string `json:"socialicon"`
+	Accesstype bool `json:"accesstype"`
 }
 type Tenantsocial struct {
 	Socialid     int    `json:"socialid" gorm:"primary_key"`
@@ -259,6 +260,7 @@ type Tenantsocial struct {
 	Sociaprofile string `json:"socialprofile"`
 	Sociallink   string `json:"sociallink"`
 	Socialicon   string `json:"socialicon"`
+	Accesstype bool `json:"accesstype"`
 }
 type Tenantlocation struct {
 	// gorm.Model

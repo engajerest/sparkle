@@ -476,6 +476,7 @@ type ComplexityRoot struct {
 	}
 
 	Socialinfo struct {
+		Accesstype    func(childComplexity int) int
 		Dailcode      func(childComplexity int) int
 		Socialicon    func(childComplexity int) int
 		Socialid      func(childComplexity int) int
@@ -3013,6 +3014,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Result.Status(childComplexity), true
 
+	case "socialinfo.accesstype":
+		if e.complexity.Socialinfo.Accesstype == nil {
+			break
+		}
+
+		return e.complexity.Socialinfo.Accesstype(childComplexity), true
+
 	case "socialinfo.dailcode":
 		if e.complexity.Socialinfo.Dailcode == nil {
 			break
@@ -4329,6 +4337,7 @@ socialid:Int
  dailcode:String
  sociallink:String
  socialicon:String
+ accesstype:Boolean
 }
 input socialadddata{
 
@@ -4336,6 +4345,8 @@ input socialadddata{
  dailcode:String
  sociallink:String
  socialicon:String
+accesstype:Boolean
+
 }
 input business{
  businessupdate:businessupdatedata
@@ -4387,6 +4398,7 @@ socialid:Int!
  dailcode:String!
  sociallink:String!
  socialicon:String!
+ accesstype:Boolean!
 }
 type Promotion {
  PromotionId: Int!
@@ -17490,6 +17502,41 @@ func (ec *executionContext) _socialinfo_socialicon(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _socialinfo_accesstype(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "socialinfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Accesstype, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _staffdetail_Staffdetailid(ctx context.Context, field graphql.CollectedField, obj *model.Staffdetail) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -22229,6 +22276,14 @@ func (ec *executionContext) unmarshalInputsocialadddata(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
+		case "accesstype":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accesstype"))
+			it.Accesstype, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -22278,6 +22333,14 @@ func (ec *executionContext) unmarshalInputsocialupdatedata(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialicon"))
 			it.Socialicon, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "accesstype":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accesstype"))
+			it.Accesstype, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25939,6 +26002,11 @@ func (ec *executionContext) _socialinfo(ctx context.Context, sel ast.SelectionSe
 			}
 		case "socialicon":
 			out.Values[i] = ec._socialinfo_socialicon(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "accesstype":
+			out.Values[i] = ec._socialinfo_accesstype(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

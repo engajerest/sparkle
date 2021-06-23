@@ -581,6 +581,7 @@ type Socialadddata struct {
 	Dailcode      *string `json:"dailcode"`
 	Sociallink    *string `json:"sociallink"`
 	Socialicon    *string `json:"socialicon"`
+	Accesstype    *bool   `json:"accesstype"`
 }
 
 type Socialinfo struct {
@@ -589,6 +590,7 @@ type Socialinfo struct {
 	Dailcode      string `json:"dailcode"`
 	Sociallink    string `json:"sociallink"`
 	Socialicon    string `json:"socialicon"`
+	Accesstype    bool   `json:"accesstype"`
 }
 
 type Socialupdatedata struct {
@@ -597,6 +599,7 @@ type Socialupdatedata struct {
 	Dailcode      *string `json:"dailcode"`
 	Sociallink    *string `json:"sociallink"`
 	Socialicon    *string `json:"socialicon"`
+	Accesstype    *bool   `json:"accesstype"`
 }
 
 type Staffdetail struct {

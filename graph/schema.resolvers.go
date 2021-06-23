@@ -340,14 +340,14 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	socialdelete := *&businessinfo.Socialdelete
 	data1 := data.UpdateTenantBusiness()
 	for _, v := range schemasocialadd {
-		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile, Dailcode: *v.Dailcode, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon})
+		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile, Dailcode: *v.Dailcode, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon,Accesstype: *v.Accesstype})
 	}
 	if len(check) != 0 {
 		social := data.InsertTenantSocial(check, data.TenantID)
 		print(social)
 	}
 	for _, k := range schemasocialupdate {
-		updatedata = append(updatedata, subscription.Social{Socialid: *k.Socialid, SociaProfile: *k.Socialprofile, Dailcode: *k.Dailcode, SocialLink: *k.Sociallink, SocialIcon: *k.Socialicon})
+		updatedata = append(updatedata, subscription.Social{Socialid: *k.Socialid, SociaProfile: *k.Socialprofile, Dailcode: *k.Dailcode, SocialLink: *k.Sociallink, SocialIcon: *k.Socialicon,Accesstype: *k.Accesstype})
 	}
 	if len(updatedata) != 0 {
 		var s subscription.Social
@@ -357,6 +357,7 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 			s.SocialIcon = updatedata[i].SocialIcon
 			s.SocialLink = updatedata[i].SocialLink
 			s.Dailcode = updatedata[i].Dailcode
+			s.Accesstype=updatedata[i].Accesstype
 			status := s.UpdateTenantSocial(data.TenantID)
 			if status == false {
 				return nil, errors.New("error in updating socialinfo")
@@ -1067,6 +1068,7 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 			Dailcode:      user.Dailcode,
 			Sociallink:    user.SocialLink,
 			Socialicon:    user.SocialIcon,
+			Accesstype: user.Accesstype,
 		})
 	}
 	if categoryid == 0 {
@@ -1124,7 +1126,7 @@ func (r *queryResolver) Getpromotions(ctx context.Context, tenantid int, modulei
 
 	for _, p := range promotionGetAll {
 		promo = append(promo, &model.Promotion{
-			PromotionID: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: p.Promoname, Tenantid: p.Tenantid, Tenantname:  p.Tenantname, Promocode: p.Promocode,
+			PromotionID: p.Promotionid, Promotiontypeid: p.Promotiontypeid, Promotionname: p.Promoname, Tenantid: p.Tenantid, Tenantname: p.Tenantname, Promocode: p.Promocode,
 			Moduleid: p.Moduleid, Broadstatus: p.Broadcaststatus, Success: p.Success, Failure: p.Failure, Promoterms: p.Promoterms, Promovalue: p.Promovalue, Promotag: p.Promotag, Promotype: p.Promotype, Startdate: p.Startdate, Enddate: p.Enddate, Status: &p.Status,
 		})
 	}
