@@ -106,7 +106,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		if status != true {
 			return nil, errors.New("tenant not subscribed")
 		}
-		storeerr := d.Firestoreinsertenant(int64(tenantdata.TenantID), int64(tenantdata.Locationid), slist[0].Moduleid, slist[0].Categoryid)
+		storeerr := d.Firestoreinsertenant(int64(tenantdata.TenantID), int64(tenantdata.Locationid), slist[0].Moduleid, slist[0].Categoryid,slist[0].Featureid)
 		if storeerr != nil {
 			print(storeerr)
 		}

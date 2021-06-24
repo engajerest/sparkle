@@ -1984,7 +1984,7 @@ func (s *TenantUser) TenantstaffCreation(data []int) (bool, error) {
 }
 
 //firestore
-func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int64, moduleid, catid int) error {
+func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int64, moduleid, catid,featureid int) error {
 	print("st1 firestore")
 	n1 := int64(tenantid)
 	id := strconv.FormatInt(n1, 10)
@@ -2043,6 +2043,7 @@ func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int6
 		"tenantid":    tenantid,
 		"moduleid":    moduleid,
 		"locationid":  locationid,
+		"featureid":featureid,
 		"tenantname":  &t.Name,
 		"email":       &t.Email,
 		"contactno":   &t.Mobile,
