@@ -1984,7 +1984,7 @@ func (s *TenantUser) TenantstaffCreation(data []int) (bool, error) {
 }
 
 //firestore
-func (t *Initialsubscriptiondata) Firestoreinsertenant(tenantid, locationid int64, moduleid, catid,featureid int) error {
+func (t *Initialsubscriptiondata) Firestoreinserttenant(tenantid, locationid int64, moduleid, catid,featureid int) error {
 	print("st1 firestore")
 	n1 := int64(tenantid)
 	id := strconv.FormatInt(n1, 10)
@@ -2392,5 +2392,129 @@ func (p *BusinessUpdate) Firestoreupdatetenant(tenantid int) error {
 		return err
 	}
 
+	return nil
+}
+//firestore web
+func (t *Fstenant) Firestoretenantweb() error {
+	print("st1 firestore")
+	n1 := int64(t.Tenantid)
+	id := strconv.FormatInt(n1, 10)
+	n2 := int64(t.Locationid)
+	loc := strconv.FormatInt(n2, 10)
+	ctx := context.Background()
+	sa := option.WithCredentialsFile(firestorejsonkey)
+    connection := os.Getenv("firestore")
+	print("connect=",connection)
+	var tenant string
+	var location string
+	if connection=="firestoredev"{
+		tenant="tenantsdev"
+		location="locationsdev"
+	}else{
+		tenant="tenants"
+		location="locations"
+	}
+	app, err := firebase.NewApp(ctx, nil, sa)
+
+	if err != nil {
+		log.Fatal("failed to create 1 firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	client, err := app.Firestore(ctx)
+
+	if err != nil {
+
+		log.Fatal("failed to create  firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	defer client.Close()
+	lowercase := strings.ToLower(t.Name)
+	print("lowercaase==", lowercase)
+	result := strings.Split(lowercase, "")
+	output := make([]string, len(result))
+
+	var lastitem string
+	for i := range result {
+		// Get letter and display it.
+		letter := lastitem + result[i]
+
+		output = append(output, letter)
+		fmt.Println(letter)
+		lastitem = output[len(output)-1]
+		fmt.Printf("lastitem: %v\n", lastitem)
+	}
+	fmt.Println(output)
+	
+
+	_, err1 := client.Collection(tenant).Doc(id).Set(ctx, map[string]interface{}{
+		"tenantid":    &t.Tenantid,
+		"moduleid":    &t.Moduleid,
+		"locationid":  &t.Locationid,
+		"featureid":&t.Featureid,
+		"tenantname":  &t.Name,
+		"email":       &t.Email,
+		"contactno":   &t.Mobile,
+		"address":     &t.Address,
+		"suburb":      &t.Suburb,
+		"city":        &t.City,
+		"state":       &t.State,
+		"postcode":    &t.Zip,
+		"latitude":    &t.Latitude,
+		"longitude":   &t.Longitude,
+		"status":      &t.Status,
+		"categoryid":  &t.Categoryid,
+		"tenantimage": &t.Tenantimage,
+		"searchindex": output,
+	})
+	if err1 != nil {
+
+		log.Fatal("failed to insert in  firestore %v", err1)
+		return err1
+	}
+	lowercase1 := strings.ToLower(t.Name)
+	print("lowercaase==", lowercase1)
+	result1 := strings.Split(lowercase1, "")
+	output1 := make([]string, len(result1))
+
+	var lastitem1 string
+	for i := range result1 {
+		// Get letter and display it.
+		letter1 := lastitem1 + result1[i]
+
+		output1 = append(output1, letter1)
+		fmt.Println(letter1)
+		lastitem1 = output1[len(output1)-1]
+		fmt.Printf("lastitem: %v\n", lastitem1)
+	}
+	fmt.Println(output1)
+	_, err2 := client.Collection(location).Doc(loc).Set(ctx, map[string]interface{}{
+		"locationid":   &t.Locationid,
+		"tenantid":     &t.Tenantid,
+		"locationname": &t.Name,
+		"email":        &t.Email,
+		"contactno":    &t.Mobile,
+		"address":      &t.Address,
+		"suburb":       &t.Suburb,
+		"city":         &t.City,
+		"state":        &t.State,
+		"postcode":     &t.Zip,
+		"latitude":     &t.Latitude,
+		"longitude":    &t.Longitude,
+		"status":       &t.Status,
+		"opentime":     &t.OpenTime,
+		"closetime":    &t.CloseTime,
+		"delivery":     false,
+		"deliverymins": 30,
+		"searchindex":  output1,
+	})
+	if err2 != nil {
+
+		log.Fatal("failed to insert in  firestore %v", err2)
+		return err2
+	}
 	return nil
 }

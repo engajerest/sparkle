@@ -76,23 +76,22 @@ type TenantLocation struct {
 }
 
 type Initialsubscriptiondata struct {
-	Name            string `json:"name"`
-	Regno           string `json:"regno"`
-	Email           string `json:"email"`
-	Mobile          string `json:"mobile"`
-	Categoryid      int    `json:"categoryid"`
-	Typeid          int    `json:"typeId"`
-	SubCategoryid   int    `json:"subcategoryid"`
-	Subcategoryname string `json:"subcategoryname"`
-	Tenanttoken     string `json:"tenanttoken"`
-	Address         string `json:"address"`
-	Suburb          string `json:"suburb"`
-	City            string `json:"city"`
-	State           string `json:"state"`
-	Zip             string `json:"zip"`
-	Countrycode     string `json:"countrycode"`
-	Currencyid      int    `json:"currencyid"`
-
+	Name            string               `json:"name"`
+	Regno           string               `json:"regno"`
+	Email           string               `json:"email"`
+	Mobile          string               `json:"mobile"`
+	Categoryid      int                  `json:"categoryid"`
+	Typeid          int                  `json:"typeId"`
+	SubCategoryid   int                  `json:"subcategoryid"`
+	Subcategoryname string               `json:"subcategoryname"`
+	Tenanttoken     string               `json:"tenanttoken"`
+	Address         string               `json:"address"`
+	Suburb          string               `json:"suburb"`
+	City            string               `json:"city"`
+	State           string               `json:"state"`
+	Zip             string               `json:"zip"`
+	Countrycode     string               `json:"countrycode"`
+	Currencyid      int                  `json:"currencyid"`
 	Currencysymbol  string               `json:"currencysymbol"`
 	Latitude        string               `json:"latitude"`
 	Longitude       string               `json:"longitude"`
@@ -110,7 +109,7 @@ type TenantSubscription struct {
 	Packageid  int    `json:"packageid"`
 	Partnerid  int    `json:"partnerid"`
 	Moduleid   int    `json:"moduleId"`
-	Featureid int `json:"featureid"`
+	Featureid  int    `json:"featureid"`
 	Currencyid int    `json:"currencyid"`
 
 	Categoryid      int    `json:"categoryid"`
@@ -120,7 +119,7 @@ type TenantSubscription struct {
 	Price           string `json:"price"`
 	TaxId           int    `json:"taxId"`
 	TaxAmount       string `json:"taxamount"`
-	Taxpercent string `json:"taxpercent"`
+	Taxpercent      string `json:"taxpercent"`
 	TotalAmount     string `json:"totalamount"`
 	PaymentStatus   int    `json:"paymentstatus"`
 	PaymentId       int    `json:"paymentId"`
@@ -129,7 +128,7 @@ type TenantSubscription struct {
 	Promovalue      string `json:"promovalue"`
 	Promostatus     bool   `json:"promostatus"`
 	Validitydate    string `json:"validitydate"`
-	Subscriptionid int `json:"subscriptionid"`
+	Subscriptionid  int    `json:"subscriptionid"`
 }
 
 type SubscriptionData struct {
@@ -142,7 +141,7 @@ type SubscribedData struct {
 	TenantName     string  `json:"tenantname"`
 	ModuleName     string  `json:"modulename"`
 	ModuleID       int     `json:"moduleId"`
-	Featureid int `json:"featureid"`
+	Featureid      int     `json:"featureid"`
 	Subscriptionid int     `json:"subscriptionid"`
 	Locationid     int     `json:"locationid"`
 	Locationname   string  `json:"locationname"`
@@ -150,9 +149,9 @@ type SubscribedData struct {
 	Categoryid     int     `json:"categoryid"`
 	Tenantaccid    string  `json:"tenantaccid"`
 	Taxamount      float64 `json:"taxamount"`
-	Taxpercent string `json:"taxpercent"`
+	Taxpercent     string  `json:"taxpercent"`
 	Totalamount    float64 `json:"totalamount"`
-	Status string `json:"status"`
+	Status         string  `json:"status"`
 }
 
 type TenantUser struct {
@@ -198,24 +197,24 @@ type Location struct {
 	Status       string `json:"status"`
 }
 type BusinessUpdate struct {
-	TenantID       int      `json:"tenantid"`
-	Moduleid       int      `json:"moduleid"`
-	Modulename     string   `json:"modulename"`
-	Brandname      string   `json:"brandname"`
-	TenantaccId    string   `json:"tenantaccid"`
-	About          string   `json:"about"`
-	Email          string   `json:"email"`
-	Phone          string   `json:"phone"`
-	Address        string   `json:"address"`
-	Paymode1       int      `json:"paymode1"`
-	Paymode2       int      `json:"paymode2"`
-	Tenanttoken    string   `json:"tenanttoken"`
-	Tenantimage    string   `json:"tenantimage"`
-	Countrycode    string   `json:"countrycode"`
-	Currencycode   string   `json:"currencycode"`
-	Currencysymbol string   `json:"currencysymbol"`
-	Tenantpaymentid string `json:"tenantpaymentid"`
-	SocialData     []Social `json:"social"`
+	TenantID        int      `json:"tenantid"`
+	Moduleid        int      `json:"moduleid"`
+	Modulename      string   `json:"modulename"`
+	Brandname       string   `json:"brandname"`
+	TenantaccId     string   `json:"tenantaccid"`
+	About           string   `json:"about"`
+	Email           string   `json:"email"`
+	Phone           string   `json:"phone"`
+	Address         string   `json:"address"`
+	Paymode1        int      `json:"paymode1"`
+	Paymode2        int      `json:"paymode2"`
+	Tenanttoken     string   `json:"tenanttoken"`
+	Tenantimage     string   `json:"tenantimage"`
+	Countrycode     string   `json:"countrycode"`
+	Currencycode    string   `json:"currencycode"`
+	Currencysymbol  string   `json:"currencysymbol"`
+	Tenantpaymentid string   `json:"tenantpaymentid"`
+	SocialData      []Social `json:"social"`
 	// SociaProfile string `json:"socialprofile"`
 	// SocialLink string `json:"sociallink"`
 	// SocialIcon string `json:"socialicon"`
@@ -252,7 +251,7 @@ type Social struct {
 	Dailcode     string `json:"dailcode"`
 	SocialLink   string `json:"sociallink"`
 	SocialIcon   string `json:"socialicon"`
-	Accesstype bool `json:"accesstype"`
+	Accesstype   bool   `json:"accesstype"`
 }
 type Tenantsocial struct {
 	Socialid     int    `json:"socialid" gorm:"primary_key"`
@@ -260,7 +259,7 @@ type Tenantsocial struct {
 	Sociaprofile string `json:"socialprofile"`
 	Sociallink   string `json:"sociallink"`
 	Socialicon   string `json:"socialicon"`
-	Accesstype bool `json:"accesstype"`
+	Accesstype   bool   `json:"accesstype"`
 }
 type Tenantlocation struct {
 	// gorm.Model
@@ -304,7 +303,7 @@ type Promotion struct {
 	Promotionid     int    `json:"promotionid"`
 	Promotiontypeid int    `json:"promotionid"`
 	Tenantid        int    `json:"tenantid"`
-	Moduleid int `json:"moduleid"`
+	Moduleid        int    `json:"moduleid"`
 	Tenantname      string `json:"tenantname"`
 	Promoname       string `json:"promoname"`
 	Promocode       string `json:"promocode"`
@@ -376,7 +375,7 @@ type Payment struct {
 	Amount          float64         `json:"amount"`
 	Refundamt       float64         `json:"refundamount"`
 	Paymentstatus   string          `json:"paymentstatus"`
-	Created string `json:"created"`
+	Created         string          `json:"created"`
 	Paymentdetails  []Paymentdetail `json:"paymentdetails" gorm:"ForeignKey:paymentid"`
 }
 type Paymentdetail struct {
@@ -410,12 +409,12 @@ type Subscribe struct {
 	Subscriptionmethodid string  `json:"subscriptionmethodid"`
 	Tenantid             int     `json:"tenantid"`
 	Moduleid             int     `json:"moduleId"`
-	Featureid int `json:"featureid"`
+	Featureid            int     `json:"featureid"`
 	Modulename           string  `json:"modulename"`
 	Packagename          string  `json:"packagename"`
 	PackageAmount        float64 `json:"packageamount"`
 	Totalamount          float64 `json:"totalamount"`
-	Taxpercent string `json:"taxpercent"`
+	Taxpercent           string  `json:"taxpercent"`
 	Taxamount            float64 `json:"taxamount"`
 	Logourl              string  `json:"logourl"`
 	Iconurl              string  `json:"iconurl"`
@@ -426,9 +425,9 @@ type Subscribe struct {
 	Subcategoryid        int     `json:"subcategoryid"`
 	Categoryid           int     `json:"categoryid"`
 	Paymentstatus        bool    `json:"paymentstatus"`
-	Status string `json:"status"`
-	Validity bool `json:"validity"`
-	Validitydate string `json:"validitydate"`
+	Status               string  `json:"status"`
+	Validity             bool    `json:"validity"`
+	Validitydate         string  `json:"validitydate"`
 }
 type User struct {
 	ID          int    `json:"id"`
@@ -555,9 +554,41 @@ type TenantUsers struct {
 	Referenceid    int    `json:"referenceid"`
 }
 
-type Firestoreconnection struct{
+type Firestoreconnection struct {
 	Firestoredb string `json:"firestoredb"`
-	Location string `json:"location"`
-	Tenant string `json:"tenant"`
-	Product string `json:"product"`
+	Location    string `json:"location"`
+	Tenant      string `json:"tenant"`
+	Product     string `json:"product"`
+}
+type RestError struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Error   string `json:"error"`
+}
+//firestore
+type Fstenant struct {
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	Mobile      string `json:"mobile"`
+	Categoryid  int    `json:"categoryid"`
+	Tenantid    int   `json:"tenantid"`
+	Locationid  int    `json:"locationid"`
+	Moduleid    int    `json:"moduleid"`
+	Featureid   int    `json:"featureid"`
+	Address     string `json:"address"`
+	Suburb      string `json:"suburb"`
+	City        string `json:"city"`
+	State       string `json:"state"`
+	Zip         string `json:"zip"`
+	Latitude    string `json:"latitude"`
+	Longitude   string `json:"longitude"`
+	OpenTime    string `json:"opentime"`
+	CloseTime   string `json:"closetime"`
+	Tenantimage string `json:"tenantimage"`
+	Status string `json:"status"`
+}
+type Result struct{
+	Status bool `json:"status"`
+	Code int `json:"code"`
+	Message string `json:"message"`
 }

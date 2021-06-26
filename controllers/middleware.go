@@ -130,3 +130,27 @@ func ForSparkleContext1(ctx context.Context) (*subscription.User, *Errors.RestEr
 	return user, nil
 }
 
+func Tenantinsert(c *gin.Context) {
+
+	var fs subscription.Fstenant
+	var res subscription.Result
+	if err := c.ShouldBindJSON(&fs); err != nil {
+		formatErr := subscription.NewBadRequestErr("invalid json body")
+		c.JSON(http.StatusBadRequest, formatErr)
+		return
+	}
+	
+
+	custerr := fs.Firestoretenantweb()
+	if custerr != nil {
+		res.Status=false
+		res.Code=http.StatusBadRequest
+		res.Message="Internal Error in Firestore"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	res.Status=true
+	res.Code=http.StatusCreated
+	res.Message="Tenant Created in Firestore Sucessfully"
+	c.JSON(http.StatusCreated,res )
+}

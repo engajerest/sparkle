@@ -7,6 +7,7 @@ import (
 
 	"github.com/engajerest/auth/controller"
 	"github.com/engajerest/auth/utils/dbconfig"
+	"github.com/gin-contrib/cors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -28,7 +29,7 @@ func StartApplication() {
 	defaultPort := viper.GetString("APP.PORT")
 	key := viper.GetString("APP.USER_CONTEXT_KEY")
 	print("key====", key)
-	
+	router.Use(cors.Default())
 	router.Use(Datasource())
 	router.Use(controller.TokenNoAuthMiddleware(key))
 	fmt.Print("Heloo world")
