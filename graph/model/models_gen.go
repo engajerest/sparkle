@@ -159,6 +159,21 @@ type Tenantschema struct {
 	Tenantimage *string `json:"tenantimage"`
 }
 
+type App struct {
+	Apptypeid int    `json:"Apptypeid"`
+	Typename  string `json:"Typename"`
+	Tag       string `json:"Tag"`
+	Mapid     int    `json:"Mapid"`
+	Status    string `json:"Status"`
+}
+
+type Apptypedata struct {
+	Status  bool   `json:"status"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Appdata []*App `json:"appdata"`
+}
+
 type Business struct {
 	Businessupdate *Businessupdatedata `json:"businessupdate"`
 	Socialadd      []*Socialadddata    `json:"socialadd"`
@@ -577,6 +592,7 @@ type Result struct {
 }
 
 type Socialadddata struct {
+	Socialtypeid  *int    `json:"socialtypeid"`
 	Socialprofile *string `json:"socialprofile"`
 	Dailcode      *string `json:"dailcode"`
 	Sociallink    *string `json:"sociallink"`
@@ -586,15 +602,18 @@ type Socialadddata struct {
 
 type Socialinfo struct {
 	Socialid      int    `json:"socialid"`
+	Socialtypeid  int    `json:"socialtypeid"`
 	Socialprofile string `json:"socialprofile"`
 	Dailcode      string `json:"dailcode"`
 	Sociallink    string `json:"sociallink"`
 	Socialicon    string `json:"socialicon"`
 	Accesstype    bool   `json:"accesstype"`
+	Socialtype    *App   `json:"socialtype"`
 }
 
 type Socialupdatedata struct {
 	Socialid      *int    `json:"socialid"`
+	Socialtypeid  *int    `json:"socialtypeid"`
 	Socialprofile *string `json:"socialprofile"`
 	Dailcode      *string `json:"dailcode"`
 	Sociallink    *string `json:"sociallink"`

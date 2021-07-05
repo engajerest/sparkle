@@ -106,7 +106,7 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		if status != true {
 			return nil, errors.New("tenant not subscribed")
 		}
-		storeerr := d.Firestoreinserttenant(int64(tenantdata.TenantID), int64(tenantdata.Locationid), slist[0].Moduleid, slist[0].Categoryid,slist[0].Featureid)
+		storeerr := d.Firestoreinserttenant(int64(tenantdata.TenantID), int64(tenantdata.Locationid), slist[0].Moduleid, slist[0].Categoryid, slist[0].Featureid)
 		if storeerr != nil {
 			print(storeerr)
 		}
@@ -339,17 +339,27 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	schemasocialupdate := *&businessinfo.Socialupdate
 	socialdelete := *&businessinfo.Socialdelete
 	data1 := data.UpdateTenantBusiness()
+
 	for _, v := range schemasocialadd {
-		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile, Dailcode: *v.Dailcode, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon,Accesstype: *v.Accesstype})
+		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile,Socialtypeid: *v.Socialtypeid, Dailcode: *v.Dailcode, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon, Accesstype: *v.Accesstype})
 	}
+	
 	if len(check) != 0 {
+	
 		social := data.InsertTenantSocial(check, data.TenantID)
 		print(social)
 	}
+	
 	for _, k := range schemasocialupdate {
-		updatedata = append(updatedata, subscription.Social{Socialid: *k.Socialid, SociaProfile: *k.Socialprofile, Dailcode: *k.Dailcode, SocialLink: *k.Sociallink, SocialIcon: *k.Socialicon,Accesstype: *k.Accesstype})
+	
+		updatedata = append(updatedata, subscription.Social{
+			Socialid: *k.Socialid,
+			Socialtypeid:*k.Socialtypeid, SociaProfile: *k.Socialprofile,
+			 Dailcode: *k.Dailcode, SocialLink: *k.Sociallink,
+			  SocialIcon: *k.Socialicon, Accesstype: *k.Accesstype})
 	}
 	if len(updatedata) != 0 {
+		
 		var s subscription.Social
 		for i := 0; i < len(updatedata); i++ {
 			s.Socialid = updatedata[i].Socialid
@@ -357,7 +367,9 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 			s.SocialIcon = updatedata[i].SocialIcon
 			s.SocialLink = updatedata[i].SocialLink
 			s.Dailcode = updatedata[i].Dailcode
-			s.Accesstype=updatedata[i].Accesstype
+			s.Accesstype = updatedata[i].Accesstype
+			s.Socialtypeid=updatedata[i].Socialtypeid
+			
 			status := s.UpdateTenantSocial(data.TenantID)
 			if status == false {
 				return nil, errors.New("error in updating socialinfo")
@@ -1059,16 +1071,21 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 	var Result []*model.Socialinfo
 	var businessinfo *subscription.BusinessUpdate
 	var stat bool
-	var socialgetall []subscription.Social
-	socialgetall = subscription.GetAllSocial(tenantid)
-	for _, user := range socialgetall {
+	
+	var data []subscription.Tenantsocial
+	data = subscription.Getsocialprofiles(tenantid)
+	for _, k := range data {
 		Result = append(Result, &model.Socialinfo{
-			Socialid:      user.Socialid,
-			Socialprofile: user.SociaProfile,
-			Dailcode:      user.Dailcode,
-			Sociallink:    user.SocialLink,
-			Socialicon:    user.SocialIcon,
-			Accesstype: user.Accesstype,
+			Socialid:      k.Socialid,
+			Socialprofile: k.Socialprofile,
+			Dailcode:      k.Dailcode,
+			Sociallink:    k.Sociallink,
+			Socialicon:    k.Socialicon,
+			Accesstype:    k.Accesstype,
+			Socialtypeid: k.Socialtypeid,Socialtype: &model.App{
+				Apptypeid: k.App_types.Apptypeid,Typename: k.App_types.Typename,
+				Tag: k.App_types.Tag,Mapid: k.App_types.Mapid,Status: k.App_types.Status,
+			},
 		})
 	}
 	if categoryid == 0 {
@@ -1162,6 +1179,20 @@ func (r *queryResolver) Getchargetypes(ctx context.Context) (*model.Chargetypeda
 	data = subscription.Getchargetypes()
 
 	return &model.Chargetypedata{Status: true, Code: http.StatusOK, Message: "Success", Types: data}, nil
+}
+
+func (r *queryResolver) Getapptypes(ctx context.Context, tag string) (*model.Apptypedata, error) {
+	id, usererr := datacontext.ForAuthContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("userid==")
+	print(id.ID)
+	var result []*model.App
+	result = subscription.Getapptypes(tag)
+	return &model.Apptypedata{
+		Status: true, Code: http.StatusOK, Message: "Success", Appdata: result,
+	}, nil
 }
 
 func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locationid int) (*model.Locationbyiddata, error) {

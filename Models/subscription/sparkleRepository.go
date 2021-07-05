@@ -48,8 +48,8 @@ const (
 	updateTenantUser               = "UPDATE app_users a, app_userprofiles b  SET  a.authname=?,a.contactno=?,b.firstname=?,b.lastname=?,b.email=?,b.contactno=?,b.profileimage=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 	getAllTenantUserByLocationId   = ""
 	updateTenantBusiness           = "UPDATE tenants SET brandname=?,tenantinfo=?,paymode1=?,paymode2=?,tenantimage=? WHERE tenantid=?"
-	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialprofile,dailcode,sociallink,socialicon,accesstype) VALUES"
-	updatesocialinfo               = "UPDATE tenantsocial SET socialprofile=?,dailcode=?, sociallink=?,socialicon=?,accesstype=? WHERE tenantid=? AND socialid=? "
+	insertSocialInfo               = "INSERT INTO tenantsocial (tenantid,socialtypeid,socialprofile,dailcode,sociallink,socialicon,accesstype) VALUES"
+	updatesocialinfo               = "UPDATE tenantsocial SET socialtypeid=?,socialprofile=?,dailcode=?, sociallink=?,socialicon=?,accesstype=? WHERE tenantid=? AND socialid=? "
 	updateauthuser                 = "UPDATE  app_users a,app_userprofiles b SET a.referenceid=?,b.userlocationid=? WHERE a.userid=b.userid AND a.userid=?"
 	getBusinessbyid                = "SELECT tenantid,IFNULL(brandname,'') AS brandname,IFNULL(tenantinfo,'') AS tenantinfo,IFNULL(paymode1,0) AS paymode1,IFNULL(paymode2,0) AS paymode2,IFNULL(tenantaccid,0) AS tenantaccid,IFNULL(address,'') AS address,IFNULL(primaryemail,'') AS primaryemail,IFNULL(primarycontact,'') AS  primarycontact,IFNULL(tenanttoken,'') AS tenanttoken,IFNULL(tenantimage,'') AS tenantimage, IFNULL(countrycode,'') AS countrycode,IFNULL(currencycode,'') AS currencycode,IFNULL(currencysymbol,'') AS currencysymbol,IFNULL(tenantpaymentid,'') AS tenantpaymentid FROM tenants WHERE tenantid=?"
 	getAllSocial                   = "SELECT socialid, IFNULL(socialprofile,'') AS socialprofile ,IFNULL(dailcode,'') AS dailcode, IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon,IFNULL(accesstype,false) AS accesstype FROM tenantsocial WHERE tenantid= ?"
@@ -880,8 +880,8 @@ func (info *BusinessUpdate) InsertTenantSocial(soc []Social, id int) error {
 	var inserts []string
 	var params []interface{}
 	for _, v := range soc {
-		inserts = append(inserts, "(?, ?, ?, ?,?,?)")
-		params = append(params, id, v.SociaProfile, v.Dailcode, v.SocialLink, v.SocialIcon,v.Accesstype)
+		inserts = append(inserts, "(?, ?, ?, ?,?,?,?)")
+		params = append(params, id,v.Socialtypeid, v.SociaProfile, v.Dailcode, v.SocialLink, v.SocialIcon,v.Accesstype)
 	}
 	queryVals := strings.Join(inserts, ",")
 	query := insertSocialInfo + queryVals
@@ -912,14 +912,18 @@ func (info *BusinessUpdate) InsertTenantSocial(soc []Social, id int) error {
 func (info *Social) UpdateTenantSocial(tenantid int) bool {
 
 	statement, err := database.Db.Prepare(updatesocialinfo)
-	print(statement)
+	
 
 	if err != nil {
 		log.Fatal(err)
 		return false
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&info.SociaProfile, &info.Dailcode, &info.SocialLink, &info.SocialIcon,&info.Accesstype, tenantid, &info.Socialid)
+
+	_, err = statement.Exec(
+		&info.Socialtypeid,&info.SociaProfile, &info.Dailcode, &info.SocialLink,
+		 &info.SocialIcon,&info.Accesstype, tenantid, &info.Socialid)
+		
 	if err != nil {
 		log.Fatal(err)
 		return false
@@ -1037,6 +1041,29 @@ func GetAllSocial(id int) []Social {
 	}
 
 	return sociallist
+}
+func Getsocialprofiles(tenantid int) []Tenantsocial{
+	var q1 string
+	n := int64(tenantid)
+	tenant := strconv.FormatInt(n, 10)
+	q1 = "SELECT socialid,IFNULL(socialtypeid,0) AS socialtypeid, IFNULL(socialprofile,'') AS socialprofile ,IFNULL(dailcode,'') AS dailcode, IFNULL(sociallink,'') AS sociallink, IFNULL(socialicon,'') AS socialicon,IFNULL(accesstype,false) AS accesstype FROM tenantsocial WHERE tenantid= " + tenant
+
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+
+	var data []Tenantsocial
+	print("con1")
+	DB.Raw(q1).Preload("App_types").Find(&data)
+	for index, value := range data {
+		fmt.Println(index, " = ", value)
+	}
+	print("stp1-0-9")
+	return data	
 }
 
 func UserAuthentication(id int64) (*User, bool, error) {
@@ -1215,6 +1242,29 @@ func Getchargetypes() []*model.Chargetype {
 	var data []*model.Chargetype
 
 	DB.Table("chargetypes").Find(&data)
+
+	fmt.Println(data)
+
+	return data
+
+}
+func Getapptypes(tag string) []*model.App {
+
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+
+	var data []*model.App
+if  tag!=""{
+	DB.Table("app_types").Where("status='Active' AND tag=?",tag).Find(&data)
+}else{
+	DB.Table("app_types").Where("status='Active'").Find(&data)
+}
+	
 
 	fmt.Println(data)
 

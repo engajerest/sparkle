@@ -511,6 +511,7 @@ input businessupdatedata{
 }
 input socialupdatedata{
 socialid:Int
+socialtypeid:Int
  socialprofile:String
  dailcode:String
  sociallink:String
@@ -518,7 +519,7 @@ socialid:Int
  accesstype:Boolean
 }
 input socialadddata{
-
+socialtypeid:Int
  socialprofile:String
  dailcode:String
  sociallink:String
@@ -572,12 +573,15 @@ type info{
 }
 type socialinfo{
 socialid:Int!
+socialtypeid:Int!
  socialprofile:String!
  dailcode:String!
  sociallink:String!
  socialicon:String!
  accesstype:Boolean!
+ socialtype:app
 }
+
 type Promotion {
  PromotionId: Int!
  Promotiontypeid:Int!
@@ -832,7 +836,19 @@ type Tenantschema{
  tenanttoken:String
  tenantimage:String
 }
-
+type apptypedata{
+status:Boolean!
+code:Int!
+message:String!
+appdata:[app]
+}
+type app{
+Apptypeid:Int!
+Typename:String!
+Tag:String!
+Mapid:Int!
+Status:String!
+}
 
 type Query {
  sparkle: Sparkle!
@@ -842,6 +858,7 @@ type Query {
  getpromotions(tenantid:Int!,moduleid:Int!):getpromotiondata
  getpromotypes:promotypesdata
  getchargetypes:chargetypedata
+ getapptypes(tag:String!):apptypedata
  getlocationbyid(tenantid:Int!,locationid:Int!):locationbyiddata
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata

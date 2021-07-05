@@ -247,6 +247,7 @@ type AuthUser struct {
 }
 type Social struct {
 	Socialid     int    `json:"socialid" `
+	Socialtypeid int `json:"socialtypeid"`
 	SociaProfile string `json:"socialprofile"`
 	Dailcode     string `json:"dailcode"`
 	SocialLink   string `json:"sociallink"`
@@ -255,11 +256,14 @@ type Social struct {
 }
 type Tenantsocial struct {
 	Socialid     int    `json:"socialid" gorm:"primary_key"`
+	Socialtypeid int `json:"socialtypeid"`
 	Tenantid     int    `json:"tenantid"`
-	Sociaprofile string `json:"socialprofile"`
+	Socialprofile string `json:"socialprofile"`
+	Dailcode     string `json:"dailcode"`
 	Sociallink   string `json:"sociallink"`
 	Socialicon   string `json:"socialicon"`
 	Accesstype   bool   `json:"accesstype"`
+	App_types          App_type `json:"app_types" gorm:"ForeignKey:apptypeid;references:socialtypeid"`
 }
 type Tenantlocation struct {
 	// gorm.Model
@@ -564,6 +568,14 @@ type RestError struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
 	Error   string `json:"error"`
+}
+
+type App_type struct{
+	Apptypeid int `json:"apptypeid"`
+	Typename string `json:"typename"`
+	Tag string `json:"tag"`
+	Mapid int `json:"mapid"`
+	Status string `json:"status"`
 }
 //firestore
 type Fstenant struct {

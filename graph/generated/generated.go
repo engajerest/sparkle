@@ -146,6 +146,7 @@ type ComplexityRoot struct {
 		GetBusiness              func(childComplexity int, tenantid int, categoryid int) int
 		Getallmodule             func(childComplexity int, categoryid int, tenantid int, mode bool) int
 		Getallpromos             func(childComplexity int, moduleid int) int
+		Getapptypes              func(childComplexity int, tag string) int
 		Getchargetypes           func(childComplexity int) int
 		Getlocationbyid          func(childComplexity int, tenantid int, locationid int) int
 		Getnonsubscribed         func(childComplexity int, tenantid int) int
@@ -210,6 +211,21 @@ type ComplexityRoot struct {
 		Tenantid    func(childComplexity int) int
 		Tenantimage func(childComplexity int) int
 		Tenanttoken func(childComplexity int) int
+	}
+
+	App struct {
+		Apptypeid func(childComplexity int) int
+		Mapid     func(childComplexity int) int
+		Status    func(childComplexity int) int
+		Tag       func(childComplexity int) int
+		Typename  func(childComplexity int) int
+	}
+
+	Apptypedata struct {
+		Appdata func(childComplexity int) int
+		Code    func(childComplexity int) int
+		Message func(childComplexity int) int
+		Status  func(childComplexity int) int
 	}
 
 	Businessdata struct {
@@ -482,6 +498,8 @@ type ComplexityRoot struct {
 		Socialid      func(childComplexity int) int
 		Sociallink    func(childComplexity int) int
 		Socialprofile func(childComplexity int) int
+		Socialtype    func(childComplexity int) int
+		Socialtypeid  func(childComplexity int) int
 	}
 
 	Staffdetail struct {
@@ -658,6 +676,7 @@ type QueryResolver interface {
 	Getpromotions(ctx context.Context, tenantid int, moduleid int) (*model.Getpromotiondata, error)
 	Getpromotypes(ctx context.Context) (*model.Promotypesdata, error)
 	Getchargetypes(ctx context.Context) (*model.Chargetypedata, error)
+	Getapptypes(ctx context.Context, tag string) (*model.Apptypedata, error)
 	Getlocationbyid(ctx context.Context, tenantid int, locationid int) (*model.Locationbyiddata, error)
 	Getpayments(ctx context.Context, tenantid int, typeid int) (*model.Getpaymentdata, error)
 	Getsubscriptions(ctx context.Context, tenantid int) (*model.Getsubscriptionsdata, error)
@@ -1321,6 +1340,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Getallpromos(childComplexity, args["moduleid"].(int)), true
 
+	case "Query.getapptypes":
+		if e.complexity.Query.Getapptypes == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getapptypes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Getapptypes(childComplexity, args["tag"].(string)), true
+
 	case "Query.getchargetypes":
 		if e.complexity.Query.Getchargetypes == nil {
 			break
@@ -1739,6 +1770,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tenantschema.Tenanttoken(childComplexity), true
+
+	case "app.Apptypeid":
+		if e.complexity.App.Apptypeid == nil {
+			break
+		}
+
+		return e.complexity.App.Apptypeid(childComplexity), true
+
+	case "app.Mapid":
+		if e.complexity.App.Mapid == nil {
+			break
+		}
+
+		return e.complexity.App.Mapid(childComplexity), true
+
+	case "app.Status":
+		if e.complexity.App.Status == nil {
+			break
+		}
+
+		return e.complexity.App.Status(childComplexity), true
+
+	case "app.Tag":
+		if e.complexity.App.Tag == nil {
+			break
+		}
+
+		return e.complexity.App.Tag(childComplexity), true
+
+	case "app.Typename":
+		if e.complexity.App.Typename == nil {
+			break
+		}
+
+		return e.complexity.App.Typename(childComplexity), true
+
+	case "apptypedata.appdata":
+		if e.complexity.Apptypedata.Appdata == nil {
+			break
+		}
+
+		return e.complexity.Apptypedata.Appdata(childComplexity), true
+
+	case "apptypedata.code":
+		if e.complexity.Apptypedata.Code == nil {
+			break
+		}
+
+		return e.complexity.Apptypedata.Code(childComplexity), true
+
+	case "apptypedata.message":
+		if e.complexity.Apptypedata.Message == nil {
+			break
+		}
+
+		return e.complexity.Apptypedata.Message(childComplexity), true
+
+	case "apptypedata.status":
+		if e.complexity.Apptypedata.Status == nil {
+			break
+		}
+
+		return e.complexity.Apptypedata.Status(childComplexity), true
 
 	case "businessdata.code":
 		if e.complexity.Businessdata.Code == nil {
@@ -3056,6 +3150,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Socialinfo.Socialprofile(childComplexity), true
 
+	case "socialinfo.socialtype":
+		if e.complexity.Socialinfo.Socialtype == nil {
+			break
+		}
+
+		return e.complexity.Socialinfo.Socialtype(childComplexity), true
+
+	case "socialinfo.socialtypeid":
+		if e.complexity.Socialinfo.Socialtypeid == nil {
+			break
+		}
+
+		return e.complexity.Socialinfo.Socialtypeid(childComplexity), true
+
 	case "staffdetail.Locationdetails":
 		if e.complexity.Staffdetail.Locationdetails == nil {
 			break
@@ -4333,6 +4441,7 @@ input businessupdatedata{
 }
 input socialupdatedata{
 socialid:Int
+socialtypeid:Int
  socialprofile:String
  dailcode:String
  sociallink:String
@@ -4340,7 +4449,7 @@ socialid:Int
  accesstype:Boolean
 }
 input socialadddata{
-
+socialtypeid:Int
  socialprofile:String
  dailcode:String
  sociallink:String
@@ -4394,12 +4503,15 @@ type info{
 }
 type socialinfo{
 socialid:Int!
+socialtypeid:Int!
  socialprofile:String!
  dailcode:String!
  sociallink:String!
  socialicon:String!
  accesstype:Boolean!
+ socialtype:app
 }
+
 type Promotion {
  PromotionId: Int!
  Promotiontypeid:Int!
@@ -4654,7 +4766,19 @@ type Tenantschema{
  tenanttoken:String
  tenantimage:String
 }
-
+type apptypedata{
+status:Boolean!
+code:Int!
+message:String!
+appdata:[app]
+}
+type app{
+Apptypeid:Int!
+Typename:String!
+Tag:String!
+Mapid:Int!
+Status:String!
+}
 
 type Query {
  sparkle: Sparkle!
@@ -4664,6 +4788,7 @@ type Query {
  getpromotions(tenantid:Int!,moduleid:Int!):getpromotiondata
  getpromotypes:promotypesdata
  getchargetypes:chargetypedata
+ getapptypes(tag:String!):apptypedata
  getlocationbyid(tenantid:Int!,locationid:Int!):locationbyiddata
  getpayments(tenantid:Int!,typeid:Int!):getpaymentdata
  getsubscriptions(tenantid:Int!):getsubscriptionsdata
@@ -5009,6 +5134,21 @@ func (ec *executionContext) field_Query_getallpromos_args(ctx context.Context, r
 		}
 	}
 	args["moduleid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getapptypes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["tag"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tag"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tag"] = arg0
 	return args, nil
 }
 
@@ -8206,6 +8346,45 @@ func (ec *executionContext) _Query_getchargetypes(ctx context.Context, field gra
 	return ec.marshalOchargetypedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐChargetypedata(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_getapptypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getapptypes_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Getapptypes(rctx, args["tag"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Apptypedata)
+	fc.Result = res
+	return ec.marshalOapptypedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐApptypedata(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_getlocationbyid(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -11048,6 +11227,318 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 	res := resTmp.(*introspection.Type)
 	fc.Result = res
 	return ec.marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _app_Apptypeid(ctx context.Context, field graphql.CollectedField, obj *model.App) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "app",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Apptypeid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _app_Typename(ctx context.Context, field graphql.CollectedField, obj *model.App) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "app",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Typename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _app_Tag(ctx context.Context, field graphql.CollectedField, obj *model.App) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "app",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tag, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _app_Mapid(ctx context.Context, field graphql.CollectedField, obj *model.App) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "app",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mapid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _app_Status(ctx context.Context, field graphql.CollectedField, obj *model.App) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "app",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _apptypedata_status(ctx context.Context, field graphql.CollectedField, obj *model.Apptypedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "apptypedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _apptypedata_code(ctx context.Context, field graphql.CollectedField, obj *model.Apptypedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "apptypedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _apptypedata_message(ctx context.Context, field graphql.CollectedField, obj *model.Apptypedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "apptypedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _apptypedata_appdata(ctx context.Context, field graphql.CollectedField, obj *model.Apptypedata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "apptypedata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Appdata, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.App)
+	fc.Result = res
+	return ec.marshalOapp2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐApp(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _businessdata_status(ctx context.Context, field graphql.CollectedField, obj *model.Businessdata) (ret graphql.Marshaler) {
@@ -17362,6 +17853,41 @@ func (ec *executionContext) _socialinfo_socialid(ctx context.Context, field grap
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _socialinfo_socialtypeid(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "socialinfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Socialtypeid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _socialinfo_socialprofile(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -17535,6 +18061,38 @@ func (ec *executionContext) _socialinfo_accesstype(ctx context.Context, field gr
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _socialinfo_socialtype(ctx context.Context, field graphql.CollectedField, obj *model.Socialinfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "socialinfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Socialtype, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.App)
+	fc.Result = res
+	return ec.marshalOapp2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐApp(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _staffdetail_Staffdetailid(ctx context.Context, field graphql.CollectedField, obj *model.Staffdetail) (ret graphql.Marshaler) {
@@ -22244,6 +22802,14 @@ func (ec *executionContext) unmarshalInputsocialadddata(ctx context.Context, obj
 
 	for k, v := range asMap {
 		switch k {
+		case "socialtypeid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialtypeid"))
+			it.Socialtypeid, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "socialprofile":
 			var err error
 
@@ -22301,6 +22867,14 @@ func (ec *executionContext) unmarshalInputsocialupdatedata(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialid"))
 			it.Socialid, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "socialtypeid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socialtypeid"))
+			it.Socialtypeid, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23944,6 +24518,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_getchargetypes(ctx, field)
 				return res
 			})
+		case "getapptypes":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getapptypes(ctx, field)
+				return res
+			})
 		case "getlocationbyid":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -24547,6 +25132,92 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec.___Type_inputFields(ctx, field, obj)
 		case "ofType":
 			out.Values[i] = ec.___Type_ofType(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var appImplementors = []string{"app"}
+
+func (ec *executionContext) _app(ctx context.Context, sel ast.SelectionSet, obj *model.App) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, appImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("app")
+		case "Apptypeid":
+			out.Values[i] = ec._app_Apptypeid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Typename":
+			out.Values[i] = ec._app_Typename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Tag":
+			out.Values[i] = ec._app_Tag(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Mapid":
+			out.Values[i] = ec._app_Mapid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Status":
+			out.Values[i] = ec._app_Status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var apptypedataImplementors = []string{"apptypedata"}
+
+func (ec *executionContext) _apptypedata(ctx context.Context, sel ast.SelectionSet, obj *model.Apptypedata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, apptypedataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("apptypedata")
+		case "status":
+			out.Values[i] = ec._apptypedata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._apptypedata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._apptypedata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "appdata":
+			out.Values[i] = ec._apptypedata_appdata(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -25985,6 +26656,11 @@ func (ec *executionContext) _socialinfo(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "socialtypeid":
+			out.Values[i] = ec._socialinfo_socialtypeid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "socialprofile":
 			out.Values[i] = ec._socialinfo_socialprofile(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -26010,6 +26686,8 @@ func (ec *executionContext) _socialinfo(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "socialtype":
+			out.Values[i] = ec._socialinfo_socialtype(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -27771,6 +28449,60 @@ func (ec *executionContext) marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 		return graphql.Null
 	}
 	return ec.___Type(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOapp2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐApp(ctx context.Context, sel ast.SelectionSet, v []*model.App) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOapp2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐApp(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOapp2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐApp(ctx context.Context, sel ast.SelectionSet, v *model.App) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._app(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOapptypedata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐApptypedata(ctx context.Context, sel ast.SelectionSet, v *model.Apptypedata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._apptypedata(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalObusiness2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐBusiness(ctx context.Context, v interface{}) (*model.Business, error) {
