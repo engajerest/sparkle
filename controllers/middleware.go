@@ -154,3 +154,75 @@ func Tenantinsert(c *gin.Context) {
 	res.Message="Tenant Created in Firestore Sucessfully"
 	c.JSON(http.StatusCreated,res )
 }
+func Tenantupdate(c *gin.Context) {
+
+	var fs subscription.Fstenant
+	var res subscription.Result
+	if err := c.ShouldBindJSON(&fs); err != nil {
+		formatErr := subscription.NewBadRequestErr("invalid json body")
+		c.JSON(http.StatusBadRequest, formatErr)
+		return
+	}
+	
+
+	custerr := fs.Firestoreupdatetenantweb(fs.Tenantid)
+	if custerr != nil {
+		res.Status=false
+		res.Code=http.StatusBadRequest
+		res.Message="Internal Error in Firestore"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	res.Status=true
+	res.Code=http.StatusCreated
+	res.Message="Tenant Updated in Firestore Sucessfully"
+	c.JSON(http.StatusCreated,res )
+}
+func Locationcreate(c *gin.Context) {
+
+	var fs subscription.Location
+	var res subscription.Result
+	if err := c.ShouldBindJSON(&fs); err != nil {
+		formatErr := subscription.NewBadRequestErr("invalid json body")
+		c.JSON(http.StatusBadRequest, formatErr)
+		return
+	}
+	
+
+	custerr := fs.Firestorecreatelocation(int64(fs.LocationId))
+	if custerr != nil {
+		res.Status=false
+		res.Code=http.StatusBadRequest
+		res.Message="Internal Error in Firestore"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	res.Status=true
+	res.Code=http.StatusCreated
+	res.Message="Location Created in Firestore Sucessfully"
+	c.JSON(http.StatusCreated,res )
+}
+func Locationupdate(c *gin.Context) {
+
+	var fs subscription.Location
+	var res subscription.Result
+	if err := c.ShouldBindJSON(&fs); err != nil {
+		formatErr := subscription.NewBadRequestErr("invalid json body")
+		c.JSON(http.StatusBadRequest, formatErr)
+		return
+	}
+	
+
+	custerr := fs.Firestorelocationupdate(fs.LocationId)
+	if custerr != nil {
+		res.Status=false
+		res.Code=http.StatusBadRequest
+		res.Message="Internal Error in Firestore"
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+	res.Status=true
+	res.Code=http.StatusCreated
+	res.Message="Location Updated in Firestore Sucessfully"
+	c.JSON(http.StatusCreated,res )
+}

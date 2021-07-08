@@ -2568,3 +2568,52 @@ func (t *Fstenant) Firestoretenantweb() error {
 	}
 	return nil
 }
+func (p *Fstenant) Firestoreupdatetenantweb(tenantid int) error {
+	print("st1 firestore")
+	n1 := int64(tenantid)
+	id := strconv.FormatInt(n1, 10)
+	ctx := context.Background()
+	sa := option.WithCredentialsFile(firestorejsonkey)
+	connection := os.Getenv("firestore")
+	print("connect=",connection)
+	var tenant string
+
+	if connection=="firestoredev"{
+		tenant="tenantsdev"
+		
+	}else{
+		tenant="tenants"
+		
+	}
+	app, err := firebase.NewApp(ctx, nil, sa)
+
+	if err != nil {
+		log.Fatal("failed to create 1 firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	client, err := app.Firestore(ctx)
+
+	if err != nil {
+
+		log.Fatal("failed to create  firestore %V", err)
+		log.Fatalln(err)
+		return err
+	}
+
+	defer client.Close()
+
+	ca := client.Collection(tenant).Doc(id)
+
+	_, err = ca.Update(context.Background(), []firestore.Update{
+		{
+			Path: "tenantimage", Value: &p.Tenantimage,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
