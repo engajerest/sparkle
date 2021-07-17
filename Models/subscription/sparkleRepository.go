@@ -1,10 +1,13 @@
 package subscription
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"fmt"
+	"html/template"
 	"log"
+	"net/smtp"
 	"os"
 	"strconv"
 	"strings"
@@ -17,10 +20,16 @@ import (
 	"github.com/engajerest/auth/utils/dbconfig"
 	database "github.com/engajerest/auth/utils/dbconfig"
 	"github.com/engajerest/sparkle/graph/model"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/api/option"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+)
+
+var (
+	router1 = gin.Default()
 )
 
 const (
@@ -881,7 +890,7 @@ func (info *BusinessUpdate) InsertTenantSocial(soc []Social, id int) error {
 	var params []interface{}
 	for _, v := range soc {
 		inserts = append(inserts, "(?, ?, ?, ?,?,?,?)")
-		params = append(params, id,v.Socialtypeid, v.SociaProfile, v.Dailcode, v.SocialLink, v.SocialIcon,v.Accesstype)
+		params = append(params, id, v.Socialtypeid, v.SociaProfile, v.Dailcode, v.SocialLink, v.SocialIcon, v.Accesstype)
 	}
 	queryVals := strings.Join(inserts, ",")
 	query := insertSocialInfo + queryVals
@@ -912,7 +921,6 @@ func (info *BusinessUpdate) InsertTenantSocial(soc []Social, id int) error {
 func (info *Social) UpdateTenantSocial(tenantid int) bool {
 
 	statement, err := database.Db.Prepare(updatesocialinfo)
-	
 
 	if err != nil {
 		log.Fatal(err)
@@ -921,9 +929,9 @@ func (info *Social) UpdateTenantSocial(tenantid int) bool {
 	defer statement.Close()
 
 	_, err = statement.Exec(
-		&info.Socialtypeid,&info.SociaProfile, &info.Dailcode, &info.SocialLink,
-		 &info.SocialIcon,&info.Accesstype, tenantid, &info.Socialid)
-		
+		&info.Socialtypeid, &info.SociaProfile, &info.Dailcode, &info.SocialLink,
+		&info.SocialIcon, &info.Accesstype, tenantid, &info.Socialid)
+
 	if err != nil {
 		log.Fatal(err)
 		return false
@@ -955,7 +963,6 @@ func (info *AuthUser) UpdateAuthUser(userid int) bool {
 func (business *BusinessUpdate) GetBusinessInfo(id int) (*BusinessUpdate, bool) {
 
 	var data BusinessUpdate
-	
 
 	stmt, err := database.Db.Prepare(getBusinessbyid)
 	if err != nil {
@@ -1028,7 +1035,7 @@ func GetAllSocial(id int) []Social {
 			&data.Socialid,
 			&data.SociaProfile, &data.Dailcode,
 			&data.SocialLink,
-			&data.SocialIcon,&data.Accesstype,
+			&data.SocialIcon, &data.Accesstype,
 		)
 		if err != nil {
 			log.Fatal(err)
@@ -1042,7 +1049,7 @@ func GetAllSocial(id int) []Social {
 
 	return sociallist
 }
-func Getsocialprofiles(tenantid int) []Tenantsocial{
+func Getsocialprofiles(tenantid int) []Tenantsocial {
 	var q1 string
 	n := int64(tenantid)
 	tenant := strconv.FormatInt(n, 10)
@@ -1063,7 +1070,7 @@ func Getsocialprofiles(tenantid int) []Tenantsocial{
 		fmt.Println(index, " = ", value)
 	}
 	print("stp1-0-9")
-	return data	
+	return data
 }
 
 func UserAuthentication(id int64) (*User, bool, error) {
@@ -1259,12 +1266,11 @@ func Getapptypes(tag string) []*model.App {
 	}
 
 	var data []*model.App
-if  tag!=""{
-	DB.Table("app_types").Where("status='Active' AND tag=?",tag).Find(&data)
-}else{
-	DB.Table("app_types").Where("status='Active'").Find(&data)
-}
-	
+	if tag != "" {
+		DB.Table("app_types").Where("status='Active' AND tag=?", tag).Find(&data)
+	} else {
+		DB.Table("app_types").Where("status='Active'").Find(&data)
+	}
 
 	fmt.Println(data)
 
@@ -1952,7 +1958,7 @@ func Checkfordeletestaffdata(tenantstaffid int) (int, error) {
 	fmt.Println("enrty in staffs")
 
 	stmt, err := database.Db.Prepare(checkfordeletestaff)
-	
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -2033,8 +2039,34 @@ func (s *TenantUser) TenantstaffCreation(data []int) (bool, error) {
 	return true, nil
 }
 
+func Getbusinessbyfavourites(categoryid, tenantid, customerid int) Getfavbusiness {
+	n := int64(categoryid)
+	n2 := int64(tenantid)
+	n3 := int64(customerid)
+	cat := strconv.FormatInt(n, 10)
+	tent := strconv.FormatInt(n2, 10)
+	cust := strconv.FormatInt(n3, 10)
+	var q1 string
+	var q2 string
+	var q3 string
+	q1 = " SELECT * FROM (SELECT a.tenantid, IFNULL(a.brandname,'') AS brandname, IFNULL(a.tenantinfo,'') AS tenantinfo, IFNULL(a.paymode1,0)AS paymode1, IFNULL(a.paymode2,0) AS paymode2, IFNULL(a.tenantaccid,0) AS tenantaccid, IFNULL(a.address,'') AS  address, IFNULL(a.primaryemail,'') AS primaryemail, IFNULL(a.primarycontact,'') AS primarycontact,IFNULL(a.tenanttoken,'') AS tenanttoken, IFNULL(a.tenantimage,'') AS tenantimage, IFNULL(a.countrycode,'') AS countrycode, IFNULL(a.currencycode,'') AS currencycode, IFNULL(a.currencysymbol,'') AS currencysymbol,  IFNULL(tenantpaymentid,'') AS tenantpaymentid, IFNULL(b.moduleid,0) AS moduleid, IFNULL(d.modulename,'')  AS modulename "
+	q2 = " FROM tenants a  INNER JOIN tenantsubscription b ON a.tenantid=b.tenantid  INNER JOIN app_category c INNER JOIN app_module d  ON b.moduleid=d.moduleid and c.categoryid=d.categoryid WHERE a.tenantid= " + tent + "  AND c.categoryid= " + cat + "  ) AS X "
+	q3 = " LEFT JOIN (SELECT IFNULL(e.favouriteid,0) AS favouriteid, IFNULL(e.tenantid,0) AS custtenantid,IFNULL(e.moduleid,0) AS custmoduleid,IFNULL(e.customerid,0) AS customerid,IFNULL(e.favouritestatus ,false) AS  favouritestatus FROM customerfavourites e WHERE e.customerid= " + cust + "  ) AS Y ON Y.custtenantid = X.tenantid AND Y.custmoduleid=X.moduleid"
+	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
+	if err != nil {
+		log.Println("Connection Failed to Open")
+
+	} else {
+		log.Println("Connection Established")
+	}
+	var data Getfavbusiness
+
+	DB.Raw(q1 + q2 + q3).Find(&data)
+	return data
+}
+
 //firestore
-func (t *Initialsubscriptiondata) Firestoreinserttenant(tenantid, locationid int64, moduleid, catid,featureid int) error {
+func (t *Initialsubscriptiondata) Firestoreinserttenant(tenantid, locationid int64, moduleid, catid, featureid int) error {
 	print("st1 firestore")
 	n1 := int64(tenantid)
 	id := strconv.FormatInt(n1, 10)
@@ -2042,16 +2074,16 @@ func (t *Initialsubscriptiondata) Firestoreinserttenant(tenantid, locationid int
 	loc := strconv.FormatInt(n2, 10)
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
-    connection := os.Getenv("firestore")
-	print("connect=",connection)
+	connection := os.Getenv("firestore")
+	print("connect=", connection)
 	var tenant string
 	var location string
-	if connection=="firestoredev"{
-		tenant="tenantsdev"
-		location="locationsdev"
-	}else{
-		tenant="tenants"
-		location="locations"
+	if connection == "firestoredev" {
+		tenant = "tenantsdev"
+		location = "locationsdev"
+	} else {
+		tenant = "tenants"
+		location = "locations"
 	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
@@ -2087,13 +2119,12 @@ func (t *Initialsubscriptiondata) Firestoreinserttenant(tenantid, locationid int
 		fmt.Printf("lastitem: %v\n", lastitem)
 	}
 	fmt.Println(output)
-	
 
 	_, err1 := client.Collection(tenant).Doc(id).Set(ctx, map[string]interface{}{
 		"tenantid":    tenantid,
 		"moduleid":    moduleid,
 		"locationid":  locationid,
-		"featureid":featureid,
+		"featureid":   featureid,
 		"tenantname":  &t.Name,
 		"email":       &t.Email,
 		"contactno":   &t.Mobile,
@@ -2165,15 +2196,15 @@ func (l *Location) Firestorecreatelocation(locationid int64) error {
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
 	connection := os.Getenv("firestore")
-	print("connect=",connection)
-	
+	print("connect=", connection)
+
 	var location string
-	if connection=="firestoredev"{
-		
-		location="locationsdev"
-	}else{
-		
-		location="locations"
+	if connection == "firestoredev" {
+
+		location = "locationsdev"
+	} else {
+
+		location = "locations"
 	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
@@ -2246,15 +2277,15 @@ func (p *Location) Firestorelocationupdate(locationid int) error {
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
 	connection := os.Getenv("firestore")
-	print("connect=",connection)
+	print("connect=", connection)
 
 	var location string
-	if connection=="firestoredev"{
-		
-		location="locationsdev"
-	}else{
-		
-		location="locations"
+	if connection == "firestoredev" {
+
+		location = "locationsdev"
+	} else {
+
+		location = "locations"
 	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
@@ -2352,15 +2383,15 @@ func (p *Updatestatus) Firestoreupdatelocationstatus(locationid int) error {
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
 	connection := os.Getenv("firestore")
-	print("connect=",connection)
-	
+	print("connect=", connection)
+
 	var location string
-	if connection=="firestoredev"{
-		
-		location="locationsdev"
-	}else{
-		
-		location="locations"
+	if connection == "firestoredev" {
+
+		location = "locationsdev"
+	} else {
+
+		location = "locations"
 	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
@@ -2402,15 +2433,15 @@ func (p *BusinessUpdate) Firestoreupdatetenant(tenantid int) error {
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
 	connection := os.Getenv("firestore")
-	print("connect=",connection)
+	print("connect=", connection)
 	var tenant string
 
-	if connection=="firestoredev"{
-		tenant="tenantsdev"
-		
-	}else{
-		tenant="tenants"
-		
+	if connection == "firestoredev" {
+		tenant = "tenantsdev"
+
+	} else {
+		tenant = "tenants"
+
 	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
@@ -2444,6 +2475,7 @@ func (p *BusinessUpdate) Firestoreupdatetenant(tenantid int) error {
 
 	return nil
 }
+
 //firestore web
 func (t *Fstenant) Firestoretenantweb() error {
 	print("st1 firestore")
@@ -2453,16 +2485,16 @@ func (t *Fstenant) Firestoretenantweb() error {
 	loc := strconv.FormatInt(n2, 10)
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
-    connection := os.Getenv("firestore")
-	print("connect=",connection)
+	connection := os.Getenv("firestore")
+	print("connect=", connection)
 	var tenant string
 	var location string
-	if connection=="firestoredev"{
-		tenant="tenantsdev"
-		location="locationsdev"
-	}else{
-		tenant="tenants"
-		location="locations"
+	if connection == "firestoredev" {
+		tenant = "tenantsdev"
+		location = "locationsdev"
+	} else {
+		tenant = "tenants"
+		location = "locations"
 	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
@@ -2498,13 +2530,12 @@ func (t *Fstenant) Firestoretenantweb() error {
 		fmt.Printf("lastitem: %v\n", lastitem)
 	}
 	fmt.Println(output)
-	
 
 	_, err1 := client.Collection(tenant).Doc(id).Set(ctx, map[string]interface{}{
 		"tenantid":    &t.Tenantid,
 		"moduleid":    &t.Moduleid,
 		"locationid":  &t.Locationid,
-		"featureid":&t.Featureid,
+		"featureid":   &t.Featureid,
 		"tenantname":  &t.Name,
 		"email":       &t.Email,
 		"contactno":   &t.Mobile,
@@ -2575,15 +2606,15 @@ func (p *Fstenant) Firestoreupdatetenantweb(tenantid int) error {
 	ctx := context.Background()
 	sa := option.WithCredentialsFile(firestorejsonkey)
 	connection := os.Getenv("firestore")
-	print("connect=",connection)
+	print("connect=", connection)
 	var tenant string
 
-	if connection=="firestoredev"{
-		tenant="tenantsdev"
-		
-	}else{
-		tenant="tenants"
-		
+	if connection == "firestoredev" {
+		tenant = "tenantsdev"
+
+	} else {
+		tenant = "tenants"
+
 	}
 	app, err := firebase.NewApp(ctx, nil, sa)
 
@@ -2616,4 +2647,48 @@ func (p *Fstenant) Firestoreupdatetenantweb(tenantid int) error {
 	}
 
 	return nil
+}
+
+//WELCOME EMAIL TEMPLATE
+func (c *Maildata) WelcomeEmail() {
+
+	viper.SetConfigName("config") // config file name without extension
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		fmt.Println("fatal error config file: default \n", err)
+		os.Exit(1)
+	}
+	from := viper.GetString("DEV.EMAIL_ADDRESS")
+	password := viper.GetString("DEV.EMAIL_PASSWORD")
+
+	// Receiver email address.
+	to := c.Tomail
+
+	// smtp server configuration.
+	smtpHost := viper.GetString("DEV.SMTP_HOST")
+	smtpPort := viper.GetString("DEV.SMTP_PORT")
+	// Authentication.
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+	router1.LoadHTMLGlob("view/*")
+
+	// Sending email.
+	t, _ := template.ParseFiles("view/template.html")
+
+	// Initialize the routes
+	var body bytes.Buffer
+
+	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	body.Write([]byte(fmt.Sprintf("Subject: This is a test subject \n%s\n\n", mimeHeaders)))
+
+	t.Execute(&body, &c)
+
+	// Sending email.
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, body.Bytes())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Email Sent!")
 }

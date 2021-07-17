@@ -849,7 +849,34 @@ Tag:String!
 Mapid:Int!
 Status:String!
 }
-
+type getfavbusinesssdata{
+status:Boolean!
+code:Int!
+message:String!
+businessinfo:getfavbusiness
+}
+type getfavbusiness{
+ tenantid:Int!
+ moduleid:Int!
+ modulename:String!
+ brandname:String!
+ about:String!
+ email:String!
+ phone:String!
+ address:String!
+ cod:Int!
+ digital:Int!
+ tenantaccid:String!
+ tenanttoken:String!
+ tenantimage:String!
+ countrycode:String!
+ currencycode:String!
+ currencysymbol:String!
+ Tenantpaymentid:String!
+ favouriteid:Int!
+ customerid:Int!
+ favouritestatus:Boolean!
+}
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
@@ -868,7 +895,8 @@ type Query {
  getsubcategorybyid(categoryid:Int!): getsubcategorydata
  gettenantsubcategory(tenantid:Int!,categoryid:Int!,moduleid:Int!):gettenantsubcategorydata
  getnonsubscribedcategory(tenantid:Int!):getnonsubscribedcategorydata
- gettenantinfo(tenantid:Int!):result
+ getfavouritebusiness(tenantid:Int!,categoryid:Int!,customerid:Int!):getfavbusinesssdata
+
 }
 
 type Mutation {

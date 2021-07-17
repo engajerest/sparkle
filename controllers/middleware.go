@@ -167,6 +167,7 @@ func Tenantupdate(c *gin.Context) {
 
 	custerr := fs.Firestoreupdatetenantweb(fs.Tenantid)
 	if custerr != nil {
+		fmt.Println("custerr",custerr)
 		res.Status=false
 		res.Code=http.StatusBadRequest
 		res.Message="Internal Error in Firestore"

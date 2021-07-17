@@ -148,6 +148,7 @@ type ComplexityRoot struct {
 		Getallpromos             func(childComplexity int, moduleid int) int
 		Getapptypes              func(childComplexity int, tag string) int
 		Getchargetypes           func(childComplexity int) int
+		Getfavouritebusiness     func(childComplexity int, tenantid int, categoryid int, customerid int) int
 		Getlocationbyid          func(childComplexity int, tenantid int, locationid int) int
 		Getnonsubscribed         func(childComplexity int, tenantid int) int
 		Getnonsubscribedcategory func(childComplexity int, tenantid int) int
@@ -156,7 +157,6 @@ type ComplexityRoot struct {
 		Getpromotypes            func(childComplexity int) int
 		Getsubcategorybyid       func(childComplexity int, categoryid int) int
 		Getsubscriptions         func(childComplexity int, tenantid int) int
-		Gettenantinfo            func(childComplexity int, tenantid int) int
 		Gettenantsubcategory     func(childComplexity int, tenantid int, categoryid int, moduleid int) int
 		Location                 func(childComplexity int, tenantid int) int
 		Sparkle                  func(childComplexity int) int
@@ -284,6 +284,36 @@ type ComplexityRoot struct {
 		Message func(childComplexity int) int
 		Promos  func(childComplexity int) int
 		Status  func(childComplexity int) int
+	}
+
+	Getfavbusiness struct {
+		About           func(childComplexity int) int
+		Address         func(childComplexity int) int
+		Brandname       func(childComplexity int) int
+		Cod             func(childComplexity int) int
+		Countrycode     func(childComplexity int) int
+		Currencycode    func(childComplexity int) int
+		Currencysymbol  func(childComplexity int) int
+		Customerid      func(childComplexity int) int
+		Digital         func(childComplexity int) int
+		Email           func(childComplexity int) int
+		Favouriteid     func(childComplexity int) int
+		Favouritestatus func(childComplexity int) int
+		Moduleid        func(childComplexity int) int
+		Modulename      func(childComplexity int) int
+		Phone           func(childComplexity int) int
+		Tenantaccid     func(childComplexity int) int
+		Tenantid        func(childComplexity int) int
+		Tenantimage     func(childComplexity int) int
+		Tenantpaymentid func(childComplexity int) int
+		Tenanttoken     func(childComplexity int) int
+	}
+
+	Getfavbusinesssdata struct {
+		Businessinfo func(childComplexity int) int
+		Code         func(childComplexity int) int
+		Message      func(childComplexity int) int
+		Status       func(childComplexity int) int
 	}
 
 	Getnonsubscribedcategorydata struct {
@@ -686,7 +716,7 @@ type QueryResolver interface {
 	Getsubcategorybyid(ctx context.Context, categoryid int) (*model.Getsubcategorydata, error)
 	Gettenantsubcategory(ctx context.Context, tenantid int, categoryid int, moduleid int) (*model.Gettenantsubcategorydata, error)
 	Getnonsubscribedcategory(ctx context.Context, tenantid int) (*model.Getnonsubscribedcategorydata, error)
-	Gettenantinfo(ctx context.Context, tenantid int) (*model.Result, error)
+	Getfavouritebusiness(ctx context.Context, tenantid int, categoryid int, customerid int) (*model.Getfavbusinesssdata, error)
 }
 
 type executableSchema struct {
@@ -1359,6 +1389,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Getchargetypes(childComplexity), true
 
+	case "Query.getfavouritebusiness":
+		if e.complexity.Query.Getfavouritebusiness == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getfavouritebusiness_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Getfavouritebusiness(childComplexity, args["tenantid"].(int), args["categoryid"].(int), args["customerid"].(int)), true
+
 	case "Query.getlocationbyid":
 		if e.complexity.Query.Getlocationbyid == nil {
 			break
@@ -1449,18 +1491,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Getsubscriptions(childComplexity, args["tenantid"].(int)), true
-
-	case "Query.gettenantinfo":
-		if e.complexity.Query.Gettenantinfo == nil {
-			break
-		}
-
-		args, err := ec.field_Query_gettenantinfo_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Gettenantinfo(childComplexity, args["tenantid"].(int)), true
 
 	case "Query.gettenantsubcategory":
 		if e.complexity.Query.Gettenantsubcategory == nil {
@@ -2071,6 +2101,174 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Getallpromodata.Status(childComplexity), true
+
+	case "getfavbusiness.about":
+		if e.complexity.Getfavbusiness.About == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.About(childComplexity), true
+
+	case "getfavbusiness.address":
+		if e.complexity.Getfavbusiness.Address == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Address(childComplexity), true
+
+	case "getfavbusiness.brandname":
+		if e.complexity.Getfavbusiness.Brandname == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Brandname(childComplexity), true
+
+	case "getfavbusiness.cod":
+		if e.complexity.Getfavbusiness.Cod == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Cod(childComplexity), true
+
+	case "getfavbusiness.countrycode":
+		if e.complexity.Getfavbusiness.Countrycode == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Countrycode(childComplexity), true
+
+	case "getfavbusiness.currencycode":
+		if e.complexity.Getfavbusiness.Currencycode == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Currencycode(childComplexity), true
+
+	case "getfavbusiness.currencysymbol":
+		if e.complexity.Getfavbusiness.Currencysymbol == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Currencysymbol(childComplexity), true
+
+	case "getfavbusiness.customerid":
+		if e.complexity.Getfavbusiness.Customerid == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Customerid(childComplexity), true
+
+	case "getfavbusiness.digital":
+		if e.complexity.Getfavbusiness.Digital == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Digital(childComplexity), true
+
+	case "getfavbusiness.email":
+		if e.complexity.Getfavbusiness.Email == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Email(childComplexity), true
+
+	case "getfavbusiness.favouriteid":
+		if e.complexity.Getfavbusiness.Favouriteid == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Favouriteid(childComplexity), true
+
+	case "getfavbusiness.favouritestatus":
+		if e.complexity.Getfavbusiness.Favouritestatus == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Favouritestatus(childComplexity), true
+
+	case "getfavbusiness.moduleid":
+		if e.complexity.Getfavbusiness.Moduleid == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Moduleid(childComplexity), true
+
+	case "getfavbusiness.modulename":
+		if e.complexity.Getfavbusiness.Modulename == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Modulename(childComplexity), true
+
+	case "getfavbusiness.phone":
+		if e.complexity.Getfavbusiness.Phone == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Phone(childComplexity), true
+
+	case "getfavbusiness.tenantaccid":
+		if e.complexity.Getfavbusiness.Tenantaccid == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Tenantaccid(childComplexity), true
+
+	case "getfavbusiness.tenantid":
+		if e.complexity.Getfavbusiness.Tenantid == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Tenantid(childComplexity), true
+
+	case "getfavbusiness.tenantimage":
+		if e.complexity.Getfavbusiness.Tenantimage == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Tenantimage(childComplexity), true
+
+	case "getfavbusiness.Tenantpaymentid":
+		if e.complexity.Getfavbusiness.Tenantpaymentid == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Tenantpaymentid(childComplexity), true
+
+	case "getfavbusiness.tenanttoken":
+		if e.complexity.Getfavbusiness.Tenanttoken == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusiness.Tenanttoken(childComplexity), true
+
+	case "getfavbusinesssdata.businessinfo":
+		if e.complexity.Getfavbusinesssdata.Businessinfo == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusinesssdata.Businessinfo(childComplexity), true
+
+	case "getfavbusinesssdata.code":
+		if e.complexity.Getfavbusinesssdata.Code == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusinesssdata.Code(childComplexity), true
+
+	case "getfavbusinesssdata.message":
+		if e.complexity.Getfavbusinesssdata.Message == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusinesssdata.Message(childComplexity), true
+
+	case "getfavbusinesssdata.status":
+		if e.complexity.Getfavbusinesssdata.Status == nil {
+			break
+		}
+
+		return e.complexity.Getfavbusinesssdata.Status(childComplexity), true
 
 	case "getnonsubscribedcategorydata.category":
 		if e.complexity.Getnonsubscribedcategorydata.Category == nil {
@@ -4779,7 +4977,34 @@ Tag:String!
 Mapid:Int!
 Status:String!
 }
-
+type getfavbusinesssdata{
+status:Boolean!
+code:Int!
+message:String!
+businessinfo:getfavbusiness
+}
+type getfavbusiness{
+ tenantid:Int!
+ moduleid:Int!
+ modulename:String!
+ brandname:String!
+ about:String!
+ email:String!
+ phone:String!
+ address:String!
+ cod:Int!
+ digital:Int!
+ tenantaccid:String!
+ tenanttoken:String!
+ tenantimage:String!
+ countrycode:String!
+ currencycode:String!
+ currencysymbol:String!
+ Tenantpaymentid:String!
+ favouriteid:Int!
+ customerid:Int!
+ favouritestatus:Boolean!
+}
 type Query {
  sparkle: Sparkle!
  location(tenantid:Int!):getalllocations
@@ -4798,7 +5023,8 @@ type Query {
  getsubcategorybyid(categoryid:Int!): getsubcategorydata
  gettenantsubcategory(tenantid:Int!,categoryid:Int!,moduleid:Int!):gettenantsubcategorydata
  getnonsubscribedcategory(tenantid:Int!):getnonsubscribedcategorydata
- gettenantinfo(tenantid:Int!):result
+ getfavouritebusiness(tenantid:Int!,categoryid:Int!,customerid:Int!):getfavbusinesssdata
+
 }
 
 type Mutation {
@@ -5152,6 +5378,39 @@ func (ec *executionContext) field_Query_getapptypes_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_getfavouritebusiness_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["tenantid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tenantid"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["categoryid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryid"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["categoryid"] = arg1
+	var arg2 int
+	if tmp, ok := rawArgs["customerid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerid"))
+		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["customerid"] = arg2
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_getlocationbyid_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5270,21 +5529,6 @@ func (ec *executionContext) field_Query_getsubcategorybyid_args(ctx context.Cont
 }
 
 func (ec *executionContext) field_Query_getsubscriptions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 int
-	if tmp, ok := rawArgs["tenantid"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantid"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["tenantid"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_gettenantinfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
@@ -8736,7 +8980,7 @@ func (ec *executionContext) _Query_getnonsubscribedcategory(ctx context.Context,
 	return ec.marshalOgetnonsubscribedcategorydata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetnonsubscribedcategorydata(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_gettenantinfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_getfavouritebusiness(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8753,7 +8997,7 @@ func (ec *executionContext) _Query_gettenantinfo(ctx context.Context, field grap
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_gettenantinfo_args(ctx, rawArgs)
+	args, err := ec.field_Query_getfavouritebusiness_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -8761,7 +9005,7 @@ func (ec *executionContext) _Query_gettenantinfo(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Gettenantinfo(rctx, args["tenantid"].(int))
+		return ec.resolvers.Query().Getfavouritebusiness(rctx, args["tenantid"].(int), args["categoryid"].(int), args["customerid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8770,9 +9014,9 @@ func (ec *executionContext) _Query_gettenantinfo(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Result)
+	res := resTmp.(*model.Getfavbusinesssdata)
 	fc.Result = res
-	return ec.marshalOresult2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+	return ec.marshalOgetfavbusinesssdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetfavbusinesssdata(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -12711,6 +12955,843 @@ func (ec *executionContext) _getallpromodata_promos(ctx context.Context, field g
 	res := resTmp.([]*model.Promo)
 	fc.Result = res
 	return ec.marshalOpromo2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐPromo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_tenantid(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_moduleid(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Moduleid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_modulename(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Modulename, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_brandname(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Brandname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_about(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.About, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_email(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_phone(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Phone, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_address(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Address, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_cod(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cod, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_digital(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Digital, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_tenantaccid(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantaccid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_tenanttoken(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenanttoken, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_tenantimage(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantimage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_countrycode(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Countrycode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_currencycode(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Currencycode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_currencysymbol(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Currencysymbol, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_Tenantpaymentid(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tenantpaymentid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_favouriteid(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Favouriteid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_customerid(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Customerid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusiness_favouritestatus(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusiness) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusiness",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Favouritestatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusinesssdata_status(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusinesssdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusinesssdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusinesssdata_code(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusinesssdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusinesssdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusinesssdata_message(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusinesssdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusinesssdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _getfavbusinesssdata_businessinfo(ctx context.Context, field graphql.CollectedField, obj *model.Getfavbusinesssdata) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "getfavbusinesssdata",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Businessinfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Getfavbusiness)
+	fc.Result = res
+	return ec.marshalOgetfavbusiness2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetfavbusiness(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _getnonsubscribedcategorydata_status(ctx context.Context, field graphql.CollectedField, obj *model.Getnonsubscribedcategorydata) (ret graphql.Marshaler) {
@@ -24628,7 +25709,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_getnonsubscribedcategory(ctx, field)
 				return res
 			})
-		case "gettenantinfo":
+		case "getfavouritebusiness":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -24636,7 +25717,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_gettenantinfo(ctx, field)
+				res = ec._Query_getfavouritebusiness(ctx, field)
 				return res
 			})
 		case "__type":
@@ -25546,6 +26627,167 @@ func (ec *executionContext) _getallpromodata(ctx context.Context, sel ast.Select
 			}
 		case "promos":
 			out.Values[i] = ec._getallpromodata_promos(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var getfavbusinessImplementors = []string{"getfavbusiness"}
+
+func (ec *executionContext) _getfavbusiness(ctx context.Context, sel ast.SelectionSet, obj *model.Getfavbusiness) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getfavbusinessImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("getfavbusiness")
+		case "tenantid":
+			out.Values[i] = ec._getfavbusiness_tenantid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "moduleid":
+			out.Values[i] = ec._getfavbusiness_moduleid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "modulename":
+			out.Values[i] = ec._getfavbusiness_modulename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "brandname":
+			out.Values[i] = ec._getfavbusiness_brandname(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "about":
+			out.Values[i] = ec._getfavbusiness_about(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "email":
+			out.Values[i] = ec._getfavbusiness_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "phone":
+			out.Values[i] = ec._getfavbusiness_phone(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "address":
+			out.Values[i] = ec._getfavbusiness_address(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "cod":
+			out.Values[i] = ec._getfavbusiness_cod(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "digital":
+			out.Values[i] = ec._getfavbusiness_digital(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tenantaccid":
+			out.Values[i] = ec._getfavbusiness_tenantaccid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tenanttoken":
+			out.Values[i] = ec._getfavbusiness_tenanttoken(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tenantimage":
+			out.Values[i] = ec._getfavbusiness_tenantimage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "countrycode":
+			out.Values[i] = ec._getfavbusiness_countrycode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "currencycode":
+			out.Values[i] = ec._getfavbusiness_currencycode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "currencysymbol":
+			out.Values[i] = ec._getfavbusiness_currencysymbol(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Tenantpaymentid":
+			out.Values[i] = ec._getfavbusiness_Tenantpaymentid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "favouriteid":
+			out.Values[i] = ec._getfavbusiness_favouriteid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "customerid":
+			out.Values[i] = ec._getfavbusiness_customerid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "favouritestatus":
+			out.Values[i] = ec._getfavbusiness_favouritestatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var getfavbusinesssdataImplementors = []string{"getfavbusinesssdata"}
+
+func (ec *executionContext) _getfavbusinesssdata(ctx context.Context, sel ast.SelectionSet, obj *model.Getfavbusinesssdata) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getfavbusinesssdataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("getfavbusinesssdata")
+		case "status":
+			out.Values[i] = ec._getfavbusinesssdata_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "code":
+			out.Values[i] = ec._getfavbusinesssdata_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "message":
+			out.Values[i] = ec._getfavbusinesssdata_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "businessinfo":
+			out.Values[i] = ec._getfavbusinesssdata_businessinfo(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -28801,6 +30043,20 @@ func (ec *executionContext) marshalOgetallpromodata2ᚖgithubᚗcomᚋengajerest
 	return ec._getallpromodata(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOgetfavbusiness2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetfavbusiness(ctx context.Context, sel ast.SelectionSet, v *model.Getfavbusiness) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._getfavbusiness(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOgetfavbusinesssdata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetfavbusinesssdata(ctx context.Context, sel ast.SelectionSet, v *model.Getfavbusinesssdata) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._getfavbusinesssdata(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOgetnonsubscribedcategorydata2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐGetnonsubscribedcategorydata(ctx context.Context, sel ast.SelectionSet, v *model.Getnonsubscribedcategorydata) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -29261,13 +30517,6 @@ func (ec *executionContext) marshalOpromotypesdata2ᚖgithubᚗcomᚋengajerest�
 		return graphql.Null
 	}
 	return ec._promotypesdata(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOresult2ᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐResult(ctx context.Context, sel ast.SelectionSet, v *model.Result) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._result(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOsocialadddata2ᚕᚖgithubᚗcomᚋengajerestᚋsparkleᚋgraphᚋmodelᚐSocialadddata(ctx context.Context, v interface{}) ([]*model.Socialadddata, error) {

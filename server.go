@@ -1,6 +1,7 @@
 package main
 
 import (
+
 	"github.com/engajerest/sparkle/app"
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +11,15 @@ var (
 )
 
 func main() {
+	// var data subscription.Maildata
+	// data.Code="12345"
+	// data.Email="enaje.cloud.com"
+	// data.Name="Engaje Tester"
+	// data.Tomail=[]string{"rajaraju75649@gmail.com","sahul4060@gmail.com","pradeep7394@gmail.com",
+	// "fazulilahi@gmail.com","fazul@adloggs.com","ilahi@nearle.in"}
+	// data.WelcomeEmail()
 	app.StartApplication()
+
 	// router := gin.Default()
 
 	// v2 := router.Group("/live")

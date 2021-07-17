@@ -18,4 +18,7 @@ DEV:
   DATABASE_SERVER_HOST: "139.59.69.8"
   USER_CONTEXT_KEY: "usercontextkey"
   JWT_SECRET_KEY: "secret"
-  
+  EMAIL_ADDRESS: "engaje.cloud@gmail.com"
+  EMAIL_PASSWORD: "Engaje@2021"
+  SMTP_HOST: "smtp.gmail.com"
+  SMTP_PORT: "587"

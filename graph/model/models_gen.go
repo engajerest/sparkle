@@ -298,6 +298,36 @@ type Getallpromodata struct {
 	Promos  []*Promo `json:"promos"`
 }
 
+type Getfavbusiness struct {
+	Tenantid        int    `json:"tenantid"`
+	Moduleid        int    `json:"moduleid"`
+	Modulename      string `json:"modulename"`
+	Brandname       string `json:"brandname"`
+	About           string `json:"about"`
+	Email           string `json:"email"`
+	Phone           string `json:"phone"`
+	Address         string `json:"address"`
+	Cod             int    `json:"cod"`
+	Digital         int    `json:"digital"`
+	Tenantaccid     string `json:"tenantaccid"`
+	Tenanttoken     string `json:"tenanttoken"`
+	Tenantimage     string `json:"tenantimage"`
+	Countrycode     string `json:"countrycode"`
+	Currencycode    string `json:"currencycode"`
+	Currencysymbol  string `json:"currencysymbol"`
+	Tenantpaymentid string `json:"Tenantpaymentid"`
+	Favouriteid     int    `json:"favouriteid"`
+	Customerid      int    `json:"customerid"`
+	Favouritestatus bool   `json:"favouritestatus"`
+}
+
+type Getfavbusinesssdata struct {
+	Status       bool            `json:"status"`
+	Code         int             `json:"code"`
+	Message      string          `json:"message"`
+	Businessinfo *Getfavbusiness `json:"businessinfo"`
+}
+
 type Getnonsubscribedcategorydata struct {
 	Status   bool   `json:"status"`
 	Code     int    `json:"code"`

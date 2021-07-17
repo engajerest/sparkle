@@ -341,25 +341,25 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 	data1 := data.UpdateTenantBusiness()
 
 	for _, v := range schemasocialadd {
-		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile,Socialtypeid: *v.Socialtypeid, Dailcode: *v.Dailcode, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon, Accesstype: *v.Accesstype})
+		check = append(check, subscription.Social{SociaProfile: *v.Socialprofile, Socialtypeid: *v.Socialtypeid, Dailcode: *v.Dailcode, SocialLink: *v.Sociallink, SocialIcon: *v.Socialicon, Accesstype: *v.Accesstype})
 	}
-	
+
 	if len(check) != 0 {
-	
+
 		social := data.InsertTenantSocial(check, data.TenantID)
 		print(social)
 	}
-	
+
 	for _, k := range schemasocialupdate {
-	
+
 		updatedata = append(updatedata, subscription.Social{
-			Socialid: *k.Socialid,
-			Socialtypeid:*k.Socialtypeid, SociaProfile: *k.Socialprofile,
-			 Dailcode: *k.Dailcode, SocialLink: *k.Sociallink,
-			  SocialIcon: *k.Socialicon, Accesstype: *k.Accesstype})
+			Socialid:     *k.Socialid,
+			Socialtypeid: *k.Socialtypeid, SociaProfile: *k.Socialprofile,
+			Dailcode: *k.Dailcode, SocialLink: *k.Sociallink,
+			SocialIcon: *k.Socialicon, Accesstype: *k.Accesstype})
 	}
 	if len(updatedata) != 0 {
-		
+
 		var s subscription.Social
 		for i := 0; i < len(updatedata); i++ {
 			s.Socialid = updatedata[i].Socialid
@@ -368,8 +368,8 @@ func (r *mutationResolver) Updatetenantbusiness(ctx context.Context, businessinf
 			s.SocialLink = updatedata[i].SocialLink
 			s.Dailcode = updatedata[i].Dailcode
 			s.Accesstype = updatedata[i].Accesstype
-			s.Socialtypeid=updatedata[i].Socialtypeid
-			
+			s.Socialtypeid = updatedata[i].Socialtypeid
+
 			status := s.UpdateTenantSocial(data.TenantID)
 			if status == false {
 				return nil, errors.New("error in updating socialinfo")
@@ -1071,7 +1071,7 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 	var Result []*model.Socialinfo
 	var businessinfo *subscription.BusinessUpdate
 	var stat bool
-	
+
 	var data []subscription.Tenantsocial
 	data = subscription.Getsocialprofiles(tenantid)
 	for _, k := range data {
@@ -1082,9 +1082,9 @@ func (r *queryResolver) GetBusiness(ctx context.Context, tenantid int, categoryi
 			Sociallink:    k.Sociallink,
 			Socialicon:    k.Socialicon,
 			Accesstype:    k.Accesstype,
-			Socialtypeid: k.Socialtypeid,Socialtype: &model.App{
-				Apptypeid: k.App_types.Apptypeid,Typename: k.App_types.Typename,
-				Tag: k.App_types.Tag,Mapid: k.App_types.Mapid,Status: k.App_types.Status,
+			Socialtypeid:  k.Socialtypeid, Socialtype: &model.App{
+				Apptypeid: k.App_types.Apptypeid, Typename: k.App_types.Typename,
+				Tag: k.App_types.Tag, Mapid: k.App_types.Mapid, Status: k.App_types.Status,
 			},
 		})
 	}
@@ -1374,17 +1374,22 @@ func (r *queryResolver) Getnonsubscribedcategory(ctx context.Context, tenantid i
 	return &model.Getnonsubscribedcategorydata{Status: true, Code: http.StatusOK, Message: "Success", Category: data}, nil
 }
 
-func (r *queryResolver) Gettenantinfo(ctx context.Context, tenantid int) (*model.Result, error) {
+func (r *queryResolver) Getfavouritebusiness(ctx context.Context, tenantid int, categoryid int, customerid int) (*model.Getfavbusinesssdata, error) {
 	id, usererr := datacontext.ForAuthContext(ctx)
 	if usererr != nil {
 		return nil, errors.New("user not detected")
 	}
-	print("userid==")
+	print("getbusin")
 	print(id.ID)
-
-	_ = subscription.Gettenantinfo(tenantid)
-
-	return &model.Result{Status: true, Code: http.StatusOK, Message: "Success"}, nil
+d := subscription.Getbusinessbyfavourites(categoryid,tenantid,customerid)
+	return &model.Getfavbusinesssdata{
+		Status: true,Code: http.StatusOK,Message: "Success",Businessinfo: &model.Getfavbusiness{
+			Tenantid: d.Tenantid,Moduleid: d.Moduleid,Modulename: d.Modulename,Brandname: d.Brandname,About: d.Tenantinfo,
+			Email: d.Primaryemail,Phone: d.Primarycontact,Address: d.Address,Cod: d.Paymode1,Digital: d.Paymode2,Tenantaccid: d.Tenantaccid,
+			Tenanttoken: d.Tenanttoken,Tenantimage: d.Tenantimage,Countrycode: d.Countrycode,Currencycode: d.Currencycode,
+			Currencysymbol: d.Currencysymbol,Tenantpaymentid: d.Tenantpaymentid,Favouriteid: d.Favouriteid,Customerid: d.Customerid,
+Favouritestatus: d.Favouritestatus,		},
+	},nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

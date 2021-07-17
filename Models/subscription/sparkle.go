@@ -247,7 +247,7 @@ type AuthUser struct {
 }
 type Social struct {
 	Socialid     int    `json:"socialid" `
-	Socialtypeid int `json:"socialtypeid"`
+	Socialtypeid int    `json:"socialtypeid"`
 	SociaProfile string `json:"socialprofile"`
 	Dailcode     string `json:"dailcode"`
 	SocialLink   string `json:"sociallink"`
@@ -255,15 +255,15 @@ type Social struct {
 	Accesstype   bool   `json:"accesstype"`
 }
 type Tenantsocial struct {
-	Socialid     int    `json:"socialid" gorm:"primary_key"`
-	Socialtypeid int `json:"socialtypeid"`
-	Tenantid     int    `json:"tenantid"`
-	Socialprofile string `json:"socialprofile"`
-	Dailcode     string `json:"dailcode"`
-	Sociallink   string `json:"sociallink"`
-	Socialicon   string `json:"socialicon"`
-	Accesstype   bool   `json:"accesstype"`
-	App_types          App_type `json:"app_types" gorm:"ForeignKey:apptypeid;references:socialtypeid"`
+	Socialid      int      `json:"socialid" gorm:"primary_key"`
+	Socialtypeid  int      `json:"socialtypeid"`
+	Tenantid      int      `json:"tenantid"`
+	Socialprofile string   `json:"socialprofile"`
+	Dailcode      string   `json:"dailcode"`
+	Sociallink    string   `json:"sociallink"`
+	Socialicon    string   `json:"socialicon"`
+	Accesstype    bool     `json:"accesstype"`
+	App_types     App_type `json:"app_types" gorm:"ForeignKey:apptypeid;references:socialtypeid"`
 }
 type Tenantlocation struct {
 	// gorm.Model
@@ -570,20 +570,21 @@ type RestError struct {
 	Error   string `json:"error"`
 }
 
-type App_type struct{
-	Apptypeid int `json:"apptypeid"`
-	Typename string `json:"typename"`
-	Tag string `json:"tag"`
-	Mapid int `json:"mapid"`
-	Status string `json:"status"`
+type App_type struct {
+	Apptypeid int    `json:"apptypeid"`
+	Typename  string `json:"typename"`
+	Tag       string `json:"tag"`
+	Mapid     int    `json:"mapid"`
+	Status    string `json:"status"`
 }
+
 //firestore
 type Fstenant struct {
 	Name        string `json:"name"`
 	Email       string `json:"email"`
 	Mobile      string `json:"mobile"`
 	Categoryid  int    `json:"categoryid"`
-	Tenantid    int   `json:"tenantid"`
+	Tenantid    int    `json:"tenantid"`
 	Locationid  int    `json:"locationid"`
 	Moduleid    int    `json:"moduleid"`
 	Featureid   int    `json:"featureid"`
@@ -597,10 +598,39 @@ type Fstenant struct {
 	OpenTime    string `json:"opentime"`
 	CloseTime   string `json:"closetime"`
 	Tenantimage string `json:"tenantimage"`
-	Status string `json:"status"`
+	Status      string `json:"status"`
 }
-type Result struct{
-	Status bool `json:"status"`
-	Code int `json:"code"`
+type Result struct {
+	Status  bool   `json:"status"`
+	Code    int    `json:"code"`
 	Message string `json:"message"`
+}
+
+type Maildata struct {
+	Name  string `json:"name"`
+	Code  string `json:"code"`
+	Email string `json:"email"`
+	Tomail []string `json:"tomail"`
+}
+type Getfavbusiness struct {
+	Tenantid        int      `json:"tenantid"`
+	Moduleid        int      `json:"moduleid"`
+	Modulename      string   `json:"modulename"`
+	Brandname       string   `json:"brandname"`
+	Tenantaccid     string   `json:"tenantaccid"`
+	Tenantinfo           string   `json:"tenantinfo"`
+	Primaryemail           string   `json:"primaryemail"`
+	Primarycontact           string   `json:"primarycontact"`
+	Address         string   `json:"address"`
+	Paymode1        int      `json:"paymode1"`
+	Paymode2        int      `json:"paymode2"`
+	Tenanttoken     string   `json:"tenanttoken"`
+	Tenantimage     string   `json:"tenantimage"`
+	Countrycode     string   `json:"countrycode"`
+	Currencycode    string   `json:"currencycode"`
+	Currencysymbol  string   `json:"currencysymbol"`
+	Tenantpaymentid string   `json:"tenantpaymentid"`
+	Favouriteid int `json:"favouriteid"`
+	Customerid int `json:"customerid"`
+	Favouritestatus bool `json:"favouritestatus"`
 }
