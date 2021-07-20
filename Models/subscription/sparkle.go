@@ -641,6 +641,13 @@ type Tenantlocationsetting struct{
 	Locationsettingid int `json:"locationsettingid"`
 	Tenantid int `json:"tenantid"`
 	Locationid int `json:"locationid"`
+	Weekday1 string `json:"weekday1"`
+	Weekday2 string `json:"weekday2"`
+	Weekday3 string `json:"weekday3"`
+	Weekday4 string `json:"weekday4"`
+	Weekday5 string `json:"weekday5"`
+	Weekday6 string `json:"weekday6"`
+	Weekday7 string `json:"weekday7"`
 	Sunday bool `json:"sunday"`
 	Monday bool `json:"monday"`
 	Tuesday bool `json:"tuesday"`

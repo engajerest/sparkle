@@ -366,6 +366,13 @@ type Tenantlocationsetting{
  Locationsettingid:Int!
 Tenantid:Int!
 Locationid:Int!
+ Weekday1:String!
+  Weekday2:String!
+   Weekday3:String!
+    Weekday4:String!
+     Weekday5:String!
+      Weekday6:String!
+       Weekday7:String!
 Sunday:Boolean!
 Monday:Boolean!
 Tuesday:Boolean!
