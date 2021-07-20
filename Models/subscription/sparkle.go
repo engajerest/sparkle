@@ -291,6 +291,8 @@ type Tenantlocation struct {
 	Appuserprofiles []App_userprofiles `json:"appuserprofile" gorm:"ForeignKey:userlocationid"`
 	Tenantcharges   []Tenantcharge     `json:"tenantcharge" gorm:"ForeignKey:locationid"`
 	Tenantsettings  []Tenantsetting    `json:"tenantsetting" gorm:"ForeignKey:locationid"`
+	Tenantlocationsettings Tenantlocationsetting `json:"tenantlocationsettings" gorm:"ForeignKey:locationid"`
+
 }
 type App_userprofiles struct {
 	// gorm.Model
@@ -633,4 +635,18 @@ type Getfavbusiness struct {
 	Favouriteid int `json:"favouriteid"`
 	Customerid int `json:"customerid"`
 	Favouritestatus bool `json:"favouritestatus"`
+}
+
+type Tenantlocationsetting struct{
+	Locationsettingid int `json:"locationsettingid"`
+	Tenantid int `json:"tenantid"`
+	Locationid int `json:"locationid"`
+	Sunday bool `json:"sunday"`
+	Monday bool `json:"monday"`
+	Tuesday bool `json:"tuesday"`
+	Wednesday bool `json:"wednesday"`
+	Thursday bool `json:"thursday"`
+	Friday bool `json:"friday"`
+	Saturday bool `json:"saturday"`
+	Status string `json:"status"`
 }

@@ -106,6 +106,15 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		if status != true {
 			return nil, errors.New("tenant not subscribed")
 		}
+		var w subscription.Tenantlocationsetting
+		w.Tenantid = tenantdata.TenantID
+		w.Locationid = tenantdata.Locationid
+		weekid, weekerror := w.Insertweekdays()
+		if weekerror != nil {
+			print(weekerror)
+		}
+		print("weekid==", weekid)
+
 		storeerr := d.Firestoreinserttenant(int64(tenantdata.TenantID), int64(tenantdata.Locationid), slist[0].Moduleid, slist[0].Categoryid, slist[0].Featureid)
 		if storeerr != nil {
 			print(storeerr)
@@ -443,7 +452,14 @@ func (r *mutationResolver) Createlocation(ctx context.Context, input *model.Loca
 	if firestor != nil {
 		print(firestor)
 	}
-
+	var w subscription.Tenantlocationsetting
+	w.Tenantid = input.TenantID
+	w.Locationid = int(locationid)
+	weekid, weekerror := w.Insertweekdays()
+	if weekerror != nil {
+		print(weekerror)
+	}
+	print("weekid==", weekid)
 	location, errr := loco.GetLocationById(locationid)
 	if errr != nil {
 		return nil, errors.New("location not found")
@@ -901,6 +917,36 @@ func (r *mutationResolver) Unsubscribe(ctx context.Context, input *model.Unsubsc
 	return &model.Promotioncreateddata{Status: true, Code: http.StatusCreated, Message: "Module Unsubscribed"}, nil
 }
 
+func (r *mutationResolver) Updateweekdays(ctx context.Context, input *model.Weekdata) (*model.Promotioncreateddata, error) {
+	id, usererr := datacontext.ForAuthContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("raju")
+	print(id.ID)
+	var w subscription.Tenantlocationsetting
+	w.Tenantid = input.Tenantid
+	w.Locationid = input.Locationid
+	w.Sunday = input.Sunday
+	w.Monday = input.Monday
+	w.Tuesday = input.Tuesday
+	w.Wednesday = input.Wednesday
+	w.Thursday = input.Thursday
+	w.Friday = input.Friday
+	w.Saturday = input.Saturday
+	w.Locationsettingid = input.Locationsettingid
+	status := w.Updateweekday()
+	if status == false {
+		return &model.Promotioncreateddata{
+			Status: false, Code: http.StatusBadRequest, Message: "Weekdays Not Updated for the Tenant",
+		}, nil
+	}
+
+	return &model.Promotioncreateddata{
+		Status: true, Code: http.StatusCreated, Message: "Tenant Weekdays Updated",
+	}, nil
+}
+
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	// id, usererr := controller.ForContext(ctx)
 	id, usererr := datacontext.ForAuthContext(ctx)
@@ -1007,6 +1053,20 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 			Tenantusers:     userresult,
 			Othercharges:    otherchargeresult,
 			Deliverycharges: deliverychargeresult,
+			Locationsettings: &model.Tenantlocationsetting{
+				Locationsettingid: loco.Tenantlocationsettings.Locationsettingid,
+				Tenantid: loco.Tenantlocationsettings.Tenantid,
+				Locationid: loco.Tenantlocationsettings.Locationid,
+				Sunday: loco.Tenantlocationsettings.Sunday,
+				Monday: loco.Tenantlocationsettings.Monday,
+				Tuesday: loco.Tenantlocationsettings.Tuesday,
+				Wednesday: 
+				loco.Tenantlocationsettings.Wednesday,
+				Thursday: loco.Tenantlocationsettings.Thursday,
+				Friday: loco.Tenantlocationsettings.Friday,
+				Saturday: loco.Tenantlocationsettings.Saturday,
+				Status: loco.Tenantlocationsettings.Status,
+			},
 		})
 
 	}
@@ -1242,6 +1302,20 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 			Delivery: loco.Delivery, Deliverytype: loco.Deliverytype, Deliverymins: loco.Deliverymins,
 			Longitude: loco.Longitude, Openingtime: loco.Opentime, Closingtime: loco.Closetime, Status: loco.Status, Tenantusers: userresult, Createdby: loco.Createdby,
 			City: loco.City, Othercharges: otherchargeresult, Deliverycharges: deliverychargeresult,
+			Locationsettings: &model.Tenantlocationsetting{
+				Locationsettingid: loco.Tenantlocationsettings.Locationsettingid,
+				Tenantid: loco.Tenantlocationsettings.Tenantid,
+				Locationid: loco.Tenantlocationsettings.Locationid,
+				Sunday: loco.Tenantlocationsettings.Sunday,
+				Monday: loco.Tenantlocationsettings.Monday,
+				Tuesday: loco.Tenantlocationsettings.Tuesday,
+				Wednesday: 
+				loco.Tenantlocationsettings.Wednesday,
+				Thursday: loco.Tenantlocationsettings.Thursday,
+				Friday: loco.Tenantlocationsettings.Friday,
+				Saturday: loco.Tenantlocationsettings.Saturday,
+				Status: loco.Tenantlocationsettings.Status,	
+			},
 		},
 	}, nil
 }
@@ -1381,15 +1455,15 @@ func (r *queryResolver) Getfavouritebusiness(ctx context.Context, tenantid int, 
 	}
 	print("getbusin")
 	print(id.ID)
-d := subscription.Getbusinessbyfavourites(categoryid,tenantid,customerid)
+	d := subscription.Getbusinessbyfavourites(categoryid, tenantid, customerid)
 	return &model.Getfavbusinesssdata{
-		Status: true,Code: http.StatusOK,Message: "Success",Businessinfo: &model.Getfavbusiness{
-			Tenantid: d.Tenantid,Moduleid: d.Moduleid,Modulename: d.Modulename,Brandname: d.Brandname,About: d.Tenantinfo,
-			Email: d.Primaryemail,Phone: d.Primarycontact,Address: d.Address,Cod: d.Paymode1,Digital: d.Paymode2,Tenantaccid: d.Tenantaccid,
-			Tenanttoken: d.Tenanttoken,Tenantimage: d.Tenantimage,Countrycode: d.Countrycode,Currencycode: d.Currencycode,
-			Currencysymbol: d.Currencysymbol,Tenantpaymentid: d.Tenantpaymentid,Favouriteid: d.Favouriteid,Customerid: d.Customerid,
-Favouritestatus: d.Favouritestatus,		},
-	},nil
+		Status: true, Code: http.StatusOK, Message: "Success", Businessinfo: &model.Getfavbusiness{
+			Tenantid: d.Tenantid, Moduleid: d.Moduleid, Modulename: d.Modulename, Brandname: d.Brandname, About: d.Tenantinfo,
+			Email: d.Primaryemail, Phone: d.Primarycontact, Address: d.Address, Cod: d.Paymode1, Digital: d.Paymode2, Tenantaccid: d.Tenantaccid,
+			Tenanttoken: d.Tenanttoken, Tenantimage: d.Tenantimage, Countrycode: d.Countrycode, Currencycode: d.Currencycode,
+			Currencysymbol: d.Currencysymbol, Tenantpaymentid: d.Tenantpaymentid, Favouriteid: d.Favouriteid, Customerid: d.Customerid,
+			Favouritestatus: d.Favouritestatus},
+	}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

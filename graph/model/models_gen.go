@@ -143,6 +143,20 @@ type TenantDetails struct {
 	Tenanttoken string `json:"Tenanttoken"`
 }
 
+type Tenantlocationsetting struct {
+	Locationsettingid int    `json:"Locationsettingid"`
+	Tenantid          int    `json:"Tenantid"`
+	Locationid        int    `json:"Locationid"`
+	Sunday            bool   `json:"Sunday"`
+	Monday            bool   `json:"Monday"`
+	Tuesday           bool   `json:"Tuesday"`
+	Wednesday         bool   `json:"Wednesday"`
+	Thursday          bool   `json:"Thursday"`
+	Friday            bool   `json:"Friday"`
+	Saturday          bool   `json:"Saturday"`
+	Status            string `json:"Status"`
+}
+
 type Tenantschema struct {
 	Tenantid    int     `json:"Tenantid"`
 	Moduleid    int     `json:"Moduleid"`
@@ -457,29 +471,30 @@ type Locationdata struct {
 }
 
 type Locationgetall struct {
-	Locationid      int               `json:"locationid"`
-	LocationName    string            `json:"locationName"`
-	Tenantid        int               `json:"tenantid"`
-	Email           string            `json:"email"`
-	Contact         string            `json:"contact"`
-	Address         string            `json:"address"`
-	Suburb          string            `json:"suburb"`
-	City            string            `json:"city"`
-	State           string            `json:"state"`
-	Postcode        string            `json:"postcode"`
-	Countycode      string            `json:"countycode"`
-	Latitude        string            `json:"latitude"`
-	Longitude       string            `json:"longitude"`
-	Openingtime     string            `json:"openingtime"`
-	Closingtime     string            `json:"closingtime"`
-	Delivery        bool              `json:"delivery"`
-	Deliverytype    string            `json:"deliverytype"`
-	Deliverymins    int               `json:"deliverymins"`
-	Status          string            `json:"status"`
-	Createdby       int               `json:"createdby"`
-	Tenantusers     []*Userinfodata   `json:"tenantusers"`
-	Othercharges    []*Othercharge    `json:"othercharges"`
-	Deliverycharges []*Deliverycharge `json:"deliverycharges"`
+	Locationid       int                    `json:"locationid"`
+	LocationName     string                 `json:"locationName"`
+	Tenantid         int                    `json:"tenantid"`
+	Email            string                 `json:"email"`
+	Contact          string                 `json:"contact"`
+	Address          string                 `json:"address"`
+	Suburb           string                 `json:"suburb"`
+	City             string                 `json:"city"`
+	State            string                 `json:"state"`
+	Postcode         string                 `json:"postcode"`
+	Countycode       string                 `json:"countycode"`
+	Latitude         string                 `json:"latitude"`
+	Longitude        string                 `json:"longitude"`
+	Openingtime      string                 `json:"openingtime"`
+	Closingtime      string                 `json:"closingtime"`
+	Delivery         bool                   `json:"delivery"`
+	Deliverytype     string                 `json:"deliverytype"`
+	Deliverymins     int                    `json:"deliverymins"`
+	Status           string                 `json:"status"`
+	Createdby        int                    `json:"createdby"`
+	Tenantusers      []*Userinfodata        `json:"tenantusers"`
+	Othercharges     []*Othercharge         `json:"othercharges"`
+	Deliverycharges  []*Deliverycharge      `json:"deliverycharges"`
+	Locationsettings *Tenantlocationsetting `json:"locationsettings"`
 }
 
 type Locationstatusinput struct {
@@ -938,4 +953,17 @@ type Usertenant struct {
 	Tenantid       int         `json:"Tenantid"`
 	Locationid     int         `json:"Locationid"`
 	Tenantusers    []*Userlist `json:"Tenantusers"`
+}
+
+type Weekdata struct {
+	Locationsettingid int  `json:"Locationsettingid"`
+	Tenantid          int  `json:"Tenantid"`
+	Locationid        int  `json:"Locationid"`
+	Sunday            bool `json:"Sunday"`
+	Monday            bool `json:"Monday"`
+	Tuesday           bool `json:"Tuesday"`
+	Wednesday         bool `json:"Wednesday"`
+	Thursday          bool `json:"Thursday"`
+	Friday            bool `json:"Friday"`
+	Saturday          bool `json:"Saturday"`
 }

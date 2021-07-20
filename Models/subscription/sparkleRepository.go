@@ -90,6 +90,8 @@ const (
 	unsubscribe                    = "UPDATE tenantsubscription SET categoryid=0, status='Inactive' WHERE subscriptionid=?"
 	deletecategories               = "DELETE  FROM tenantsubcategories WHERE tenantid=? AND moduleid=?"
 	deletesubcatbyid               = "DELETE  FROM tenantsubcategories WHERE tenantsubcatid=?"
+	insertweekdays = "INSERT INTO tenantlocationsettings (tenantid,locationid) VALUES(?,?)"
+	updateweekdays = "UPDATE tenantlocationsettings SET sunday=?,monday=?,tuesday=?,wednesday=?,thursday=?,friday=?,saturday=? WHERE  locationsettingid=?"
 	//firestore
 	firestorejsonkey = "./engaje-2021-firebase-adminsdk-7sb61-42247472ad.json"
 )
@@ -620,7 +622,7 @@ func LocationTest(id int) []Tenantlocation {
 	var data []Tenantlocation
 
 	DB.Table("tenantlocations").
-		Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=?", id).Find(&data)
+		Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Preload("Tenantlocationsettings").Where("tenantid=?", id).Find(&data)
 	for index, value := range data {
 		fmt.Println(index, " = ", value)
 	}
@@ -642,7 +644,7 @@ func Locationbyid(tenantid, locationid int) *Tenantlocation {
 	var data Tenantlocation
 
 	DB.Table("tenantlocations").
-		Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Where("tenantid=? AND locationid=?", tenantid, locationid).Find(&data)
+		Preload("Appuserprofiles").Preload("Tenantcharges").Preload("Tenantsettings").Preload("Tenantlocationsettings").Where("tenantid=? AND locationid=?", tenantid, locationid).Find(&data)
 
 	fmt.Println(data)
 
@@ -2064,6 +2066,46 @@ func Getbusinessbyfavourites(categoryid, tenantid, customerid int) Getfavbusines
 	DB.Raw(q1 + q2 + q3).Find(&data)
 	return data
 }
+func (p *Tenantlocationsetting) Insertweekdays() (int64,error){
+  
+	statement, err := database.Db.Prepare(insertweekdays)
+
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+	defer statement.Close()
+	res, err := statement.Exec(&p.Tenantid,&p.Locationid)
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal("Error:", err.Error())
+
+	}
+	log.Print("Row inserted in locationsettings!")
+	return id, nil	
+}
+
+func (u *Tenantlocationsetting) Updateweekday() bool {
+	statement, err := database.Db.Prepare(updateweekdays)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer statement.Close()
+	_, err = statement.Exec(&u.Sunday,&u.Monday,&u.Tuesday,&u.Wednesday,&u.Thursday,&u.Friday,&u.Saturday,&u.Locationsettingid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Print("Row updated in tenant weekdays!")
+	return true
+}
+
 
 //firestore
 func (t *Initialsubscriptiondata) Firestoreinserttenant(tenantid, locationid int64, moduleid, catid, featureid int) error {

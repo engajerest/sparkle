@@ -349,6 +349,32 @@ Locationid:Int!
  Closingtime:String!
 
 }
+
+input weekdata{
+Locationsettingid:Int!
+Tenantid:Int!
+Locationid:Int!
+Sunday:Boolean!
+Monday:Boolean!
+Tuesday:Boolean!
+Wednesday:Boolean!
+Thursday:Boolean!
+Friday:Boolean!
+Saturday:Boolean!   
+}
+type Tenantlocationsetting{
+ Locationsettingid:Int!
+Tenantid:Int!
+Locationid:Int!
+Sunday:Boolean!
+Monday:Boolean!
+Tuesday:Boolean!
+Wednesday:Boolean!
+Thursday:Boolean!
+Friday:Boolean!
+Saturday:Boolean!  
+Status:String!  
+}
 type LocationInfo{
  Locationid:Int!
  LocationName:String!
@@ -385,6 +411,7 @@ type locationgetall {
  tenantusers:[userinfodata]
  othercharges:[othercharge]
  deliverycharges:[deliverycharge]
+ locationsettings:Tenantlocationsetting
 }
 type othercharge{
 Tenantchargeid:Int!
@@ -915,4 +942,5 @@ type Mutation {
  insertsubcategory(input:subcatinput):promotioncreateddata
  subscribemore(input:[subscribemoreinput]):subscribedData
  unsubscribe(input:unsubscribeinput):promotioncreateddata
+ updateweekdays(input:weekdata):promotioncreateddata
 }
