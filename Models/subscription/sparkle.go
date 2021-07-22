@@ -288,11 +288,10 @@ type Tenantlocation struct {
 	Createdby    int    `json:"createdby"`
 	Status       string `json:"status"`
 	// Tenantstaffdetails []Tenantstaffdetails `json:"tenantstaffdetails" gorm:"ForeignKey:locationid"`
-	Appuserprofiles []App_userprofiles `json:"appuserprofile" gorm:"ForeignKey:userlocationid"`
-	Tenantcharges   []Tenantcharge     `json:"tenantcharge" gorm:"ForeignKey:locationid"`
-	Tenantsettings  []Tenantsetting    `json:"tenantsetting" gorm:"ForeignKey:locationid"`
+	Appuserprofiles        []App_userprofiles    `json:"appuserprofile" gorm:"ForeignKey:userlocationid"`
+	Tenantcharges          []Tenantcharge        `json:"tenantcharge" gorm:"ForeignKey:locationid"`
+	Tenantsettings         []Tenantsetting       `json:"tenantsetting" gorm:"ForeignKey:locationid"`
 	Tenantlocationsettings Tenantlocationsetting `json:"tenantlocationsettings" gorm:"ForeignKey:locationid"`
-
 }
 type App_userprofiles struct {
 	// gorm.Model
@@ -609,51 +608,58 @@ type Result struct {
 }
 
 type Maildata struct {
-	Name  string `json:"name"`
-	Code  string `json:"code"`
-	Email string `json:"email"`
+	Name   string   `json:"name"`
+	Code   string   `json:"code"`
+	Email  string   `json:"email"`
 	Tomail []string `json:"tomail"`
 }
 type Getfavbusiness struct {
-	Tenantid        int      `json:"tenantid"`
-	Moduleid        int      `json:"moduleid"`
-	Modulename      string   `json:"modulename"`
-	Brandname       string   `json:"brandname"`
-	Tenantaccid     string   `json:"tenantaccid"`
-	Tenantinfo           string   `json:"tenantinfo"`
-	Primaryemail           string   `json:"primaryemail"`
-	Primarycontact           string   `json:"primarycontact"`
-	Address         string   `json:"address"`
-	Paymode1        int      `json:"paymode1"`
-	Paymode2        int      `json:"paymode2"`
-	Tenanttoken     string   `json:"tenanttoken"`
-	Tenantimage     string   `json:"tenantimage"`
-	Countrycode     string   `json:"countrycode"`
-	Currencycode    string   `json:"currencycode"`
-	Currencysymbol  string   `json:"currencysymbol"`
-	Tenantpaymentid string   `json:"tenantpaymentid"`
-	Favouriteid int `json:"favouriteid"`
-	Customerid int `json:"customerid"`
-	Favouritestatus bool `json:"favouritestatus"`
+	Tenantid        int    `json:"tenantid"`
+	Moduleid        int    `json:"moduleid"`
+	Modulename      string `json:"modulename"`
+	Brandname       string `json:"brandname"`
+	Tenantaccid     string `json:"tenantaccid"`
+	Tenantinfo      string `json:"tenantinfo"`
+	Primaryemail    string `json:"primaryemail"`
+	Primarycontact  string `json:"primarycontact"`
+	Address         string `json:"address"`
+	Paymode1        int    `json:"paymode1"`
+	Paymode2        int    `json:"paymode2"`
+	Tenanttoken     string `json:"tenanttoken"`
+	Tenantimage     string `json:"tenantimage"`
+	Countrycode     string `json:"countrycode"`
+	Currencycode    string `json:"currencycode"`
+	Currencysymbol  string `json:"currencysymbol"`
+	Tenantpaymentid string `json:"tenantpaymentid"`
+	Favouriteid     int    `json:"favouriteid"`
+	Customerid      int    `json:"customerid"`
+	Favouritestatus bool   `json:"favouritestatus"`
 }
 
-type Tenantlocationsetting struct{
-	Locationsettingid int `json:"locationsettingid"`
-	Tenantid int `json:"tenantid"`
-	Locationid int `json:"locationid"`
-	Weekday1 string `json:"weekday1"`
-	Weekday2 string `json:"weekday2"`
-	Weekday3 string `json:"weekday3"`
-	Weekday4 string `json:"weekday4"`
-	Weekday5 string `json:"weekday5"`
-	Weekday6 string `json:"weekday6"`
-	Weekday7 string `json:"weekday7"`
-	Sunday bool `json:"sunday"`
-	Monday bool `json:"monday"`
-	Tuesday bool `json:"tuesday"`
-	Wednesday bool `json:"wednesday"`
-	Thursday bool `json:"thursday"`
-	Friday bool `json:"friday"`
-	Saturday bool `json:"saturday"`
-	Status string `json:"status"`
+type Tenantlocationsetting struct {
+	Locationsettingid int    `json:"locationsettingid"`
+	Tenantid          int    `json:"tenantid"`
+	Locationid        int    `json:"locationid"`
+	Starttime1        string `json:"starttime1"`
+	Endtime1          string `json:"endtime1"`
+	Starttime2        string `json:"starttime2"`
+	Endtime2          string `json:"endtime2"`
+	Starttime3        string `json:"starttime3"`
+	Endtime3          string `json:"endtime3"`
+	Starttime4        string `json:"starttime4"`
+	Endtime4          string `json:"endtime4"`
+	Starttime5        string `json:"starttime5"`
+	Endtime5          string `json:"endtime5"`
+	Starttime6        string `json:"starttime6"`
+	Endtime6          string `json:"endtime6"`
+	Starttime7        string `json:"starttime7"`
+	Endtime7          string `json:"endtime7"`
+	Sunday            bool   `json:"sunday"`
+	Monday            bool   `json:"monday"`
+	Tuesday           bool   `json:"tuesday"`
+	Wednesday         bool   `json:"wednesday"`
+	Thursday          bool   `json:"thursday"`
+	Friday            bool   `json:"friday"`
+	Saturday          bool   `json:"saturday"`
+	Status            string `json:"status"`
 }

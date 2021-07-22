@@ -91,7 +91,7 @@ const (
 	deletecategories               = "DELETE  FROM tenantsubcategories WHERE tenantid=? AND moduleid=?"
 	deletesubcatbyid               = "DELETE  FROM tenantsubcategories WHERE tenantsubcatid=?"
 	insertweekdays = "INSERT INTO tenantlocationsettings (tenantid,locationid) VALUES(?,?)"
-	updateweekdays = "UPDATE tenantlocationsettings SET sunday=?,monday=?,tuesday=?,wednesday=?,thursday=?,friday=?,saturday=? WHERE  locationsettingid=?"
+	updateweekdays = "UPDATE tenantlocationsettings SET sunday=?,monday=?,tuesday=?,wednesday=?,thursday=?,friday=?,saturday=?,starttime1=?,starttime2=?,starttime3=?,starttime4=?,starttime5=?,starttime6=?,starttime7=?,endtime1=?,endtime2=?,endtime3=?,endtime4=?,endtime5=?,endtime6=?,endtime7=? WHERE  locationsettingid=?"
 	//firestore
 	firestorejsonkey = "./engaje-2021-firebase-adminsdk-7sb61-42247472ad.json"
 )
@@ -2097,14 +2097,17 @@ func (u *Tenantlocationsetting) Updateweekday() bool {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	_, err = statement.Exec(&u.Sunday,&u.Monday,&u.Tuesday,&u.Wednesday,&u.Thursday,&u.Friday,&u.Saturday,&u.Locationsettingid)
+	_, err = statement.Exec(&u.Sunday,&u.Monday,&u.Tuesday,&u.Wednesday,&u.Thursday,&u.Friday,&u.Saturday,&u.Starttime1,&u.Starttime2,&u.Starttime3,&u.Starttime4,&u.Starttime5,&u.Starttime6,
+		&u.Starttime7,&u.Endtime1,&u.Endtime2,&u.Endtime3,&u.Endtime4,&u.Endtime5,&u.Endtime6,&u.Endtime7,&u.Locationsettingid)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Print("Row updated in tenant weekdays!")
+	log.Print("Row updated in tenant weekdays and timings!")
 	return true
 }
+
+
 
 
 //firestore

@@ -934,6 +934,20 @@ func (r *mutationResolver) Updateweekdays(ctx context.Context, input *model.Week
 	w.Thursday = input.Thursday
 	w.Friday = input.Friday
 	w.Saturday = input.Saturday
+	w.Starttime1 = input.Starttime1
+	w.Starttime2 = input.Starttime2
+	w.Starttime3 = input.Starttime3
+	w.Starttime4 = input.Starttime4
+	w.Starttime5 = input.Starttime5
+	w.Starttime6 = input.Starttime6
+	w.Starttime7 = input.Starttime7
+	w.Endtime1 = input.Endtime1
+	w.Endtime2 = input.Endtime2
+	w.Endtime3 = input.Endtime3
+	w.Endtime4 = input.Endtime4
+	w.Endtime5 = input.Endtime5
+	w.Endtime6 = input.Endtime6
+	w.Endtime7 = input.Endtime7
 	w.Locationsettingid = input.Locationsettingid
 	status := w.Updateweekday()
 	if status == false {
@@ -1065,13 +1079,20 @@ func (r *queryResolver) Location(ctx context.Context, tenantid int) (*model.Geta
 				Friday:            loco.Tenantlocationsettings.Friday,
 				Saturday:          loco.Tenantlocationsettings.Saturday,
 				Status:            loco.Tenantlocationsettings.Status,
-				Weekday1: loco.Tenantlocationsettings.Weekday1,
-				Weekday2: loco.Tenantlocationsettings.Weekday2,
-				Weekday3: loco.Tenantlocationsettings.Weekday3,
-				Weekday4: loco.Tenantlocationsettings.Weekday4,
-				Weekday5: loco.Tenantlocationsettings.Weekday5,
-				Weekday6: loco.Tenantlocationsettings.Weekday6,
-				Weekday7: loco.Tenantlocationsettings.Weekday7,
+				Starttime1:        loco.Tenantlocationsettings.Starttime1,
+				Starttime2:        loco.Tenantlocationsettings.Starttime2,
+				Starttime3:        loco.Tenantlocationsettings.Starttime3,
+				Starttime4:        loco.Tenantlocationsettings.Starttime4,
+				Starttime5:        loco.Tenantlocationsettings.Starttime5,
+				Starttime6:        loco.Tenantlocationsettings.Starttime6,
+				Starttime7:        loco.Tenantlocationsettings.Starttime7,
+				Endtime1:          loco.Tenantlocationsettings.Endtime1,
+				Endtime2:          loco.Tenantlocationsettings.Endtime2,
+				Endtime3:          loco.Tenantlocationsettings.Endtime3,
+				Endtime4:          loco.Tenantlocationsettings.Endtime4,
+				Endtime5:          loco.Tenantlocationsettings.Endtime5,
+				Endtime6:          loco.Tenantlocationsettings.Endtime6,
+				Endtime7:          loco.Tenantlocationsettings.Endtime7,
 			},
 		})
 
@@ -1320,13 +1341,20 @@ func (r *queryResolver) Getlocationbyid(ctx context.Context, tenantid int, locat
 				Friday:            loco.Tenantlocationsettings.Friday,
 				Saturday:          loco.Tenantlocationsettings.Saturday,
 				Status:            loco.Tenantlocationsettings.Status,
-				Weekday1: loco.Tenantlocationsettings.Weekday1,
-				Weekday2: loco.Tenantlocationsettings.Weekday2,
-				Weekday3: loco.Tenantlocationsettings.Weekday3,
-				Weekday4: loco.Tenantlocationsettings.Weekday4,
-				Weekday5: loco.Tenantlocationsettings.Weekday5,
-				Weekday6: loco.Tenantlocationsettings.Weekday6,
-				Weekday7: loco.Tenantlocationsettings.Weekday7,
+				Starttime1:        loco.Tenantlocationsettings.Starttime1,
+				Starttime2:        loco.Tenantlocationsettings.Starttime2,
+				Starttime3:        loco.Tenantlocationsettings.Starttime3,
+				Starttime4:        loco.Tenantlocationsettings.Starttime4,
+				Starttime5:        loco.Tenantlocationsettings.Starttime5,
+				Starttime6:        loco.Tenantlocationsettings.Starttime6,
+				Starttime7:        loco.Tenantlocationsettings.Starttime7,
+				Endtime1:          loco.Tenantlocationsettings.Endtime1,
+				Endtime2:          loco.Tenantlocationsettings.Endtime2,
+				Endtime3:          loco.Tenantlocationsettings.Endtime3,
+				Endtime4:          loco.Tenantlocationsettings.Endtime4,
+				Endtime5:          loco.Tenantlocationsettings.Endtime5,
+				Endtime6:          loco.Tenantlocationsettings.Endtime6,
+				Endtime7:          loco.Tenantlocationsettings.Endtime7,
 			},
 		},
 	}, nil
@@ -1486,3 +1514,4 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+

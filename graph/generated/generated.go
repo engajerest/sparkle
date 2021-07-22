@@ -199,24 +199,31 @@ type ComplexityRoot struct {
 	}
 
 	Tenantlocationsetting struct {
+		Endtime1          func(childComplexity int) int
+		Endtime2          func(childComplexity int) int
+		Endtime3          func(childComplexity int) int
+		Endtime4          func(childComplexity int) int
+		Endtime5          func(childComplexity int) int
+		Endtime6          func(childComplexity int) int
+		Endtime7          func(childComplexity int) int
 		Friday            func(childComplexity int) int
 		Locationid        func(childComplexity int) int
 		Locationsettingid func(childComplexity int) int
 		Monday            func(childComplexity int) int
 		Saturday          func(childComplexity int) int
+		Starttime1        func(childComplexity int) int
+		Starttime2        func(childComplexity int) int
+		Starttime3        func(childComplexity int) int
+		Starttime4        func(childComplexity int) int
+		Starttime5        func(childComplexity int) int
+		Starttime6        func(childComplexity int) int
+		Starttime7        func(childComplexity int) int
 		Status            func(childComplexity int) int
 		Sunday            func(childComplexity int) int
 		Tenantid          func(childComplexity int) int
 		Thursday          func(childComplexity int) int
 		Tuesday           func(childComplexity int) int
 		Wednesday         func(childComplexity int) int
-		Weekday1          func(childComplexity int) int
-		Weekday2          func(childComplexity int) int
-		Weekday3          func(childComplexity int) int
-		Weekday4          func(childComplexity int) int
-		Weekday5          func(childComplexity int) int
-		Weekday6          func(childComplexity int) int
-		Weekday7          func(childComplexity int) int
 	}
 
 	Tenantschema struct {
@@ -1746,6 +1753,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TenantData.Totalamount(childComplexity), true
 
+	case "Tenantlocationsetting.Endtime1":
+		if e.complexity.Tenantlocationsetting.Endtime1 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Endtime1(childComplexity), true
+
+	case "Tenantlocationsetting.Endtime2":
+		if e.complexity.Tenantlocationsetting.Endtime2 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Endtime2(childComplexity), true
+
+	case "Tenantlocationsetting.Endtime3":
+		if e.complexity.Tenantlocationsetting.Endtime3 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Endtime3(childComplexity), true
+
+	case "Tenantlocationsetting.Endtime4":
+		if e.complexity.Tenantlocationsetting.Endtime4 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Endtime4(childComplexity), true
+
+	case "Tenantlocationsetting.Endtime5":
+		if e.complexity.Tenantlocationsetting.Endtime5 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Endtime5(childComplexity), true
+
+	case "Tenantlocationsetting.Endtime6":
+		if e.complexity.Tenantlocationsetting.Endtime6 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Endtime6(childComplexity), true
+
+	case "Tenantlocationsetting.Endtime7":
+		if e.complexity.Tenantlocationsetting.Endtime7 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Endtime7(childComplexity), true
+
 	case "Tenantlocationsetting.Friday":
 		if e.complexity.Tenantlocationsetting.Friday == nil {
 			break
@@ -1780,6 +1836,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tenantlocationsetting.Saturday(childComplexity), true
+
+	case "Tenantlocationsetting.Starttime1":
+		if e.complexity.Tenantlocationsetting.Starttime1 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Starttime1(childComplexity), true
+
+	case "Tenantlocationsetting.Starttime2":
+		if e.complexity.Tenantlocationsetting.Starttime2 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Starttime2(childComplexity), true
+
+	case "Tenantlocationsetting.Starttime3":
+		if e.complexity.Tenantlocationsetting.Starttime3 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Starttime3(childComplexity), true
+
+	case "Tenantlocationsetting.Starttime4":
+		if e.complexity.Tenantlocationsetting.Starttime4 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Starttime4(childComplexity), true
+
+	case "Tenantlocationsetting.Starttime5":
+		if e.complexity.Tenantlocationsetting.Starttime5 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Starttime5(childComplexity), true
+
+	case "Tenantlocationsetting.Starttime6":
+		if e.complexity.Tenantlocationsetting.Starttime6 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Starttime6(childComplexity), true
+
+	case "Tenantlocationsetting.Starttime7":
+		if e.complexity.Tenantlocationsetting.Starttime7 == nil {
+			break
+		}
+
+		return e.complexity.Tenantlocationsetting.Starttime7(childComplexity), true
 
 	case "Tenantlocationsetting.Status":
 		if e.complexity.Tenantlocationsetting.Status == nil {
@@ -1822,55 +1927,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Tenantlocationsetting.Wednesday(childComplexity), true
-
-	case "Tenantlocationsetting.Weekday1":
-		if e.complexity.Tenantlocationsetting.Weekday1 == nil {
-			break
-		}
-
-		return e.complexity.Tenantlocationsetting.Weekday1(childComplexity), true
-
-	case "Tenantlocationsetting.Weekday2":
-		if e.complexity.Tenantlocationsetting.Weekday2 == nil {
-			break
-		}
-
-		return e.complexity.Tenantlocationsetting.Weekday2(childComplexity), true
-
-	case "Tenantlocationsetting.Weekday3":
-		if e.complexity.Tenantlocationsetting.Weekday3 == nil {
-			break
-		}
-
-		return e.complexity.Tenantlocationsetting.Weekday3(childComplexity), true
-
-	case "Tenantlocationsetting.Weekday4":
-		if e.complexity.Tenantlocationsetting.Weekday4 == nil {
-			break
-		}
-
-		return e.complexity.Tenantlocationsetting.Weekday4(childComplexity), true
-
-	case "Tenantlocationsetting.Weekday5":
-		if e.complexity.Tenantlocationsetting.Weekday5 == nil {
-			break
-		}
-
-		return e.complexity.Tenantlocationsetting.Weekday5(childComplexity), true
-
-	case "Tenantlocationsetting.Weekday6":
-		if e.complexity.Tenantlocationsetting.Weekday6 == nil {
-			break
-		}
-
-		return e.complexity.Tenantlocationsetting.Weekday6(childComplexity), true
-
-	case "Tenantlocationsetting.Weekday7":
-		if e.complexity.Tenantlocationsetting.Weekday7 == nil {
-			break
-		}
-
-		return e.complexity.Tenantlocationsetting.Weekday7(childComplexity), true
 
 	case "Tenantschema.about":
 		if e.complexity.Tenantschema.About == nil {
@@ -4657,19 +4713,41 @@ Tuesday:Boolean!
 Wednesday:Boolean!
 Thursday:Boolean!
 Friday:Boolean!
-Saturday:Boolean!   
+Saturday:Boolean!
+Starttime1:String!
+Endtime1:String!
+Starttime2:String!
+Endtime2:String!
+Starttime3:String!
+Endtime3:String!
+Starttime4:String!
+Endtime4:String!
+Starttime5:String!
+Endtime5:String!
+Starttime6:String!
+Endtime6:String!
+Starttime7:String!
+Endtime7:String!    
 }
+
 type Tenantlocationsetting{
  Locationsettingid:Int!
 Tenantid:Int!
 Locationid:Int!
- Weekday1:String!
-  Weekday2:String!
-   Weekday3:String!
-    Weekday4:String!
-     Weekday5:String!
-      Weekday6:String!
-       Weekday7:String!
+Starttime1:String!
+Endtime1:String!
+Starttime2:String!
+Endtime2:String!
+Starttime3:String!
+Endtime3:String!
+Starttime4:String!
+Endtime4:String!
+Starttime5:String!
+Endtime5:String!
+Starttime6:String!
+Endtime6:String!
+Starttime7:String!
+Endtime7:String!
 Sunday:Boolean!
 Monday:Boolean!
 Tuesday:Boolean!
@@ -5247,6 +5325,7 @@ type Mutation {
  subscribemore(input:[subscribemoreinput]):subscribedData
  unsubscribe(input:unsubscribeinput):promotioncreateddata
  updateweekdays(input:weekdata):promotioncreateddata
+
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -10328,7 +10407,7 @@ func (ec *executionContext) _Tenantlocationsetting_Locationid(ctx context.Contex
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tenantlocationsetting_Weekday1(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tenantlocationsetting_Starttime1(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10346,7 +10425,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday1(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Weekday1, nil
+		return obj.Starttime1, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10363,7 +10442,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday1(ctx context.Context,
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tenantlocationsetting_Weekday2(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tenantlocationsetting_Endtime1(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10381,7 +10460,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday2(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Weekday2, nil
+		return obj.Endtime1, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10398,7 +10477,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday2(ctx context.Context,
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tenantlocationsetting_Weekday3(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tenantlocationsetting_Starttime2(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10416,7 +10495,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday3(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Weekday3, nil
+		return obj.Starttime2, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10433,7 +10512,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday3(ctx context.Context,
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tenantlocationsetting_Weekday4(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tenantlocationsetting_Endtime2(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10451,7 +10530,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday4(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Weekday4, nil
+		return obj.Endtime2, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10468,7 +10547,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday4(ctx context.Context,
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tenantlocationsetting_Weekday5(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tenantlocationsetting_Starttime3(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10486,7 +10565,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday5(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Weekday5, nil
+		return obj.Starttime3, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10503,7 +10582,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday5(ctx context.Context,
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tenantlocationsetting_Weekday6(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tenantlocationsetting_Endtime3(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10521,7 +10600,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday6(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Weekday6, nil
+		return obj.Endtime3, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10538,7 +10617,7 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday6(ctx context.Context,
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tenantlocationsetting_Weekday7(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+func (ec *executionContext) _Tenantlocationsetting_Starttime4(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10556,7 +10635,252 @@ func (ec *executionContext) _Tenantlocationsetting_Weekday7(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Weekday7, nil
+		return obj.Starttime4, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantlocationsetting_Endtime4(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantlocationsetting",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Endtime4, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantlocationsetting_Starttime5(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantlocationsetting",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Starttime5, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantlocationsetting_Endtime5(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantlocationsetting",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Endtime5, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantlocationsetting_Starttime6(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantlocationsetting",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Starttime6, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantlocationsetting_Endtime6(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantlocationsetting",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Endtime6, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantlocationsetting_Starttime7(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantlocationsetting",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Starttime7, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Tenantlocationsetting_Endtime7(ctx context.Context, field graphql.CollectedField, obj *model.Tenantlocationsetting) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Tenantlocationsetting",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Endtime7, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -25995,6 +26319,118 @@ func (ec *executionContext) unmarshalInputweekdata(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "Starttime1":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Starttime1"))
+			it.Starttime1, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Endtime1":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Endtime1"))
+			it.Endtime1, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Starttime2":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Starttime2"))
+			it.Starttime2, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Endtime2":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Endtime2"))
+			it.Endtime2, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Starttime3":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Starttime3"))
+			it.Starttime3, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Endtime3":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Endtime3"))
+			it.Endtime3, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Starttime4":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Starttime4"))
+			it.Starttime4, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Endtime4":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Endtime4"))
+			it.Endtime4, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Starttime5":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Starttime5"))
+			it.Starttime5, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Endtime5":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Endtime5"))
+			it.Endtime5, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Starttime6":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Starttime6"))
+			it.Starttime6, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Endtime6":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Endtime6"))
+			it.Endtime6, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Starttime7":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Starttime7"))
+			it.Starttime7, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Endtime7":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Endtime7"))
+			it.Endtime7, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -26966,38 +27402,73 @@ func (ec *executionContext) _Tenantlocationsetting(ctx context.Context, sel ast.
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Weekday1":
-			out.Values[i] = ec._Tenantlocationsetting_Weekday1(ctx, field, obj)
+		case "Starttime1":
+			out.Values[i] = ec._Tenantlocationsetting_Starttime1(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Weekday2":
-			out.Values[i] = ec._Tenantlocationsetting_Weekday2(ctx, field, obj)
+		case "Endtime1":
+			out.Values[i] = ec._Tenantlocationsetting_Endtime1(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Weekday3":
-			out.Values[i] = ec._Tenantlocationsetting_Weekday3(ctx, field, obj)
+		case "Starttime2":
+			out.Values[i] = ec._Tenantlocationsetting_Starttime2(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Weekday4":
-			out.Values[i] = ec._Tenantlocationsetting_Weekday4(ctx, field, obj)
+		case "Endtime2":
+			out.Values[i] = ec._Tenantlocationsetting_Endtime2(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Weekday5":
-			out.Values[i] = ec._Tenantlocationsetting_Weekday5(ctx, field, obj)
+		case "Starttime3":
+			out.Values[i] = ec._Tenantlocationsetting_Starttime3(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Weekday6":
-			out.Values[i] = ec._Tenantlocationsetting_Weekday6(ctx, field, obj)
+		case "Endtime3":
+			out.Values[i] = ec._Tenantlocationsetting_Endtime3(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Weekday7":
-			out.Values[i] = ec._Tenantlocationsetting_Weekday7(ctx, field, obj)
+		case "Starttime4":
+			out.Values[i] = ec._Tenantlocationsetting_Starttime4(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Endtime4":
+			out.Values[i] = ec._Tenantlocationsetting_Endtime4(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Starttime5":
+			out.Values[i] = ec._Tenantlocationsetting_Starttime5(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Endtime5":
+			out.Values[i] = ec._Tenantlocationsetting_Endtime5(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Starttime6":
+			out.Values[i] = ec._Tenantlocationsetting_Starttime6(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Endtime6":
+			out.Values[i] = ec._Tenantlocationsetting_Endtime6(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Starttime7":
+			out.Values[i] = ec._Tenantlocationsetting_Starttime7(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Endtime7":
+			out.Values[i] = ec._Tenantlocationsetting_Endtime7(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

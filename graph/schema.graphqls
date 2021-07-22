@@ -360,19 +360,41 @@ Tuesday:Boolean!
 Wednesday:Boolean!
 Thursday:Boolean!
 Friday:Boolean!
-Saturday:Boolean!   
+Saturday:Boolean!
+Starttime1:String!
+Endtime1:String!
+Starttime2:String!
+Endtime2:String!
+Starttime3:String!
+Endtime3:String!
+Starttime4:String!
+Endtime4:String!
+Starttime5:String!
+Endtime5:String!
+Starttime6:String!
+Endtime6:String!
+Starttime7:String!
+Endtime7:String!    
 }
+
 type Tenantlocationsetting{
  Locationsettingid:Int!
 Tenantid:Int!
 Locationid:Int!
- Weekday1:String!
-  Weekday2:String!
-   Weekday3:String!
-    Weekday4:String!
-     Weekday5:String!
-      Weekday6:String!
-       Weekday7:String!
+Starttime1:String!
+Endtime1:String!
+Starttime2:String!
+Endtime2:String!
+Starttime3:String!
+Endtime3:String!
+Starttime4:String!
+Endtime4:String!
+Starttime5:String!
+Endtime5:String!
+Starttime6:String!
+Endtime6:String!
+Starttime7:String!
+Endtime7:String!
 Sunday:Boolean!
 Monday:Boolean!
 Tuesday:Boolean!
@@ -950,4 +972,5 @@ type Mutation {
  subscribemore(input:[subscribemoreinput]):subscribedData
  unsubscribe(input:unsubscribeinput):promotioncreateddata
  updateweekdays(input:weekdata):promotioncreateddata
+
 }

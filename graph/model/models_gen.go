@@ -147,13 +147,20 @@ type Tenantlocationsetting struct {
 	Locationsettingid int    `json:"Locationsettingid"`
 	Tenantid          int    `json:"Tenantid"`
 	Locationid        int    `json:"Locationid"`
-	Weekday1          string `json:"Weekday1"`
-	Weekday2          string `json:"Weekday2"`
-	Weekday3          string `json:"Weekday3"`
-	Weekday4          string `json:"Weekday4"`
-	Weekday5          string `json:"Weekday5"`
-	Weekday6          string `json:"Weekday6"`
-	Weekday7          string `json:"Weekday7"`
+	Starttime1        string `json:"Starttime1"`
+	Endtime1          string `json:"Endtime1"`
+	Starttime2        string `json:"Starttime2"`
+	Endtime2          string `json:"Endtime2"`
+	Starttime3        string `json:"Starttime3"`
+	Endtime3          string `json:"Endtime3"`
+	Starttime4        string `json:"Starttime4"`
+	Endtime4          string `json:"Endtime4"`
+	Starttime5        string `json:"Starttime5"`
+	Endtime5          string `json:"Endtime5"`
+	Starttime6        string `json:"Starttime6"`
+	Endtime6          string `json:"Endtime6"`
+	Starttime7        string `json:"Starttime7"`
+	Endtime7          string `json:"Endtime7"`
 	Sunday            bool   `json:"Sunday"`
 	Monday            bool   `json:"Monday"`
 	Tuesday           bool   `json:"Tuesday"`
@@ -963,14 +970,28 @@ type Usertenant struct {
 }
 
 type Weekdata struct {
-	Locationsettingid int  `json:"Locationsettingid"`
-	Tenantid          int  `json:"Tenantid"`
-	Locationid        int  `json:"Locationid"`
-	Sunday            bool `json:"Sunday"`
-	Monday            bool `json:"Monday"`
-	Tuesday           bool `json:"Tuesday"`
-	Wednesday         bool `json:"Wednesday"`
-	Thursday          bool `json:"Thursday"`
-	Friday            bool `json:"Friday"`
-	Saturday          bool `json:"Saturday"`
+	Locationsettingid int    `json:"Locationsettingid"`
+	Tenantid          int    `json:"Tenantid"`
+	Locationid        int    `json:"Locationid"`
+	Sunday            bool   `json:"Sunday"`
+	Monday            bool   `json:"Monday"`
+	Tuesday           bool   `json:"Tuesday"`
+	Wednesday         bool   `json:"Wednesday"`
+	Thursday          bool   `json:"Thursday"`
+	Friday            bool   `json:"Friday"`
+	Saturday          bool   `json:"Saturday"`
+	Starttime1        string `json:"Starttime1"`
+	Endtime1          string `json:"Endtime1"`
+	Starttime2        string `json:"Starttime2"`
+	Endtime2          string `json:"Endtime2"`
+	Starttime3        string `json:"Starttime3"`
+	Endtime3          string `json:"Endtime3"`
+	Starttime4        string `json:"Starttime4"`
+	Endtime4          string `json:"Endtime4"`
+	Starttime5        string `json:"Starttime5"`
+	Endtime5          string `json:"Endtime5"`
+	Starttime6        string `json:"Starttime6"`
+	Endtime6          string `json:"Endtime6"`
+	Starttime7        string `json:"Starttime7"`
+	Endtime7          string `json:"Endtime7"`
 }
