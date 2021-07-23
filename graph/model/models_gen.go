@@ -698,6 +698,31 @@ type Stafflocation struct {
 	Postcode     string `json:"Postcode"`
 }
 
+type Staffweekdata struct {
+	Tenantuserid int    `json:"Tenantuserid"`
+	Sunday       bool   `json:"Sunday"`
+	Monday       bool   `json:"Monday"`
+	Tuesday      bool   `json:"Tuesday"`
+	Wednesday    bool   `json:"Wednesday"`
+	Thursday     bool   `json:"Thursday"`
+	Friday       bool   `json:"Friday"`
+	Saturday     bool   `json:"Saturday"`
+	Starttime1   string `json:"Starttime1"`
+	Endtime1     string `json:"Endtime1"`
+	Starttime2   string `json:"Starttime2"`
+	Endtime2     string `json:"Endtime2"`
+	Starttime3   string `json:"Starttime3"`
+	Endtime3     string `json:"Endtime3"`
+	Starttime4   string `json:"Starttime4"`
+	Endtime4     string `json:"Endtime4"`
+	Starttime5   string `json:"Starttime5"`
+	Endtime5     string `json:"Endtime5"`
+	Starttime6   string `json:"Starttime6"`
+	Endtime6     string `json:"Endtime6"`
+	Starttime7   string `json:"Starttime7"`
+	Endtime7     string `json:"Endtime7"`
+}
+
 type Subcat struct {
 	Subcategoryname string `json:"Subcategoryname"`
 	Subcategoryid   int    `json:"Subcategoryid"`
@@ -933,6 +958,28 @@ type Userfromtenant struct {
 	Profileimage string `json:"Profileimage"`
 	Locationid   int    `json:"Locationid"`
 	Locationname string `json:"Locationname"`
+	Tenantuserid int    `json:"Tenantuserid"`
+	Starttime1   string `json:"Starttime1"`
+	Endtime1     string `json:"Endtime1"`
+	Starttime2   string `json:"Starttime2"`
+	Endtime2     string `json:"Endtime2"`
+	Starttime3   string `json:"Starttime3"`
+	Endtime3     string `json:"Endtime3"`
+	Starttime4   string `json:"Starttime4"`
+	Endtime4     string `json:"Endtime4"`
+	Starttime5   string `json:"Starttime5"`
+	Endtime5     string `json:"Endtime5"`
+	Starttime6   string `json:"Starttime6"`
+	Endtime6     string `json:"Endtime6"`
+	Starttime7   string `json:"Starttime7"`
+	Endtime7     string `json:"Endtime7"`
+	Sunday       bool   `json:"Sunday"`
+	Monday       bool   `json:"Monday"`
+	Tuesday      bool   `json:"Tuesday"`
+	Wednesday    bool   `json:"Wednesday"`
+	Thursday     bool   `json:"Thursday"`
+	Friday       bool   `json:"Friday"`
+	Saturday     bool   `json:"Saturday"`
 }
 
 type Userinfodata struct {

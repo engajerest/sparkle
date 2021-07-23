@@ -92,6 +92,8 @@ const (
 	deletesubcatbyid               = "DELETE  FROM tenantsubcategories WHERE tenantsubcatid=?"
 	insertweekdays = "INSERT INTO tenantlocationsettings (tenantid,locationid) VALUES(?,?)"
 	updateweekdays = "UPDATE tenantlocationsettings SET sunday=?,monday=?,tuesday=?,wednesday=?,thursday=?,friday=?,saturday=?,starttime1=?,starttime2=?,starttime3=?,starttime4=?,starttime5=?,starttime6=?,starttime7=?,endtime1=?,endtime2=?,endtime3=?,endtime4=?,endtime5=?,endtime6=?,endtime7=? WHERE  locationsettingid=?"
+	insertstaffweekdays = "INSERT INTO tenantusersettings (tenantid,locationid,userid) VALUES(?,?,?)"
+	updatestaffweekdays = "UPDATE tenantusersettings SET sunday=?,monday=?,tuesday=?,wednesday=?,thursday=?,friday=?,saturday=?,starttime1=?,starttime2=?,starttime3=?,starttime4=?,starttime5=?,starttime6=?,starttime7=?,endtime1=?,endtime2=?,endtime3=?,endtime4=?,endtime5=?,endtime6=?,endtime7=? WHERE  tenantuserid=?"
 	//firestore
 	firestorejsonkey = "./engaje-2021-firebase-adminsdk-7sb61-42247472ad.json"
 )
@@ -1901,9 +1903,9 @@ func Gettenantusers(tenantid, userid int) []TenantUsers {
 	var q1 string
 
 	if userid != 0 {
-		q1 = "SELECT a.firstname,a.lastname,IFNULL(a.profileimage,'') AS profileimage, a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocations b, app_users c WHERE a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid= " + tent + "  AND a.userid=" + user
+		q1 = "SELECT a.firstname,a.lastname,IFNULL(a.profileimage,'') AS profileimage, a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid,IFNULL(f.tenantuserid,0) AS tenantuserid,f.starttime1,f.starttime2,f.starttime3,f.starttime4,f.starttime5,f.starttime6,f.starttime7,f.endtime1,f.endtime2,f.endtime3,f.endtime4,f.endtime5,f.endtime6,f.endtime7,IFNULL(f.sunday,0) AS sunday,IFNULL(f.monday,0) AS monday, IFNULL(f.tuesday,0) AS tuesday, IFNULL(f.wednesday,0) AS wednesday,	IFNULL(f.thursday,0) AS thursday, IFNULL(f.friday,0) AS friday, IFNULL(f.saturday,0) AS saturday FROM app_userprofiles a, tenantlocations b, app_users c,tenantusersettings f WHERE a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND a.userid=f.userid AND a.userlocationid=f.locationid AND c.referenceid=f.tenantid AND b.tenantid= " + tent + "  AND a.userid=" + user
 	} else {
-		q1 = "SELECT a.firstname,a.lastname,IFNULL(a.profileimage,'') AS profileimage, a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid FROM app_userprofiles a, tenantlocations b, app_users c WHERE a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND b.tenantid=" + tent
+		q1 = "SELECT a.firstname,a.lastname,IFNULL(a.profileimage,'') AS profileimage, a.userlocationid,a.userid,a.created,a.contactno,a.email,a.status,b.locationname,c.referenceid,IFNULL(f.tenantuserid,0) AS tenantuserid,f.starttime1,f.starttime2,f.starttime3,f.starttime4,f.starttime5,f.starttime6,f.starttime7,f.endtime1,f.endtime2,f.endtime3,f.endtime4,f.endtime5,f.endtime6,f.endtime7,IFNULL(f.sunday,0) AS sunday,IFNULL(f.monday,0) AS monday, IFNULL(f.tuesday,0) AS tuesday, IFNULL(f.wednesday,0) AS wednesday,	IFNULL(f.thursday,0) AS thursday, IFNULL(f.friday,0) AS friday, IFNULL(f.saturday,0) AS saturday FROM app_userprofiles a, tenantlocations b, app_users c,tenantusersettings f WHERE a.userid=c.userid AND a.userlocationid=b.locationid AND c.referenceid=b.tenantid AND a.userid=f.userid AND a.userlocationid=f.locationid AND c.referenceid=f.tenantid AND b.tenantid=" + tent
 	}
 
 	DB, err := gorm.Open(mysql.New(mysql.Config{Conn: dbconfig.Db}), &gorm.Config{})
@@ -2107,9 +2109,46 @@ func (u *Tenantlocationsetting) Updateweekday() bool {
 	return true
 }
 
+func (p *Tenantlocationsetting) InsertStaffweekdays(userid int64) (int64,error){
+  
+	statement, err := database.Db.Prepare(insertstaffweekdays)
 
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+	defer statement.Close()
+	res, err := statement.Exec(&p.Tenantid,&p.Locationid,userid)
+	if err != nil {
+		log.Fatal(err)
 
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal("Error:", err.Error())
 
+	}
+	log.Print("Row inserted in tenantstaffs!")
+	return id, nil	
+}
+
+func (u *Tenantusersetting) Updatestaffweekday() bool {
+	statement, err := database.Db.Prepare(updatestaffweekdays)
+	print(statement)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer statement.Close()
+	_, err = statement.Exec(&u.Sunday,&u.Monday,&u.Tuesday,&u.Wednesday,&u.Thursday,&u.Friday,&u.Saturday,&u.Starttime1,&u.Starttime2,&u.Starttime3,&u.Starttime4,&u.Starttime5,&u.Starttime6,
+		&u.Starttime7,&u.Endtime1,&u.Endtime2,&u.Endtime3,&u.Endtime4,&u.Endtime5,&u.Endtime6,&u.Endtime7,&u.Tenantuserid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Print("Row updated in tenantstaff weekdays and timings!")
+	return true
+}
 //firestore
 func (t *Initialsubscriptiondata) Firestoreinserttenant(tenantid, locationid int64, moduleid, catid, featureid int) error {
 	print("st1 firestore")

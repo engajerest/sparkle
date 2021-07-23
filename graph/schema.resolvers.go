@@ -114,6 +114,13 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 			print(weekerror)
 		}
 		print("weekid==", weekid)
+		tenantusersettingid, userror := w.InsertStaffweekdays(int64(id.ID))
+		if userror != nil {
+			fmt.Println(userror)
+		}
+		print(tenantusersettingid)
+
+
 
 		storeerr := d.Firestoreinserttenant(int64(tenantdata.TenantID), int64(tenantdata.Locationid), slist[0].Moduleid, slist[0].Categoryid, slist[0].Featureid)
 		if storeerr != nil {
@@ -174,6 +181,14 @@ func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.T
 	if tenantuserid != 0 {
 		tenantprofileid := user.InsertTenantUserintoProfile(tenantuserid)
 		print(tenantprofileid)
+		var w subscription.Tenantlocationsetting
+		w.Tenantid = create.Tenantid
+		w.Locationid = create.Locationid
+		tenantusersettingid, userror := w.InsertStaffweekdays(tenantuserid)
+		if userror != nil {
+			fmt.Println(userror)
+		}
+		print(tenantusersettingid)
 
 		// staffid, er := subscription.Checkstaffdata(create.Tenantid, create.Moduleid, int(tenantuserid))
 		// print("initstaffid=", staffid)
@@ -961,6 +976,51 @@ func (r *mutationResolver) Updateweekdays(ctx context.Context, input *model.Week
 	}, nil
 }
 
+func (r *mutationResolver) Updatestaffweekdays(ctx context.Context, input *model.Staffweekdata) (*model.Promotioncreateddata, error) {
+	id, usererr := datacontext.ForAuthContext(ctx)
+	if usererr != nil {
+		return nil, errors.New("user not detected")
+	}
+	print("raju")
+	print(id.ID)
+	var w subscription.Tenantusersetting
+	
+	w.Sunday = input.Sunday
+	w.Monday = input.Monday
+	w.Tuesday = input.Tuesday
+	w.Wednesday = input.Wednesday
+	w.Thursday = input.Thursday
+	w.Friday = input.Friday
+	w.Saturday = input.Saturday
+	w.Starttime1 = input.Starttime1
+	w.Starttime2 = input.Starttime2
+	w.Starttime3 = input.Starttime3
+	w.Starttime4 = input.Starttime4
+	w.Starttime5 = input.Starttime5
+	w.Starttime6 = input.Starttime6
+	w.Starttime7 = input.Starttime7
+	w.Endtime1 = input.Endtime1
+	w.Endtime2 = input.Endtime2
+	w.Endtime3 = input.Endtime3
+	w.Endtime4 = input.Endtime4
+	w.Endtime5 = input.Endtime5
+	w.Endtime6 = input.Endtime6
+	w.Endtime7 = input.Endtime7
+	w.Tenantuserid = input.Tenantuserid
+	status := w.Updatestaffweekday()
+	if status == false {
+		return &model.Promotioncreateddata{
+			Status: false, Code: http.StatusBadRequest, Message: "Weekdays Not Updated for the Tenantstaffs",
+		}, nil
+	}
+
+	return &model.Promotioncreateddata{
+		Status: true, Code: http.StatusCreated, Message: "Tenantstaffs Weekdays Updated",
+	}, nil
+
+
+}
+
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {
 	// id, usererr := controller.ForContext(ctx)
 	id, usererr := datacontext.ForAuthContext(ctx)
@@ -1122,7 +1182,14 @@ func (r *queryResolver) Tenantusers(ctx context.Context, tenantid int, userid in
 	for _, k := range data {
 		Result = append(Result, &model.Userfromtenant{Tenantid: k.Referenceid, Userid: k.Userid, Firstname: k.Firstname,
 			Lastname: k.Lastname, Email: k.Email, Contact: k.Contactno, Profileimage: k.Profileimage,
-			Locationid: k.Userlocationid, Locationname: k.Locationname})
+			Locationid: k.Userlocationid, Locationname: k.Locationname,
+			Tenantuserid: k.Tenantuserid,Starttime1: k.Starttime1,Endtime1: k.Endtime1,
+			Starttime2: k.Starttime2,Endtime2: k.Endtime2,Starttime3: k.Starttime3,Endtime3: k.Endtime3,
+			Starttime4: k.Starttime4,Endtime4: k.Endtime4,Starttime5: k.Starttime5,Endtime5: k.Endtime5,
+			Starttime6: k.Starttime6,Endtime6: k.Endtime6,Starttime7: k.Starttime7,Endtime7: k.Endtime7,
+			Sunday: k.Sunday,Monday: k.Monday,Tuesday: k.Tuesday,Wednesday: k.Wednesday,Thursday: k.Thursday,
+			Friday: k.Friday,Saturday: k.Saturday,
+		})
 	}
 
 	// for _, k := range data {
@@ -1514,4 +1581,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-

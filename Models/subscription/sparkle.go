@@ -557,6 +557,29 @@ type TenantUsers struct {
 	Email          string `json:"email"`
 	Locationname   string `json:"locationname"`
 	Referenceid    int    `json:"referenceid"`
+	Tenantuserid int `json:"tenantuserid"`
+	Starttime1   string `json:"starttime1"`
+	Endtime1     string `json:"endtime1"`
+	Starttime2   string `json:"starttime2"`
+	Endtime2     string `json:"endtime2"`
+	Starttime3   string `json:"starttime3"`
+	Endtime3     string `json:"endtime3"`
+	Starttime4   string `json:"starttime4"`
+	Endtime4     string `json:"endtime4"`
+	Starttime5   string `json:"starttime5"`
+	Endtime5     string `json:"endtime5"`
+	Starttime6   string `json:"starttime6"`
+	Endtime6     string `json:"endtime6"`
+	Starttime7   string `json:"starttime7"`
+	Endtime7     string `json:"endtime7"`
+	Sunday       bool   `json:"sunday"`
+	Monday       bool   `json:"monday"`
+	Tuesday      bool   `json:"tuesday"`
+	Wednesday    bool   `json:"wednesday"`
+	Thursday     bool   `json:"thursday"`
+	Friday       bool   `json:"friday"`
+	Saturday     bool   `json:"saturday"`
+
 }
 
 type Firestoreconnection struct {
@@ -662,4 +685,32 @@ type Tenantlocationsetting struct {
 	Friday            bool   `json:"friday"`
 	Saturday          bool   `json:"saturday"`
 	Status            string `json:"status"`
+}
+type Tenantusersetting struct {
+	Tenantuserid int    `json:"tenantuserid"`
+	Tenantid     int    `json:"tenantid"`
+	Locationid   int    `json:"locationid"`
+	Userid       int    `json:"userid"`
+	Starttime1   string `json:"starttime1"`
+	Endtime1     string `json:"endtime1"`
+	Starttime2   string `json:"starttime2"`
+	Endtime2     string `json:"endtime2"`
+	Starttime3   string `json:"starttime3"`
+	Endtime3     string `json:"endtime3"`
+	Starttime4   string `json:"starttime4"`
+	Endtime4     string `json:"endtime4"`
+	Starttime5   string `json:"starttime5"`
+	Endtime5     string `json:"endtime5"`
+	Starttime6   string `json:"starttime6"`
+	Endtime6     string `json:"endtime6"`
+	Starttime7   string `json:"starttime7"`
+	Endtime7     string `json:"endtime7"`
+	Sunday       bool   `json:"sunday"`
+	Monday       bool   `json:"monday"`
+	Tuesday      bool   `json:"tuesday"`
+	Wednesday    bool   `json:"wednesday"`
+	Thursday     bool   `json:"thursday"`
+	Friday       bool   `json:"friday"`
+	Saturday     bool   `json:"saturday"`
+	Status       string `json:"status"`
 }

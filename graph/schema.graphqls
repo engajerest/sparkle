@@ -376,9 +376,32 @@ Endtime6:String!
 Starttime7:String!
 Endtime7:String!    
 }
-
+input staffweekdata{
+Tenantuserid:Int!
+Sunday:Boolean!
+Monday:Boolean!
+Tuesday:Boolean!
+Wednesday:Boolean!
+Thursday:Boolean!
+Friday:Boolean!
+Saturday:Boolean!
+Starttime1:String!
+Endtime1:String!
+Starttime2:String!
+Endtime2:String!
+Starttime3:String!
+Endtime3:String!
+Starttime4:String!
+Endtime4:String!
+Starttime5:String!
+Endtime5:String!
+Starttime6:String!
+Endtime6:String!
+Starttime7:String!
+Endtime7:String!    
+}
 type Tenantlocationsetting{
- Locationsettingid:Int!
+Locationsettingid:Int!
 Tenantid:Int!
 Locationid:Int!
 Starttime1:String!
@@ -404,6 +427,7 @@ Friday:Boolean!
 Saturday:Boolean!  
 Status:String!  
 }
+
 type LocationInfo{
  Locationid:Int!
  LocationName:String!
@@ -515,7 +539,28 @@ Contact:String!
 Profileimage:String!
 Locationid:Int!
 Locationname:String!
-
+Tenantuserid:Int!
+Starttime1:String!
+Endtime1:String!
+Starttime2:String!
+Endtime2:String!
+Starttime3:String!
+Endtime3:String!
+Starttime4:String!
+Endtime4:String!
+Starttime5:String!
+Endtime5:String!
+Starttime6:String!
+Endtime6:String!
+Starttime7:String!
+Endtime7:String!
+Sunday:Boolean!
+Monday:Boolean!
+Tuesday:Boolean!
+Wednesday:Boolean!
+Thursday:Boolean!
+Friday:Boolean!
+Saturday:Boolean!  
  
 }
 type staffdetail{
@@ -972,5 +1017,6 @@ type Mutation {
  subscribemore(input:[subscribemoreinput]):subscribedData
  unsubscribe(input:unsubscribeinput):promotioncreateddata
  updateweekdays(input:weekdata):promotioncreateddata
+ updatestaffweekdays(input:staffweekdata):promotioncreateddata
 
 }
