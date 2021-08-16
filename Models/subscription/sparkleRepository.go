@@ -36,7 +36,7 @@ const (
 	getAllCategoryQuery            = "SELECT categoryid,categoryname,categorytype,sortorder,status FROM app_category WHERE STATUS='Active'"
 	getAllSubCategoryQuery         = "SELECT  subcategoryid,categorytypeid,categoryid,subcategoryname,status,icon FROM app_subcategory WHERE statuscode=1"
 	getAllPackageQuery             = "SELECT a.packageid,a.moduleid,a.packagename,a.packageamount,a.paymentmode,a.packagecontent,a.packageicon,b.modulename,IFNULL(c.promocodeid,0) AS promocodeid,IFNULL(c.promoname ,'') AS promoname,IFNULL(c.promodescription,'') AS promodescription,IFNULL(c.packageexpiry,0) AS packageexpiry,IFNULL(c.promotype ,'') AS promotype,IFNULL(c.promovalue,0) AS promovalue,IFNULL(c.validity,'') AS validity,IF(c.validity>=DATE(NOW()), true, false) AS validity FROM app_package a Inner JOIN app_module b ON a.moduleid=b.moduleid LEFT OUTER JOIN  app_promocodes c ON a.packageid=c.packageid WHERE a.`status`='Active' "
-	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,suburb,latitude,longitude,postcode,countrycode,timezone,currencyid,currencycode,currencysymbol,tenanttoken) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	insertTenantInfoQuery          = "INSERT INTO tenants (createdby,partnerid,registrationno,tenantname,primaryemail,primarycontact,Address,state,city,suburb,latitude,longitude,postcode,countrycode,timezone,currencyid,currencycode,currencysymbol,tenanttoken,paymode2) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantLocationQuery      = "INSERT INTO tenantlocations (tenantid,locationname,email,contactno,address,state,city,suburb,latitude,longitude,postcode,countrycode,opentime,closetime,deliverymins,createdby) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantSubscription       = "INSERT INTO tenantsubscription (tenantid,transactiondate,packageid,partnerid,moduleid,featureid,categoryid,subcategoryid,currencyid,subscriptionprice,quantity,taxid,taxamount,taxpercent,totalamount,paymentstatus,paymentid,promoid,promoprice,promostatus,validitydate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 	Updatesubscriptionpay          = "UPDATE  tenantsubscription SET transactiondate=?,featureid=?,partnerid=?,currencyid=?,subscriptionprice=?,quantity=?,taxid=?,taxamount=?,taxpercent=?,totalamount=?,paymentstatus=?,paymentid=?,promoid=?,promoprice=?,promostatus=?,validitydate=?  WHERE subscriptionid=? "
@@ -94,6 +94,8 @@ const (
 	updateweekdays = "UPDATE tenantlocationsettings SET sunday=?,monday=?,tuesday=?,wednesday=?,thursday=?,friday=?,saturday=?,starttime1=?,starttime2=?,starttime3=?,starttime4=?,starttime5=?,starttime6=?,starttime7=?,endtime1=?,endtime2=?,endtime3=?,endtime4=?,endtime5=?,endtime6=?,endtime7=? WHERE  locationsettingid=?"
 	insertstaffweekdays = "INSERT INTO tenantusersettings (tenantid,locationid,userid) VALUES(?,?,?)"
 	updatestaffweekdays = "UPDATE tenantusersettings SET sunday=?,monday=?,tuesday=?,wednesday=?,thursday=?,friday=?,saturday=?,starttime1=?,starttime2=?,starttime3=?,starttime4=?,starttime5=?,starttime6=?,starttime7=?,endtime1=?,endtime2=?,endtime3=?,endtime4=?,endtime5=?,endtime6=?,endtime7=? WHERE  tenantuserid=?"
+	checkuser = "SELECT IFNULL(userid,0) AS userid,authname,contactno FROM app_users WHERE authname=? AND contactno=? AND configid=?"
+	checkuserforupdate = "SELECT IFNULL(userid,0) AS userid,authname,contactno FROM app_users WHERE authname=? AND contactno=? AND configid=? AND userid NOT IN (?)"
 	//firestore
 	firestorejsonkey = "./engaje-2021-firebase-adminsdk-7sb61-42247472ad.json"
 )
@@ -121,7 +123,7 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 
 		res, err := stmt.Exec(&s.Userid, &s.Partnerid, &s.Regno, &s.Name, &s.Email, &s.Mobile,
 			&s.Address, &s.State, &s.City, &s.Suburb, &s.Latitude, &s.Longitude, &s.Zip, &s.Countrycode,
-			&s.TimeZone, &s.Currencyid, &s.CurrencyCode, &s.Currencysymbol, &s.Tenanttoken)
+			&s.TimeZone, &s.Currencyid, &s.CurrencyCode, &s.Currencysymbol, &s.Tenanttoken,1)
 		if err != nil {
 			tx.Rollback() // return an error too, we may want to wrap them
 			return false, nil, err
@@ -232,7 +234,62 @@ func (s *Initialsubscriptiondata) Subscriptioninitial() (bool, *SubscribedData, 
 	tx.Commit()
 	return true, &data, nil
 }
+func (user *TenantUser) CheckUserforupdate() *User{
+	var data User
+	statement, err := database.Db.Prepare(checkuserforupdate)
 
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("1")
+	row := statement.QueryRow(user.Email, user.Mobile,user.Configid,user.Userid)
+	err = row.Scan(&data.ID,&data.Email,&data.Mobile)
+	print(err)
+	fmt.Println("2")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			data.ID=0
+			return &data
+		} else {
+			data.ID=0
+			return &data
+
+		}
+	}
+	// fmt.Println(user)
+	user.Userid = data.ID
+	user.Email=data.Email
+	user.Mobile=data.Mobile
+	return &data
+}
+func (user *TenantUser) CheckUser() *User{
+	var data User
+	statement, err := database.Db.Prepare(checkuser)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("1")
+	row := statement.QueryRow(user.Email, user.Mobile,user.Configid)
+	err = row.Scan(&data.ID,&data.Email,&data.Mobile)
+	print(err)
+	fmt.Println("2")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			data.ID=0
+			return &data
+		} else {
+			data.ID=0
+			return &data
+
+		}
+	}
+	// fmt.Println(user)
+	user.Userid = data.ID
+
+	
+	return &data
+}
 func GetAllCategory() []Category {
 	print("st1c")
 	stmt, err := database.Db.Prepare(getAllCategoryQuery)
@@ -364,7 +421,7 @@ func (info *SubscriptionData) CreateTenant(userid int) (int64, error) {
 
 	fmt.Println("2")
 	res, err := statement.Exec(userid, &info.Info.Regno, &info.Info.Name, &info.Info.Email, &info.Info.Mobile, &info.Info.CategoryId, &info.Info.SubCategoryID,
-		&info.Address.Address, &info.Address.State, &info.Address.Suburb, &info.Address.Latitude, &info.Address.Longitude, &info.Address.Zip, &info.Address.Countrycode, &info.Address.TimeZone, &info.Address.CurrencyCode, &info.Info.Tenanttoken)
+		&info.Address.Address, &info.Address.State, &info.Address.Suburb, &info.Address.Latitude, &info.Address.Longitude, &info.Address.Zip, &info.Address.Countrycode, &info.Address.TimeZone, &info.Address.CurrencyCode, &info.Info.Tenanttoken,1)
 	if err != nil {
 		log.Fatal(err)
 

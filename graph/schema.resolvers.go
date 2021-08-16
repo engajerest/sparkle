@@ -120,8 +120,6 @@ func (r *mutationResolver) Subscribe(ctx context.Context, input model.Data) (*mo
 		}
 		print(tenantusersettingid)
 
-
-
 		storeerr := d.Firestoreinserttenant(int64(tenantdata.TenantID), int64(tenantdata.Locationid), slist[0].Moduleid, slist[0].Categoryid, slist[0].Featureid)
 		if storeerr != nil {
 			print(storeerr)
@@ -163,66 +161,59 @@ func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.T
 	user.Roleid = create.Roleid
 	user.Locationid = create.Locationid
 	user.Tenantid = create.Tenantid
-	tenantuserid, err := user.CreateTenantUser()
-	if err != nil {
-		if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'authname'", user.Email) {
-			print("true")
+	print("email===", user.Email)
+var result int64
+	res := user.CheckUser()
+	if res.ID != 0 {
+		if res.Email == create.Email {
 			return &model.Tenantuserdata{Status: false, Code: http.StatusConflict, Message: "Email Already Exists",
 				Tenantuser: &model.User{}}, nil
-		} else if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'contactno'", user.Mobile) {
+		} else if res.Mobile == create.Mobile {
 			return &model.Tenantuserdata{Status: false, Code: http.StatusConflict, Message: "Contactno Already Exists",
 				Tenantuser: &model.User{}}, nil
-		} else {
-			return nil, err
 		}
 
-	}
+	} else {
+		tenantuserid, err := user.CreateTenantUser()
+		print("chki==",tenantuserid)
+		result=tenantuserid
+	
+		if err != nil {
+			if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'authname'", user.Email) {
+				print("true")
+				return &model.Tenantuserdata{Status: false, Code: http.StatusConflict, Message: "Email Already Exists",
+					Tenantuser: &model.User{}}, nil
+			} else if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'contactno'", user.Mobile) {
+				return &model.Tenantuserdata{Status: false, Code: http.StatusConflict, Message: "Contactno Already Exists",
+					Tenantuser: &model.User{}}, nil
+			} else {
+				print("tetet")
+				return nil, err
+			}
 
-	if tenantuserid != 0 {
-		tenantprofileid := user.InsertTenantUserintoProfile(tenantuserid)
-		print(tenantprofileid)
-		var w subscription.Tenantlocationsetting
-		w.Tenantid = create.Tenantid
-		w.Locationid = create.Locationid
-		tenantusersettingid, userror := w.InsertStaffweekdays(tenantuserid)
-		if userror != nil {
-			fmt.Println(userror)
 		}
-		print(tenantusersettingid)
 
-		// staffid, er := subscription.Checkstaffdata(create.Tenantid, create.Moduleid, int(tenantuserid))
-		// print("initstaffid=", staffid)
-		// if er != nil {
-		// 	return nil, er
-		// }
-		// if staffid != 0 {
-		// 	if len(intlist) != 0 {
-		// 		for i := 0; i < len(intlist); i++ {
-		// 			var d subscription.TenantUser
-		// 			d.Userid = int(tenantuserid)
-		// 			d.Tenantid = create.Tenantid
-		// 			d.Moduleid = create.Moduleid
-		// 			d.Tenantstaffid = staffid
-		// 			d.Locationid = intlist[i]
-		// 			staffdetailid := d.InsertTenantstaffdetails()
-		// 			print(staffdetailid)
-		// 		}
+		if tenantuserid != 0 {
+			tenantprofileid := user.InsertTenantUserintoProfile(tenantuserid)
+			print(tenantprofileid)
+			var w subscription.Tenantlocationsetting
+			w.Tenantid = create.Tenantid
+			w.Locationid = create.Locationid
+			tenantusersettingid, userror := w.InsertStaffweekdays(tenantuserid)
+			if userror != nil {
+				fmt.Println(userror)
+			}
+			print(tenantusersettingid)
 
-		// 	}
-		// } else {
-		// 	var d subscription.TenantUser
-		// 	d.Userid = int(tenantuserid)
-		// 	d.Tenantid = create.Tenantid
-		// 	d.Moduleid = create.Moduleid
-		// 	status, err := d.TenantstaffCreation(intlist)
-		// 	if err != nil {
-		// 		return nil, err
-		// 	}
-		// 	if status == false {
-		// 		return nil, errors.New("staff not created")
-		// 	}
-		// }
-
+		}
+		return &model.Tenantuserdata{
+			Status:  true,
+			Code:    http.StatusOK,
+			Message: "Success",
+			Tenantuser: &model.User{
+				Userid: int(tenantuserid),
+			},
+		}, nil
 	}
 
 	return &model.Tenantuserdata{
@@ -230,7 +221,7 @@ func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.T
 		Code:    http.StatusOK,
 		Message: "Success",
 		Tenantuser: &model.User{
-			Userid: int(tenantuserid),
+			Userid: int(result),
 		},
 	}, nil
 }
@@ -245,7 +236,6 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 	print(id.ID)
 	var data subscription.TenantUser
 	data.Userid = update.Userid
-
 	data.Tenantid = update.Tenantid
 	data.FirstName = update.Firstname
 	data.LastName = update.Lastname
@@ -253,85 +243,97 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 	data.Profileimage = update.Profileimage
 	data.Mobile = update.Mobile
 	data.Locationid = update.Locationid
-
-	data1, err := data.UpdateTenantUser()
-	if err != nil {
-		if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'authname'", data.Email) {
-			print("true")
+	data.Configid = id.Configid
+	print("updateconfig==",data.Configid)
+	res := data.CheckUserforupdate()
+	if res.ID != 0 {
+		if res.Email == update.Email {
 			return &model.Tenantupdatedata{Status: false, Code: http.StatusConflict, Message: "Email Already Exists",
 				Updated: 0}, nil
-		} else if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'contactno'", data.Mobile) {
+		} else if res.Mobile == update.Mobile {
 			return &model.Tenantupdatedata{Status: false, Code: http.StatusConflict, Message: "Contactno Already Exists",
 				Updated: 0}, nil
-		} else {
-			return nil, err
 		}
 
+	} else {
+		data1, err := data.UpdateTenantUser()
+		if err != nil {
+			if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'authname'", data.Email) {
+				print("true")
+				return &model.Tenantupdatedata{Status: false, Code: http.StatusConflict, Message: "Email Already Exists",
+					Updated: 0}, nil
+			} else if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'contactno'", data.Mobile) {
+				return &model.Tenantupdatedata{Status: false, Code: http.StatusConflict, Message: "Contactno Already Exists",
+					Updated: 0}, nil
+			} else {
+				return nil, err
+			}
+
+		}
+
+		// if len(deletelist) != 0 {
+		// 	for i := 0; i < len(deletelist); i++ {
+		// 		var c subscription.TenantUser
+		// 		c.Staffdetailid = deletelist[i]
+		// 		status1 := c.Deletetenantstaffdetails()
+		// 		print(status1)
+		// 	}
+		// 	tenantstaffid, err1 := subscription.Checkfordeletestaffdata(update.Tenantstaffid)
+		// 	if err1 != nil {
+		// 		print(err1)
+		// 	}
+		// 	if tenantstaffid == 0 {
+		// 		print("staff header must be deleted")
+		// 		var c subscription.TenantUser
+		// 		c.Tenantstaffid = update.Tenantstaffid
+		// 		status := c.Deletetenantstaff()
+		// 		print(status)
+		// 	}
+
+		// }
+
+		// staffid, er := subscription.Checkstaffdata(update.Tenantid, update.Moduleid, update.Userid)
+		// print("initstaffid=", staffid)
+		// if er != nil {
+		// 	return nil, er
+		// }
+		// if len(createlist) != 0 {
+		// 	if staffid != 0 {
+		// 		for i := 0; i < len(createlist); i++ {
+		// 			var d subscription.TenantUser
+		// 			d.Userid = update.Userid
+		// 			d.Tenantid = update.Tenantid
+		// 			d.Moduleid = update.Moduleid
+		// 			d.Tenantstaffid = staffid
+		// 			d.Locationid = createlist[i]
+		// 			staffdetailid := d.InsertTenantstaffdetails()
+		// 			print(staffdetailid)
+		// 		}
+
+		// 	} else {
+		// 		var d subscription.TenantUser
+		// 		d.Userid = update.Userid
+		// 		d.Tenantid = update.Tenantid
+		// 		d.Moduleid = update.Moduleid
+		// 		status, err := d.TenantstaffCreation(createlist)
+		// 		if err != nil {
+		// 			return nil, err
+		// 		}
+		// 		if status == false {
+		// 			return nil, errors.New("staff not created")
+		// 		}
+		// 	}
+		// }
+
+		if data1 != false {
+			return &model.Tenantupdatedata{
+				Status:  true,
+				Code:    http.StatusOK,
+				Message: "Success",
+				Updated: 1,
+			}, nil
+		}
 	}
-
-	// if len(deletelist) != 0 {
-	// 	for i := 0; i < len(deletelist); i++ {
-	// 		var c subscription.TenantUser
-	// 		c.Staffdetailid = deletelist[i]
-	// 		status1 := c.Deletetenantstaffdetails()
-	// 		print(status1)
-	// 	}
-	// 	tenantstaffid, err1 := subscription.Checkfordeletestaffdata(update.Tenantstaffid)
-	// 	if err1 != nil {
-	// 		print(err1)
-	// 	}
-	// 	if tenantstaffid == 0 {
-	// 		print("staff header must be deleted")
-	// 		var c subscription.TenantUser
-	// 		c.Tenantstaffid = update.Tenantstaffid
-	// 		status := c.Deletetenantstaff()
-	// 		print(status)
-	// 	}
-
-	// }
-
-	// staffid, er := subscription.Checkstaffdata(update.Tenantid, update.Moduleid, update.Userid)
-	// print("initstaffid=", staffid)
-	// if er != nil {
-	// 	return nil, er
-	// }
-	// if len(createlist) != 0 {
-	// 	if staffid != 0 {
-	// 		for i := 0; i < len(createlist); i++ {
-	// 			var d subscription.TenantUser
-	// 			d.Userid = update.Userid
-	// 			d.Tenantid = update.Tenantid
-	// 			d.Moduleid = update.Moduleid
-	// 			d.Tenantstaffid = staffid
-	// 			d.Locationid = createlist[i]
-	// 			staffdetailid := d.InsertTenantstaffdetails()
-	// 			print(staffdetailid)
-	// 		}
-
-	// 	} else {
-	// 		var d subscription.TenantUser
-	// 		d.Userid = update.Userid
-	// 		d.Tenantid = update.Tenantid
-	// 		d.Moduleid = update.Moduleid
-	// 		status, err := d.TenantstaffCreation(createlist)
-	// 		if err != nil {
-	// 			return nil, err
-	// 		}
-	// 		if status == false {
-	// 			return nil, errors.New("staff not created")
-	// 		}
-	// 	}
-	// }
-
-	if data1 != false {
-		return &model.Tenantupdatedata{
-			Status:  true,
-			Code:    http.StatusOK,
-			Message: "Success",
-			Updated: 1,
-		}, nil
-	}
-
 	return &model.Tenantupdatedata{
 		Status:  false,
 		Code:    http.StatusBadRequest,
@@ -984,7 +986,7 @@ func (r *mutationResolver) Updatestaffweekdays(ctx context.Context, input *model
 	print("raju")
 	print(id.ID)
 	var w subscription.Tenantusersetting
-	
+
 	w.Sunday = input.Sunday
 	w.Monday = input.Monday
 	w.Tuesday = input.Tuesday
@@ -1017,7 +1019,6 @@ func (r *mutationResolver) Updatestaffweekdays(ctx context.Context, input *model
 	return &model.Promotioncreateddata{
 		Status: true, Code: http.StatusCreated, Message: "Tenantstaffs Weekdays Updated",
 	}, nil
-
 
 }
 
@@ -1183,12 +1184,12 @@ func (r *queryResolver) Tenantusers(ctx context.Context, tenantid int, userid in
 		Result = append(Result, &model.Userfromtenant{Tenantid: k.Referenceid, Userid: k.Userid, Firstname: k.Firstname,
 			Lastname: k.Lastname, Email: k.Email, Contact: k.Contactno, Profileimage: k.Profileimage,
 			Locationid: k.Userlocationid, Locationname: k.Locationname,
-			Tenantuserid: k.Tenantuserid,Starttime1: k.Starttime1,Endtime1: k.Endtime1,
-			Starttime2: k.Starttime2,Endtime2: k.Endtime2,Starttime3: k.Starttime3,Endtime3: k.Endtime3,
-			Starttime4: k.Starttime4,Endtime4: k.Endtime4,Starttime5: k.Starttime5,Endtime5: k.Endtime5,
-			Starttime6: k.Starttime6,Endtime6: k.Endtime6,Starttime7: k.Starttime7,Endtime7: k.Endtime7,
-			Sunday: k.Sunday,Monday: k.Monday,Tuesday: k.Tuesday,Wednesday: k.Wednesday,Thursday: k.Thursday,
-			Friday: k.Friday,Saturday: k.Saturday,
+			Tenantuserid: k.Tenantuserid, Starttime1: k.Starttime1, Endtime1: k.Endtime1,
+			Starttime2: k.Starttime2, Endtime2: k.Endtime2, Starttime3: k.Starttime3, Endtime3: k.Endtime3,
+			Starttime4: k.Starttime4, Endtime4: k.Endtime4, Starttime5: k.Starttime5, Endtime5: k.Endtime5,
+			Starttime6: k.Starttime6, Endtime6: k.Endtime6, Starttime7: k.Starttime7, Endtime7: k.Endtime7,
+			Sunday: k.Sunday, Monday: k.Monday, Tuesday: k.Tuesday, Wednesday: k.Wednesday, Thursday: k.Thursday,
+			Friday: k.Friday, Saturday: k.Saturday,
 		})
 	}
 
