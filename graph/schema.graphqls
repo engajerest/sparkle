@@ -194,6 +194,10 @@ input tenantuser{
  locationid:Int!
  roleid:Int!
  configid:Int!
+ dialcode:String!
+ countrycode:String!
+ currencycode:String!
+ currencysymbol:String!
 }
 input data{
  tenantinfo:TenantDetails

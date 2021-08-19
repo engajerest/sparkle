@@ -869,16 +869,20 @@ type Tenantupdatedata struct {
 }
 
 type Tenantuser struct {
-	Tenantid     int    `json:"Tenantid"`
-	Moduleid     int    `json:"Moduleid"`
-	Firstname    string `json:"firstname"`
-	Lastname     string `json:"lastname"`
-	Mobile       string `json:"mobile"`
-	Email        string `json:"email"`
-	Profileimage string `json:"profileimage"`
-	Locationid   int    `json:"locationid"`
-	Roleid       int    `json:"roleid"`
-	Configid     int    `json:"configid"`
+	Tenantid       int    `json:"Tenantid"`
+	Moduleid       int    `json:"Moduleid"`
+	Firstname      string `json:"firstname"`
+	Lastname       string `json:"lastname"`
+	Mobile         string `json:"mobile"`
+	Email          string `json:"email"`
+	Profileimage   string `json:"profileimage"`
+	Locationid     int    `json:"locationid"`
+	Roleid         int    `json:"roleid"`
+	Configid       int    `json:"configid"`
+	Dialcode       string `json:"dialcode"`
+	Countrycode    string `json:"countrycode"`
+	Currencycode   string `json:"currencycode"`
+	Currencysymbol string `json:"currencysymbol"`
 }
 
 type Tenantuserdata struct {

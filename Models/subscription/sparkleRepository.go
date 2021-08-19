@@ -46,7 +46,7 @@ const (
 	getLocationbyid                = "SELECT  locationid,locationname,address,IFNULL(suburb,'') AS suburb,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status,IFNULL(delivery,false) AS delivery,IFNULL(deliverytype,'') AS deliverytype,IFNULL(deliverymins,0) AS deliverymins FROM tenantlocations WHERE status='Active' AND locationid=? "
 	getAllLocations                = "SELECT  locationid,locationname,tenantid,email,contactno,address,IFNULL(suburb,'') AS suburb,city,state,postcode,latitude,longitude,countrycode,opentime,closetime,createdby,status FROM tenantlocations WHERE status='Active' AND tenantid=? "
 	createTenantUserQuery          = "INSERT INTO app_users (authname,password,hashsalt,contactno,roleid,referenceid) VALUES(?,?,?,?,?,?)"
-	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofiles (userid,firstname,lastname,email,contactno,profileimage,userlocationid) VALUES(?,?,?,?,?,?,?)"
+	insertTenantUsertoProfileQuery = "INSERT INTO app_userprofiles (userid,firstname,lastname,email,contactno,profileimage,userlocationid,dialcode,countrycode,currencycode,currencysymbol) VALUES(?,?,?,?,?,?,?,?,?,?,?)"
 	insertTenantstaff              = "INSERT INTO tenantstaffs (tenantid,moduleid,userid) VALUES(?,?,?)"
 	insertTenantstaffdetails       = "INSERT INTO tenantstaffdetails (tenantstaffid,tenantid,locationid) VALUES(?,?,?)"
 	checktenantstaffid             = "SELECT IFNULL(tenantstaffid,0) AS tenantstaffid FROM tenantstaffs WHERE tenantid=? AND moduleid=? AND  userid=?"
@@ -86,7 +86,7 @@ const (
 	getmodules                     = "SELECT moduleid,categoryid,modulename,content,IFNULL(logourl,'') AS logourl,IFNULL(iconurl,'') AS iconurl FROM app_module WHERE STATUS='Active' AND categoryid=?"
 	getpromo                       = "SELECT IFNULL(promocodeid,0) AS promocodeid,moduleid,partnerid,packageid, IFNULL(promoname,'') AS promoname, IFNULL(promodescription,'') AS promodescription, IFNULL(packageexpiry,0) AS packageexpiry, IFNULL(promotype,'') AS promotype, IFNULL(promovalue,0) AS promovalue, IFNULL(validity,'') AS validity,IF(validity>= DATE(NOW()), TRUE, FALSE) AS validitystatus FROM app_promocodes WHERE STATUS='Active' AND moduleid=?"
 	insertsubcategory              = "INSERT INTO tenantsubcategories (tenantid,moduleid,categoryid,subcategoryid,subcategoryname) VALUES(?,?,?,?,?)"
-	createUsernopassword           = "INSERT INTO app_users (authname,contactno,roleid,configid,referenceid) VALUES(?,?,?,?,?)"
+	createUsernopassword           = "INSERT INTO app_users (authname,contactno,roleid,configid,referenceid,dialcode) VALUES(?,?,?,?,?,?)"
 	unsubscribe                    = "UPDATE tenantsubscription SET categoryid=0, status='Inactive' WHERE subscriptionid=?"
 	deletecategories               = "DELETE  FROM tenantsubcategories WHERE tenantid=? AND moduleid=?"
 	deletesubcatbyid               = "DELETE  FROM tenantsubcategories WHERE tenantsubcatid=?"
@@ -758,7 +758,7 @@ func (user *TenantUser) InsertTenantUserintoProfile(id int64) int64 {
 		log.Fatal(err)
 	}
 	defer statement.Close()
-	res, err := statement.Exec(id, &user.FirstName, &user.LastName, &user.Email, &user.Mobile, &user.Profileimage, &user.Locationid)
+	res, err := statement.Exec(id, &user.FirstName, &user.LastName, &user.Email, &user.Mobile, &user.Profileimage, &user.Locationid,&user.Dialcode,&user.Countrycode,&user.Currencycode,&user.Currencysymbol)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -892,7 +892,7 @@ func (user *TenantUser) CreateTenantUser() (int64, error) {
 
 	fmt.Println("2")
 
-	res, err1 := statement.Exec(&user.Email, &user.Mobile, &user.Roleid, &user.Configid, &user.Tenantid)
+	res, err1 := statement.Exec(&user.Email, &user.Mobile, &user.Roleid, &user.Configid, &user.Tenantid,&user.Dialcode)
 	if err1 != nil {
 
 		fmt.Println(err1)

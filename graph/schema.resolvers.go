@@ -150,6 +150,7 @@ func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.T
 		return nil, errors.New("user not detected")
 	}
 	print("tenantuser")
+	println("shahul")
 	print(id.ID)
 	var user subscription.TenantUser
 	user.FirstName = create.Firstname
@@ -161,8 +162,12 @@ func (r *mutationResolver) Createtenantuser(ctx context.Context, create *model.T
 	user.Roleid = create.Roleid
 	user.Locationid = create.Locationid
 	user.Tenantid = create.Tenantid
+	user.Dialcode = create.Dialcode
+	user.Currencycode = create.Currencycode
+	user.Countrycode = create.Countrycode
+	user.Currencysymbol = create.Currencysymbol
 	print("email===", user.Email)
-var result int64
+	var result int64
 	res := user.CheckUser()
 	if res.ID != 0 {
 		if res.Email == create.Email {
@@ -175,9 +180,9 @@ var result int64
 
 	} else {
 		tenantuserid, err := user.CreateTenantUser()
-		print("chki==",tenantuserid)
-		result=tenantuserid
-	
+		print("chki==", tenantuserid)
+		result = tenantuserid
+
 		if err != nil {
 			if err.Error() == fmt.Sprintf("Error 1062: Duplicate entry '%s' for key 'authname'", user.Email) {
 				print("true")
@@ -244,7 +249,7 @@ func (r *mutationResolver) Updatetenantuser(ctx context.Context, update *model.U
 	data.Mobile = update.Mobile
 	data.Locationid = update.Locationid
 	data.Configid = id.Configid
-	print("updateconfig==",data.Configid)
+	print("updateconfig==", data.Configid)
 	res := data.CheckUserforupdate()
 	if res.ID != 0 {
 		if res.Email == update.Email {
@@ -1019,7 +1024,6 @@ func (r *mutationResolver) Updatestaffweekdays(ctx context.Context, input *model
 	return &model.Promotioncreateddata{
 		Status: true, Code: http.StatusCreated, Message: "Tenantstaffs Weekdays Updated",
 	}, nil
-
 }
 
 func (r *queryResolver) Sparkle(ctx context.Context) (*model.Sparkle, error) {

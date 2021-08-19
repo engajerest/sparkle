@@ -4737,6 +4737,10 @@ input tenantuser{
  locationid:Int!
  roleid:Int!
  configid:Int!
+ dialcode:String!
+ countrycode:String!
+ currencycode:String!
+ currencysymbol:String!
 }
 input data{
  tenantinfo:TenantDetails
@@ -27144,6 +27148,38 @@ func (ec *executionContext) unmarshalInputtenantuser(ctx context.Context, obj in
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("configid"))
 			it.Configid, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "dialcode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dialcode"))
+			it.Dialcode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "countrycode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("countrycode"))
+			it.Countrycode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "currencycode":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("currencycode"))
+			it.Currencycode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "currencysymbol":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("currencysymbol"))
+			it.Currencysymbol, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

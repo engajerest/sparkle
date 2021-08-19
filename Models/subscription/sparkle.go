@@ -160,6 +160,10 @@ type TenantUser struct {
 	FirstName     string `json:"firstname"`
 	LastName      string `json:"lastname"`
 	Password      string `json:"password"`
+	Dialcode string `json:"dialcode"`
+	Countrycode string `json:"countrycode"`
+	Currencycode string `json:"currencycode"`
+	Currencysymbol string `json:"currencysymbol"`
 	Email         string `json:"email"`
 	Mobile        string `json:"mobile"`
 	Profileimage  string `json:"profileimage"`
